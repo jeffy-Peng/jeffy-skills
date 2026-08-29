@@ -61,7 +61,7 @@ description: |
 
 ### 阶段 2：建立来源与 Claim 账本
 
-使用 [assets/claim-ledger-template.csv](assets/claim-ledger-template.csv) 或同等结构。为来源分配稳定 ID（`S01`、`S02`），为承重判断分配 Claim ID（`C01`、`C02`）。
+直接在 `report.md` 附录 A2 维护 Claim 账本。为来源分配稳定 ID（`S01`、`S02`），为承重判断分配 Claim ID（`C01`、`C02`）。
 
 把“来源出处”和“证据作用”分开记录，不使用旧版混合分级。每条承重判断必须写明支持来源、反向材料、独立性、置信度、资料缺口、反证条件、时效期和复查状态。置信度按 [references/evidence-protocol.md](references/evidence-protocol.md) 的「置信度标定」取锚点值，不凭感觉；时效期按 Claim 类型设置。
 
