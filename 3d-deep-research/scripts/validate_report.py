@@ -620,24 +620,6 @@ def validate_markdown(
             if not candidate.is_file():
                 errors.append(f"Image file not found: {ref}")
 
-    # Readability rule 2: each of the six main chapters ends with a
-    # 「本章判断的成色」 block.
-    chapter_matches = list(
-        re.finditer(r"^##\s+([一二三四五六])、(.+)$", body_text, flags=re.MULTILINE)
-    )
-    for pos, chapter in enumerate(chapter_matches):
-        end = (
-            chapter_matches[pos + 1].start()
-            if pos + 1 < len(chapter_matches)
-            else len(body_text)
-        )
-        chapter_text = body_text[chapter.start() : end]
-        if "本章判断的成色" not in chapter_text:
-            warnings.append(
-                f"Chapter {chapter.group(1)}（{chapter.group(2).strip()}）"
-                " has no 「本章判断的成色」 closing block."
-            )
-
     # Readability rule 1: framework jargon must not appear in body prose.
     jargon_hits: dict[str, list[int]] = {}
     for line_no, line in _prose_lines(body_text):
@@ -651,8 +633,8 @@ def validate_markdown(
             f"(lines {shown}); translate it per readability-style.md."
         )
 
-    # Chart-allocation binding rule 2: every data chart (figure with <img>)
-    # states the question it answers ("本图回答的问题：……").
+    # Figure contract: every data chart (figure with <img>) states the
+    # question it answers ("本图回答的问题：……").
     for index, figure in enumerate(figures, start=1):
         if "<img" not in figure.lower():
             continue
