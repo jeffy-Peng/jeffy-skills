@@ -18,7 +18,7 @@ description: |
 2. 始终读取 [references/xyz-method.md](references/xyz-method.md)，执行 X/Y/Z 与交汇分析。
 3. 根据对象类型读取 [references/object-adapters.md](references/object-adapters.md) 的对应部分。
 4. 需要图表或 PDF 时读取 [references/visual-guidelines.md](references/visual-guidelines.md)。
-5. 写作前读取 [references/readability-style.md](references/readability-style.md)：正文去术语、限定语集中化、问句标题；严谨性全部保留在附录，不删一个字。
+5. 写作前读取 [references/readability-style.md](references/readability-style.md)：正文去术语、避免限定语过载、使用问题式标题；严谨性全部保留在附录。
 6. 写作时复制 [assets/report-template.md](assets/report-template.md)，不要重新发明报告结构；章节标题措辞按补丁规则人话化，章节顺序与数量不变。
 
 ## 执行流程
@@ -126,9 +126,11 @@ description: |
 先运行：
 
 ```bash
-python [skill目录]/scripts/validate_report.py report.md --strict
+python [skill目录]/scripts/validate_project.py [研究项目目录] --strict
 python [skill目录]/scripts/render_report.py report.md output.pdf --title "研究对象立体分析报告" --engine auto
 ```
+
+完整研究默认使用 `validate_project.py`，联合校验 `research-contract.md`、`retrieval-map.md` 和 `report.md`；仅收到一份独立报告时使用 `validate_report.py report.md --strict`。两者都只验证机器可检查的结构与证据一致性，不证明外部事实真实性。
 
 `render_report.py` 已内置 linkify 步骤：渲染时自动把 `[Sxx]` 引用转为指向来源账本的可点击锚点（HTML 与 PDF 均生效），可用 `--no-linkify` 关闭；`linkify_sources.py` 仍可对已有 HTML 单独使用。
 
