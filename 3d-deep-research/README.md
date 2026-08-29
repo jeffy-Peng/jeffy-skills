@@ -86,6 +86,8 @@ npx skills add Arslan-jh/jeffy-skills --skill 3d-deep-research
 6. HTML/PDF 能成功生成，且 PDF 文本可提取。
 7. 视觉产物没有缺字、裁切、重叠或难以阅读的过密区域。
 
+`--strict` 会校验 A1/A2/A5/A6 的必填内容、ID 引用闭环和 load-bearing Claim 的审计覆盖；它不能证明外部来源为真，也不能替代阶段 7 的逐句归属审计。
+
 ```bash
 python scripts/validate_report.py report.md --strict
 python scripts/render_report.py report.md output.pdf --engine auto
