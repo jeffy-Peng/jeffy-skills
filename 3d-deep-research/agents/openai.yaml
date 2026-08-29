@@ -1,4 +1,4 @@
 interface:
-  display_name: "3D Deep Research｜证据链立体深研"
-  short_description: "用证据账本、三轴机制分析和严格校验交付可追溯的深度研究报告"
-  default_prompt: "Use $3d-deep-research to build a traceable evidence chain, analyze the subject across timeline, force field, and mechanisms, and deliver a validated Markdown, HTML, and PDF report with question-driven charts and clickable source links."
+  display_name: "3D Deep Research"
+  short_description: "用证据链和 X/Y/Z 分析复杂问题，输出可追溯的深度研究报告"
+  default_prompt: "使用 $3d-deep-research 研究[对象]，回答[核心问题]，并输出可追溯的 Markdown 报告。"
