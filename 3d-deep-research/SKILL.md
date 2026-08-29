@@ -21,8 +21,6 @@ description: |
 5. 写作前读取 [references/readability-style.md](references/readability-style.md)：正文去术语、限定语集中化、问句标题；严谨性全部保留在附录，不删一个字。
 6. 写作时复制 [assets/report-template.md](assets/report-template.md)，不要重新发明报告结构；章节标题措辞按补丁规则人话化，章节顺序与数量不变。
 
-`schema.json` 是可选的结构化研究状态规范。只有需要机器可读中间状态、自动化验证或跨 Agent 合并时才读取。
-
 ## 执行流程
 
 ### 阶段 0：确认研究设定
