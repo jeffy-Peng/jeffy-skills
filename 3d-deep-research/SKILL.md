@@ -17,7 +17,7 @@ description: |
 1. 始终读取 [references/evidence-protocol.md](references/evidence-protocol.md)，建立来源账本和 Claim 账本。
 2. 始终读取 [references/xyz-method.md](references/xyz-method.md)，执行 X/Y/Z 与交汇分析。
 3. 根据对象类型读取 [references/object-adapters.md](references/object-adapters.md) 的对应部分。
-4. 需要图表或 PDF 时读取 [references/visual-guidelines.md](references/visual-guidelines.md)，并叠加 [references/chart-allocation.md](references/chart-allocation.md) 的问题驱动图表配置规则（冲突时以补丁为准）。
+4. 需要图表或 PDF 时读取 [references/visual-guidelines.md](references/visual-guidelines.md)。
 5. 写作前读取 [references/readability-style.md](references/readability-style.md)：正文去术语、限定语集中化、问句标题；严谨性全部保留在附录，不删一个字。
 6. 写作时复制 [assets/report-template.md](assets/report-template.md)，不要重新发明报告结构；章节标题措辞按补丁规则人话化，章节顺序与数量不变。
 
@@ -134,7 +134,7 @@ python [skill目录]/scripts/render_report.py report.md output.pdf --title "研�
 
 依赖说明：Markdown 转 HTML 需要 `python -m pip install markdown`（缺失时回退到 Codex 内置 Node.js + marked）；校验 PDF 文本需要 `pypdf` 或 `PyPDF2`；PDF 引擎按 `--engine auto` 自动选择 Chromium 或 WeasyPrint。
 
-渲染后执行两份补丁的交付前自检清单（chart-allocation 第五步、readability-style 规则五），全部打勾后方可交付。
+渲染后按 visual-guidelines 的图表契约与 readability-style 规则五完成交付前自检，全部打勾后方可交付。
 
 `--engine auto` 在 Windows 优先使用 Chromium，其他平台优先使用可用引擎；输出目录不存在时自动创建。默认保留同名 HTML。
 
