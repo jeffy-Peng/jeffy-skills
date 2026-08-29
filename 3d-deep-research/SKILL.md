@@ -128,9 +128,11 @@ description: |
 先运行：
 
 ```bash
-python [skill目录]/scripts/validate_report.py report.md --strict
+python [skill目录]/scripts/validate_project.py [研究项目目录] --strict
 python [skill目录]/scripts/render_report.py report.md output.pdf --title "研究对象立体分析报告" --engine auto
 ```
+
+完整研究默认使用 `validate_project.py`，联合校验 `research-contract.md`、`retrieval-map.md` 和 `report.md`；仅收到一份独立报告时使用 `validate_report.py report.md --strict`。两者都只验证机器可检查的结构与证据一致性，不证明外部事实真实性。
 
 `render_report.py` 已内置 linkify 步骤：渲染时自动把 `[Sxx]` 引用转为指向来源账本的可点击锚点（HTML 与 PDF 均生效），可用 `--no-linkify` 关闭；`linkify_sources.py` 仍可对已有 HTML 单独使用。
 

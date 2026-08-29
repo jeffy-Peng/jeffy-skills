@@ -89,9 +89,11 @@ npx skills add Arslan-jh/jeffy-skills --skill 3d-deep-research
 `--strict` 会校验 A1/A2/A5/A6 的必填内容、ID 引用闭环和 load-bearing Claim 的审计覆盖；它不能证明外部来源为真，也不能替代阶段 7 的逐句归属审计。
 
 ```bash
-python scripts/validate_report.py report.md --strict
+python scripts/validate_project.py path/to/research-project --strict
 python scripts/render_report.py report.md output.pdf --engine auto
 ```
+
+完整研究使用 `validate_project.py` 联合检查研究契约、检索地图和最终报告；只有单份报告时，仍可运行 `python scripts/validate_report.py report.md --strict`。
 
 ## 仓库结构
 
