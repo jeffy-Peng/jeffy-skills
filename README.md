@@ -1,6 +1,6 @@
 # jeffy-skills
 
-我的个人 Skills 仓库。
+我的个人 Skill 仓库。
 
 ## Skills
 
