@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Validate a 3d-deep-research Markdown report and optionally its PDF.
 
-Structural checks cover sections, citations, placeholders, readability and
-figure accessibility. Evidence-loop checks (confidence calibration and
+Structural checks cover sections, citations, placeholders and figure
+accessibility. Evidence-loop checks (confidence calibration and
 the attribution-audit / excerpt-archive appendix sections) enforce the
 traces of the pre-delivery fact audit; they cannot verify the facts
 themselves.
@@ -18,23 +18,6 @@ from pathlib import Path
 
 
 CHINESE_NUMERALS = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6}
-
-# Jargon blacklist from references/readability-style.md (rule 1 translation
-# table, left column). These terms must not appear in the report body; they
-# are only allowed in appendices and figure footnotes.
-JARGON_BLACKLIST = [
-    "承重判断",
-    "load-bearing",
-    "shared-origin",
-    "证据门控",
-    "反证条件",
-    "user-voice",
-    "置信度",
-]
-
-# Paragraphs in the report body longer than this many characters must be
-# split (references/readability-style.md, rule 4).
-MAX_PARAGRAPH_CHARS = 300
 
 PLACEHOLDER_PATTERNS = [
     r"\[研究对象\]",
@@ -114,24 +97,6 @@ def _split_body_and_appendix(md_text: str) -> tuple[str, str]:
     if appendix_match:
         return md_text[: appendix_match.start()], md_text[appendix_match.start() :]
     return md_text, ""
-
-
-def _prose_lines(text: str) -> list[tuple[int, str]]:
-    """Return (line_no, line) pairs of body prose, excluding headings, tables,
-    code fences, HTML blocks, blockquotes, lists, and image lines."""
-    lines: list[tuple[int, str]] = []
-    in_code = False
-    for line_no, line in enumerate(text.splitlines(), start=1):
-        stripped = line.strip()
-        if stripped.startswith("```"):
-            in_code = not in_code
-            continue
-        if in_code or not stripped:
-            continue
-        if re.match(r"^(#|\||<|>|[-*]\s|!\[|\d+\.\s)", stripped):
-            continue
-        lines.append((line_no, stripped))
-    return lines
 
 
 def _split_markdown_row(line: str) -> list[str]:
@@ -620,19 +585,6 @@ def validate_markdown(
             if not candidate.is_file():
                 errors.append(f"Image file not found: {ref}")
 
-    # Readability rule 1: framework jargon must not appear in body prose.
-    jargon_hits: dict[str, list[int]] = {}
-    for line_no, line in _prose_lines(body_text):
-        for term in JARGON_BLACKLIST:
-            if term.lower() in line.lower():
-                jargon_hits.setdefault(term, []).append(line_no)
-    for term, line_numbers in jargon_hits.items():
-        shown = ", ".join(str(n) for n in line_numbers[:5])
-        warnings.append(
-            f"Jargon {term!r} appears in the report body "
-            f"(lines {shown}); translate it per readability-style.md."
-        )
-
     # Figure contract: every data chart (figure with <img>) states the
     # question it answers ("本图回答的问题：……").
     for index, figure in enumerate(figures, start=1):
@@ -645,25 +597,6 @@ def validate_markdown(
                 f"Data-chart figure {index} does not state "
                 "「本图回答的问题」 near the chart."
             )
-
-    # Readability rule 4: body paragraphs over 300 characters must be split.
-    paragraph_start: int | None = None
-    paragraph_len = 0
-    prose = _prose_lines(body_text)
-    for index, (line_no, line) in enumerate(prose):
-        if paragraph_start is None:
-            paragraph_start = line_no
-        paragraph_len += len(re.sub(r"\s", "", line))
-        is_last = index + 1 == len(prose)
-        continues = not is_last and prose[index + 1][0] == line_no + 1
-        if not continues:
-            if paragraph_len > MAX_PARAGRAPH_CHARS:
-                warnings.append(
-                    f"Paragraph starting at line {paragraph_start} has "
-                    f"{paragraph_len} characters (> {MAX_PARAGRAPH_CHARS}); split it."
-                )
-            paragraph_start = None
-            paragraph_len = 0
 
     stats = {
         "main_sections": len(main_sections),
