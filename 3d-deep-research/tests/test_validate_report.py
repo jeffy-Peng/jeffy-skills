@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 import unittest
 from pathlib import Path
 
@@ -73,6 +74,47 @@ class ValidateReportTests(unittest.TestCase):
 
         self.assertEqual(errors, [])
 
+    def test_required_structure_rejects_missing_parts(self) -> None:
+        cases = {
+            "H1": (
+                VALID_REPORT.replace("# 月球研究报告", "月球研究报告", 1),
+                "exactly one H1",
+            ),
+            "section four": (
+                VALID_REPORT.replace("## 四、它为什么这样运转", "### 它为什么这样运转", 1),
+                "Main sections",
+            ),
+            "A1 shape": (
+                VALID_REPORT.replace(
+                    "| Source ID | 来源与日期 | 证据作用 | 限制 |",
+                    "| Source ID | 来源与日期 | 证据作用 |",
+                    1,
+                ),
+                "A1 must",
+            ),
+            "A2 shape": (
+                VALID_REPORT.replace(
+                    "| Claim ID | 关键判断 | 类型与重要性 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
+                    "| Claim ID | 关键判断 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
+                    1,
+                ),
+                "A2 must",
+            ),
+            "A3": (
+                VALID_REPORT.replace(
+                    "### A3 资料边界\n\n现有证据不能确定水冰的完整储量和开采难度。\n",
+                    "",
+                    1,
+                ),
+                "A3 must",
+            ),
+        }
+
+        for name, (report, expected) in cases.items():
+            with self.subTest(name=name):
+                errors, _ = validate_report.validate_markdown(report)
+                self.assertTrue(any(expected in error for error in errors), errors)
+
     def test_unresolved_template_placeholder_fails(self) -> None:
         report = VALID_REPORT.replace("# 月球研究报告", "# [研究对象]深度研究报告")
 
@@ -129,6 +171,32 @@ class ValidateReportTests(unittest.TestCase):
 
         self.assertTrue(any("outside a <figure>" in error for error in errors), errors)
         self.assertTrue(any("Image file not found" in error for error in errors), errors)
+
+    def test_figure_contract(self) -> None:
+        figure = """<figure>
+<svg viewBox="0 0 10 10" role="img" aria-label="月球水冰示意">
+  <circle cx="5" cy="5" r="4"></circle>
+</svg>
+<figcaption>图 1：月球极区水冰证据 [S01]</figcaption>
+</figure>"""
+
+        def add_figure(value: str) -> str:
+            return VALID_REPORT.replace("## 二、为什么会走到今天", value + "\n\n## 二、为什么会走到今天", 1)
+
+        errors, _ = validate_report.validate_markdown(add_figure(figure))
+        self.assertEqual(errors, [])
+
+        cases = {
+            "figcaption": (re.sub(r"<figcaption>.*?</figcaption>", "", figure), "figcaption"),
+            "Source ID": (figure.replace(" [S01]", "", 1), "no Source ID"),
+            "viewBox": (figure.replace(' viewBox="0 0 10 10"', "", 1), "viewbox"),
+            "role": (figure.replace(' role="img"', "", 1), "role="),
+            "aria-label": (figure.replace(' aria-label="月球水冰示意"', "", 1), "aria-label="),
+        }
+        for name, (broken_figure, expected) in cases.items():
+            with self.subTest(name=name):
+                errors, _ = validate_report.validate_markdown(add_figure(broken_figure))
+                self.assertTrue(any(expected in error for error in errors), errors)
 
 
 if __name__ == "__main__":
