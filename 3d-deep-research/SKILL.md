@@ -97,10 +97,10 @@ python [skill目录]/scripts/validate_report.py report.md --strict
 用户需要 PDF 时再运行：
 
 ```bash
-python [skill目录]/scripts/render_report.py report.md output.pdf --title "研究对象立体分析报告" --engine auto
+python [skill目录]/scripts/render_report.py report.md output.pdf
 ```
 
-渲染器会把 `[Sxx]` 引用转为可点击锚点。交付前按 visual guidelines 检查输出，并通读正文。
+标题取报告第一行 H1。渲染器会把 `[Sxx]` 引用转为可点击锚点。交付前按 visual guidelines 检查输出，并通读正文。
 
 ## 质量红线
 
