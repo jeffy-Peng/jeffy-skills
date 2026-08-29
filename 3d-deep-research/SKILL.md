@@ -43,7 +43,7 @@ description: |
 
 涉及“最新、现在、最近”时联网核实，并记录发布日期和访问日期。输出到用户指定位置；未指定时使用当前项目的 `output/`。
 
-### 1. 建立检索地图
+### 1. 规划检索
 
 先列出：
 
@@ -51,7 +51,7 @@ description: |
 2. 需要验证的因果或机制；
 3. 需要主动寻找的反向证据、替代解释和失败案例。
 
-复制 [assets/retrieval-map-template.md](assets/retrieval-map-template.md) 为 `retrieval-map.md`，随检索更新来源、状态和关联 Claim。每个承重问题都应有对应来源，或明确标为“未解决”。来源选择遵循 evidence protocol，优先使用适合该对象的原始材料、官方记录和独立来源。
+检索过程中根据证据调整问题。每个影响结论的问题最终都要有来源支持，或在 A2/A3 明确标为未解决。复杂任务可以维护检索笔记，但不强制生成独立表格。来源选择遵循 evidence protocol，优先使用适合该对象的原始材料、官方记录和独立来源。
 
 ### 2. 维护证据账本
 
@@ -92,7 +92,7 @@ description: |
 python [skill目录]/scripts/validate_report.py report.md --strict
 ```
 
-`validate_report.py` 只检查机器可验证的结构和证据一致性，不证明外部事实真实。研究契约和检索地图仍需人工确认与最终报告一致。
+`validate_report.py` 只检查机器可验证的结构和证据一致性，不证明外部事实真实。
 
 用户需要 PDF 时再运行：
 
