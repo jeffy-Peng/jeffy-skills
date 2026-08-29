@@ -138,12 +138,6 @@ python [skill目录]/scripts/render_report.py report.md output.pdf --title "研�
 
 渲染后执行两份补丁的交付前自检清单（chart-allocation 第五步、readability-style 规则五），全部打勾后方可交付。
 
-旧命令保持兼容：
-
-```bash
-python [skill目录]/scripts/md_to_pdf.py report.md output.pdf --title "研究对象立体分析报告"
-```
-
 `--engine auto` 在 Windows 优先使用 Chromium，其他平台优先使用可用引擎；输出目录不存在时自动创建。默认保留同名 HTML。
 
 PDF 生成后必须：
