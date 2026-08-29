@@ -2,7 +2,7 @@
 """Validate a 3d-deep-research Markdown report and optionally its PDF.
 
 Structural checks cover sections, citations, placeholders, readability and
-chart-allocation patches. Evidence-loop checks (confidence calibration and
+figure accessibility. Evidence-loop checks (confidence calibration and
 the attribution-audit / excerpt-archive appendix sections) enforce the
 traces of the pre-delivery fact audit; they cannot verify the facts
 themselves.
@@ -581,8 +581,7 @@ def validate_markdown(
                 if required.lower() not in attributes.lower():
                     errors.append(f"Figure {index} SVG is missing {required}.")
 
-    # --- Patch-aware rules (references/chart-allocation.md and
-    # --- references/readability-style.md) ---
+    # --- Reference-backed rules (visual and readability guidelines) ---
 
     body_text, appendix_text = _split_body_and_appendix(md_text)
 
