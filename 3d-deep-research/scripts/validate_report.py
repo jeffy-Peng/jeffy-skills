@@ -47,6 +47,45 @@ PLACEHOLDER_PATTERNS = [
     r"\bTBD\b",
 ]
 
+SOURCE_PROVENANCE = {
+    "primary",
+    "independent-secondary",
+    "community",
+    "lead-only",
+}
+EVIDENCE_ROLES = {"fact", "behavior", "context", "user-voice", "counterevidence"}
+SOURCE_INDEPENDENCE = {"independent", "shared-origin", "unknown"}
+CLAIM_TYPES = {"fact", "causal", "mechanism", "market", "forecast"}
+CLAIM_IMPORTANCE = {"load-bearing", "supporting"}
+CONFIDENCE_LEVELS = {"high", "medium", "low", "高", "中", "低"}
+CLAIM_INDEPENDENCE = SOURCE_INDEPENDENCE | {"mixed"}
+REVISIT_STATUSES = {
+    "未到期",
+    "已到期待复核",
+    "已复核仍成立",
+    "已推翻",
+    "部分修正",
+    "not-due",
+    "due",
+    "revisited-holds",
+    "overturned",
+    "partially-revised",
+}
+EMPTY_AUDIT_VALUES = {
+    "",
+    "-",
+    "—",
+    "无",
+    "没有",
+    "空",
+    "略",
+    "同上",
+    "n/a",
+    "na",
+    "none",
+    "null",
+}
+
 
 def _configure_utf8_console() -> None:
     for stream in (sys.stdout, sys.stderr):
@@ -95,9 +134,311 @@ def _prose_lines(text: str) -> list[tuple[int, str]]:
     return lines
 
 
+def _split_markdown_row(line: str) -> list[str]:
+    """Split a pipe-table row while preserving escaped pipes."""
+    value = line.strip()
+    if not value.startswith("|"):
+        return []
+    if value.endswith("|"):
+        value = value[1:-1]
+    else:
+        value = value[1:]
+    return [cell.replace(r"\|", "|").strip() for cell in re.split(r"(?<!\\)\|", value)]
+
+
+def _is_separator_row(cells: list[str]) -> bool:
+    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell) for cell in cells)
+
+
+def _extract_appendix_table(
+    md_text: str,
+    section_id: str,
+) -> tuple[list[str], list[list[str]]]:
+    section = re.search(
+        rf"^###\s+{re.escape(section_id)}\b[^\n]*\n(.*?)(?=^###\s+|^##\s+|\Z)",
+        md_text,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    if not section:
+        return [], []
+
+    table_lines = [
+        line for line in section.group(1).splitlines() if line.strip().startswith("|")
+    ]
+    if len(table_lines) < 2:
+        return [], []
+
+    header = _split_markdown_row(table_lines[0])
+    separator = _split_markdown_row(table_lines[1])
+    if len(header) != len(separator) or not _is_separator_row(separator):
+        return [], []
+
+    rows: list[list[str]] = []
+    for line in table_lines[2:]:
+        cells = _split_markdown_row(line)
+        if len(cells) == len(header):
+            rows.append(cells)
+    return header, rows
+
+
+def _plain_cell(value: str) -> str:
+    value = re.sub(r"<[^>]+>", " ", value)
+    value = re.sub(r"!?(?:\[([^]]*)\])\([^)]+\)", r"\1", value)
+    value = re.sub(r"[`*_~]", "", value)
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def _is_empty_audit_value(value: str) -> bool:
+    plain = _plain_cell(value).strip("[]（）()。.;；:： ").lower()
+    if plain in EMPTY_AUDIT_VALUES:
+        return True
+    return bool(re.fullmatch(r"(?:待补|todo|tbd|placeholder)(?:充|写|核验)?", plain))
+
+
+def _contains_enum(value: str, allowed: set[str]) -> bool:
+    lowered = value.lower()
+    return any(
+        re.search(rf"(?<![\w-]){re.escape(item.lower())}(?![\w-])", lowered)
+        for item in allowed
+    )
+
+
+def _marked_detail(value: str, labels: tuple[str, ...]) -> str | None:
+    label_pattern = "|".join(re.escape(label) for label in labels)
+    match = re.search(
+        rf"(?:{label_pattern})\s*[:：]?\s*(.*?)(?=(?:；|;)\s*[^；;]+[:：]|$)",
+        value,
+        flags=re.IGNORECASE,
+    )
+    return match.group(1).strip() if match else None
+
+
+def _validate_evidence_consistency(
+    md_text: str,
+    body_text: str,
+) -> list[str]:
+    """Validate machine-checkable evidence-loop invariants.
+
+    These checks reject empty or internally inconsistent ledgers. They do not
+    establish that an external source is true or that a quotation entails a
+    report claim.
+    """
+    issues: list[str] = []
+
+    tables = {
+        section_id: _extract_appendix_table(md_text, section_id)
+        for section_id in ("A1", "A2", "A5", "A6")
+    }
+    for section_id, label in (
+        ("A1", "source ledger"),
+        ("A2", "Claim evidence matrix"),
+        ("A5", "quotation archive"),
+        ("A6", "attribution and number audit"),
+    ):
+        header, rows = tables[section_id]
+        if not header:
+            issues.append(f"{section_id} {label} table was not found or is malformed.")
+        elif not rows:
+            issues.append(f"{section_id} {label} has no data rows.")
+
+    _, source_rows = tables["A1"]
+    source_ids: set[str] = set()
+    for row_no, row in enumerate(source_rows, start=1):
+        source_id = row[0].strip()
+        if not re.fullmatch(r"S\d{2,}", source_id):
+            issues.append(f"A1 row {row_no} has an invalid Source ID: {source_id or '<empty>'}.")
+            continue
+        if source_id in source_ids:
+            issues.append(f"A1 has duplicate Source ID {source_id}.")
+        source_ids.add(source_id)
+
+        if len(row) < 4:
+            issues.append(f"Source {source_id} does not contain the four required ledger fields.")
+            continue
+        source_and_date, provenance_role_independence, file_and_limits = row[1:4]
+        if _is_empty_audit_value(source_and_date):
+            issues.append(f"Source {source_id} has no title, publisher, or date details.")
+        location_pattern = (
+            r"https?://|(?:^|[\s(])[^\s)]+\."
+            r"(?:pdf|html?|md|txt|csv|xlsx?|docx?)\b"
+        )
+        if not re.search(
+            location_pattern,
+            source_and_date + " " + file_and_limits,
+            flags=re.IGNORECASE,
+        ):
+            issues.append(f"Source {source_id} has no verifiable URL or file location.")
+        if not re.search(r"\b\d{4}-\d{2}-\d{2}\b", source_and_date):
+            issues.append(f"Source {source_id} has no ISO publication/access date.")
+        if not _contains_enum(provenance_role_independence, SOURCE_PROVENANCE):
+            issues.append(f"Source {source_id} has no valid provenance type.")
+        if not _contains_enum(provenance_role_independence, EVIDENCE_ROLES):
+            issues.append(f"Source {source_id} has no valid evidence role.")
+        if not _contains_enum(provenance_role_independence, SOURCE_INDEPENDENCE):
+            issues.append(f"Source {source_id} has no valid independence value.")
+        if _is_empty_audit_value(file_and_limits):
+            issues.append(f"Source {source_id} has no file/access limitations.")
+
+    _, claim_rows = tables["A2"]
+    claim_ids: set[str] = set()
+    load_bearing_ids: set[str] = set()
+    claim_support_ids: dict[str, set[str]] = {}
+    claim_source_ids: set[str] = set()
+    for row_no, row in enumerate(claim_rows, start=1):
+        claim_id = row[0].strip()
+        if not re.fullmatch(r"C\d{2,}", claim_id):
+            issues.append(f"A2 row {row_no} has an invalid Claim ID: {claim_id or '<empty>'}.")
+            continue
+        if claim_id in claim_ids:
+            issues.append(f"A2 has duplicate Claim ID {claim_id}.")
+        claim_ids.add(claim_id)
+
+        if len(row) < 8:
+            issues.append(f"Claim {claim_id} does not contain all eight matrix fields.")
+            continue
+        statement = row[1]
+        type_importance = row[2]
+        support_counter = row[3]
+        confidence_independence = row[4]
+        gap_disconfirmation = row[5]
+        stale_after = row[6]
+        revisit_status = row[7]
+
+        if _is_empty_audit_value(statement):
+            issues.append(f"Claim {claim_id} has no falsifiable statement.")
+        if not _contains_enum(type_importance, CLAIM_TYPES):
+            issues.append(f"Claim {claim_id} has no valid Claim type.")
+        is_load_bearing = _contains_enum(type_importance, {"load-bearing"})
+        if not _contains_enum(type_importance, CLAIM_IMPORTANCE):
+            issues.append(f"Claim {claim_id} has no valid importance value.")
+        if is_load_bearing:
+            load_bearing_ids.add(claim_id)
+
+        counter_detail = _marked_detail(
+            support_counter,
+            (
+                "反向",
+                "反向材料",
+                "反向证据",
+                "反向检索",
+                "counter",
+                "counterevidence",
+            ),
+        )
+        support_part = support_counter
+        counter_marker = re.search(
+            r"反向(?:材料|证据|检索)?|counter(?:evidence)?",
+            support_counter,
+            flags=re.IGNORECASE,
+        )
+        if counter_marker:
+            support_part = support_counter[: counter_marker.start()]
+        supporting_ids = set(re.findall(r"S\d{2,}", support_part))
+        all_claim_sources = set(re.findall(r"S\d{2,}", support_counter))
+        claim_support_ids[claim_id] = supporting_ids
+        claim_source_ids.update(all_claim_sources)
+        if is_load_bearing and not supporting_ids:
+            issues.append(f"Load-bearing Claim {claim_id} has no supporting Source ID.")
+        if is_load_bearing and (
+            counter_detail is None or _is_empty_audit_value(counter_detail)
+        ):
+            issues.append(
+                f"Load-bearing Claim {claim_id} has no counterevidence Source ID "
+                "or concrete reverse-search note."
+            )
+
+        if not _contains_enum(confidence_independence, CONFIDENCE_LEVELS):
+            issues.append(f"Claim {claim_id} has no calibrated confidence value.")
+        if not _contains_enum(confidence_independence, CLAIM_INDEPENDENCE):
+            issues.append(f"Claim {claim_id} has no valid independence value.")
+        if is_load_bearing and _contains_enum(confidence_independence, {"low", "低"}):
+            issues.append(
+                f"Load-bearing Claim {claim_id} cannot retain low confidence "
+                "as a firm conclusion."
+            )
+
+        gap_detail = _marked_detail(gap_disconfirmation, ("缺口", "evidence gap"))
+        disconfirmation_detail = _marked_detail(
+            gap_disconfirmation,
+            ("反证条件", "disconfirmation condition"),
+        )
+        if gap_detail is None or _is_empty_audit_value(gap_detail):
+            issues.append(f"Claim {claim_id} has no concrete evidence gap.")
+        if disconfirmation_detail is None or _is_empty_audit_value(disconfirmation_detail):
+            issues.append(f"Claim {claim_id} has no concrete disconfirmation condition.")
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", stale_after.strip()):
+            issues.append(f"Claim {claim_id} has no valid stale_after date.")
+        if _plain_cell(revisit_status).lower() not in {item.lower() for item in REVISIT_STATUSES}:
+            issues.append(f"Claim {claim_id} has no valid revisit status.")
+
+    dangling_claim_sources = claim_source_ids - source_ids
+    if dangling_claim_sources:
+        issues.append(
+            "Claim matrix references undefined Source IDs: "
+            + ", ".join(sorted(dangling_claim_sources))
+            + "."
+        )
+
+    body_source_ids = set(re.findall(r"\[(S\d{2,})\]", body_text))
+    if not body_source_ids:
+        issues.append("The report body has no [Sxx] source citations.")
+    dangling_body_sources = body_source_ids - source_ids
+    if dangling_body_sources:
+        issues.append(
+            "Report body references undefined Source IDs: "
+            + ", ".join(sorted(dangling_body_sources))
+            + "."
+        )
+
+    for section_id, minimum_cells in (("A5", 4), ("A6", 5)):
+        _, audit_rows = tables[section_id]
+        audit_ids: set[str] = set()
+        for row_no, row in enumerate(audit_rows, start=1):
+            claim_id = row[0].strip()
+            if not re.fullmatch(r"C\d{2,}", claim_id):
+                issues.append(
+                    f"{section_id} row {row_no} has an invalid Claim ID: "
+                    f"{claim_id or '<empty>'}."
+                )
+                continue
+            if claim_id in audit_ids:
+                issues.append(f"{section_id} has duplicate Claim ID {claim_id}.")
+            audit_ids.add(claim_id)
+            if claim_id not in claim_ids:
+                issues.append(f"{section_id} references undefined Claim ID {claim_id}.")
+            if len(row) < minimum_cells or any(
+                _is_empty_audit_value(cell) for cell in row[1:minimum_cells]
+            ):
+                issues.append(f"{section_id} audit row for {claim_id} is incomplete or empty.")
+                continue
+            if section_id == "A5":
+                excerpt_sources = set(re.findall(r"S\d{2,}", row[1]))
+                if not excerpt_sources:
+                    issues.append(f"A5 excerpt for {claim_id} has no Source ID.")
+                elif not excerpt_sources.issubset(source_ids):
+                    issues.append(f"A5 excerpt for {claim_id} references an undefined Source ID.")
+                elif claim_id in claim_support_ids and not (
+                    excerpt_sources & claim_support_ids[claim_id]
+                ):
+                    issues.append(
+                        f"A5 excerpt for {claim_id} does not cite one of its supporting sources."
+                    )
+
+        missing_audit = load_bearing_ids - audit_ids
+        if missing_audit:
+            issues.append(
+                f"{section_id} is missing load-bearing Claims: "
+                + ", ".join(sorted(missing_audit))
+                + "."
+            )
+
+    return issues
+
+
 def validate_markdown(
     md_text: str,
     base_dir: Path | None = None,
+    strict: bool = False,
 ) -> tuple[list[str], list[str], dict[str, int]]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -154,9 +495,12 @@ def validate_markdown(
     if re.search(r"```\s*mermaid\b", md_text, flags=re.IGNORECASE):
         errors.append("Unrendered Mermaid source found; render it to SVG first.")
 
-    source_definitions = set(
-        re.findall(r"^\|\s*(S\d{2,})\s*\|", md_text, flags=re.MULTILINE)
-    )
+    _, a1_rows = _extract_appendix_table(md_text, "A1")
+    source_definitions = {
+        row[0].strip()
+        for row in a1_rows
+        if row and re.fullmatch(r"S\d{2,}", row[0].strip())
+    }
     source_references = set(re.findall(r"\[(S\d{2,})\]", md_text))
     if not source_references:
         errors.append("No [Sxx] source references found in the report.")
@@ -166,7 +510,14 @@ def validate_markdown(
             "Source references missing from the source ledger: "
             + ", ".join(sorted(unresolved_sources))
         )
-    unused_sources = source_definitions - source_references
+    _, a2_rows_for_usage = _extract_appendix_table(md_text, "A2")
+    _, a5_rows_for_usage = _extract_appendix_table(md_text, "A5")
+    ledger_source_uses = {
+        source_id
+        for row in a2_rows_for_usage + a5_rows_for_usage
+        for source_id in re.findall(r"S\d{2,}", " | ".join(row[1:]))
+    }
+    unused_sources = source_definitions - source_references - ledger_source_uses
     if unused_sources:
         warnings.append(
             "Source ledger entries are not cited in the report: "
@@ -234,6 +585,12 @@ def validate_markdown(
     # --- references/readability-style.md) ---
 
     body_text, appendix_text = _split_body_and_appendix(md_text)
+
+    evidence_issues = _validate_evidence_consistency(md_text, body_text)
+    if strict:
+        errors.extend(evidence_issues)
+    else:
+        warnings.extend(evidence_issues)
 
     # Evidence loop: the appendix must carry the attribution-audit log and
     # the excerpt archive (assets/report-template.md A5/A6). These are the
@@ -359,7 +716,11 @@ def main() -> None:
         raise SystemExit(f"Markdown report not found: {markdown_path}")
 
     md_text = markdown_path.read_text(encoding="utf-8")
-    errors, warnings, stats = validate_markdown(md_text, base_dir=markdown_path.parent)
+    errors, warnings, stats = validate_markdown(
+        md_text,
+        base_dir=markdown_path.parent,
+        strict=args.strict,
+    )
 
     if args.pdf:
         pdf_path = Path(args.pdf).expanduser().resolve()
