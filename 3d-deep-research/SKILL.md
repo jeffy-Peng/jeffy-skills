@@ -1,7 +1,7 @@
 ---
 name: 3d-deep-research
 description: |
-  3D Deep Research（立体分析法）是一个证据链驱动的深度研究 Skill。用于对产品、公司、技术、概念、人物、行业、竞品、市场或复杂事件进行系统调研，并交付可追溯、可验证的 Markdown、HTML 与 PDF 报告。核心把 X 轴时间线因果链、Y 轴关键截面力场、Z 轴内部机制拆解汇合为机制判断，并支持问题驱动的图表配置与分层降密度写作。用户提到 deep research、深度研究、系统调研、竞品分析、市场研究、尽职调查、行业研究、来龙去脉、证据链或正式研究报告时使用。它不是 3D 建模、3D 渲染、CAD 或图形设计 Skill；简单名词解释、纯新闻摘要、短篇观点、仿写和无需证据链的简答不使用。
+  3D Deep Research（立体分析法）是一个证据链驱动的深度研究 Skill。用于对产品、公司、技术、概念、人物、行业、竞品、市场或复杂事件进行系统调研，并交付可追溯、可验证的 Markdown、HTML 与 PDF 报告。核心把 X 轴时间线因果链、Y 轴关键截面力场、Z 轴内部机制拆解汇合为机制判断，并支持问题驱动的视觉表达和清晰写作。用户提到 deep research、深度研究、系统调研、竞品分析、市场研究、尽职调查、行业研究、来龙去脉、证据链或正式研究报告时使用。它不是 3D 建模、3D 渲染、CAD 或图形设计 Skill；简单名词解释、纯新闻摘要、短篇观点、仿写和无需证据链的简答不使用。
 ---
 
 # 3D Deep Research
@@ -18,8 +18,15 @@ description: |
 2. 始终读取 [references/xyz-method.md](references/xyz-method.md)，执行 X/Y/Z 与交汇分析。
 3. 根据对象类型读取 [references/object-adapters.md](references/object-adapters.md) 的对应部分。
 4. 需要图表或 PDF 时读取 [references/visual-guidelines.md](references/visual-guidelines.md)。
-5. 写作前读取 [references/readability-style.md](references/readability-style.md)：正文去术语、避免限定语过载、使用问题式标题；严谨性全部保留在附录。
-6. 写作时复制 [assets/report-template.md](assets/report-template.md)，不要重新发明报告结构；章节标题措辞按补丁规则人话化，章节顺序与数量不变。
+5. 写作时复制 [assets/report-template.md](assets/report-template.md)，不要重新发明报告结构；章节标题使用自然语言，章节顺序与数量不变。
+
+## 写作规则
+
+- 先给结论，再展开事实、原因和限制。
+- 使用自然语言，不把 Claim 类型、证据门控等内部框架术语直接写进正文。
+- 每段集中表达一个判断；难以一次读懂时主动改写或拆分，不设置机械字数限制。
+- 数字首次出现时提供比较对象、时间、单位和统计口径。
+- 重大不确定性在它真正影响结论的位置说明；完整记录保留在附录 A2。
 
 ## 执行流程
 
@@ -136,7 +143,7 @@ python [skill目录]/scripts/render_report.py report.md output.pdf --title "研�
 
 依赖说明：Markdown 转 HTML 需要 `python -m pip install markdown`（缺失时回退到 Codex 内置 Node.js + marked）；校验 PDF 文本需要 `pypdf` 或 `PyPDF2`；PDF 引擎按 `--engine auto` 自动选择 Chromium 或 WeasyPrint。
 
-渲染后按 visual-guidelines 的图表契约与 readability-style 规则五完成交付前自检，全部打勾后方可交付。
+渲染后按 visual-guidelines 的图表契约完成图表自检，并通读正文，确认结论先行、术语已转为自然语言、数字具有参照系。
 
 `--engine auto` 在 Windows 优先使用 Chromium，其他平台优先使用可用引擎；输出目录不存在时自动创建。默认保留同名 HTML。
 
