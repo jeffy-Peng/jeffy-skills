@@ -126,9 +126,7 @@ blockquote p,
 li p,
 td p,
 th p,
-figcaption p,
-.cover p,
-.jf-figure-note {
+figcaption p {
     text-indent: 0;
 }
 
@@ -146,8 +144,7 @@ blockquote p {
     margin: 1mm 0;
 }
 
-strong,
-b {
+strong {
     font-weight: 700;
     color: #2b1a1a;
 }
@@ -231,8 +228,7 @@ a {
     overflow-wrap: anywhere;
 }
 
-figure,
-.jf-figure {
+figure {
     margin: 6mm 0;
     padding: 4mm;
     border: 0.7pt solid #e2bcbc;
@@ -241,8 +237,7 @@ figure,
     break-inside: avoid;
 }
 
-figcaption,
-.jf-caption {
+figcaption {
     margin-bottom: 3mm;
     color: #8a0000;
     font-size: 9.5pt;
@@ -250,8 +245,7 @@ figcaption,
     text-align: left;
 }
 
-figure svg,
-.jf-figure svg {
+figure svg {
     display: block;
     width: 100%;
     max-width: 100%;
@@ -259,29 +253,19 @@ figure svg,
     margin: 0 auto;
 }
 
-figure svg text,
-.jf-figure svg text {
+figure svg text {
     font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Droid Sans Fallback", Arial, sans-serif;
 }
 
-.jf-figure-note {
-    margin-top: 3mm;
-    color: #5f4b4b;
-    font-size: 9pt;
-    line-height: 1.5;
-}
-
 /* figure images: fit page box, cap height in print to avoid overflow/cropping */
-figure img,
-.jf-figure img {
+figure img {
     max-width: 100%;
     height: auto;
     display: block;
     margin: 0 auto;
 }
 @media print {
-    figure img,
-    .jf-figure img {
+    figure img {
         max-height: 150mm;
         width: auto;
         max-width: 100%;
