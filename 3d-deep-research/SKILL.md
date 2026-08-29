@@ -55,7 +55,7 @@ description: |
 
 ### 2. 维护证据账本
 
-在 `report.md` 附录 A2 维护来源与 Claim 账本。来源使用稳定 ID（`S01`、`S02`），承重判断使用 Claim ID（`C01`、`C02`）。把“来源出处”和“证据作用”分开记录。
+在 `report.md` 附录 A1 和 A2 分别维护来源与 Claim 账本。来源使用稳定 ID（`S01`、`S02`），承重判断使用 Claim ID（`C01`、`C02`）。把“来源出处”和“证据作用”分开记录。
 
 研究过程中持续更新账本。每条承重判断的支持证据、反向材料、独立性、置信度、资料缺口、反证条件、时效期和复查状态，按 [references/evidence-protocol.md](references/evidence-protocol.md) 记录和判断；不要凭感觉设定置信度。
 
@@ -69,7 +69,7 @@ description: |
 
 ### 4. 写作与视觉表达
 
-使用 [assets/report-template.md](assets/report-template.md) 的六个一级章节和必要附录。章节标题使用自然语言，篇幅服从问题和证据。
+使用 [assets/report-template.md](assets/report-template.md) 的四个必选章节、按需保留的第五章和必要附录。章节标题使用自然语言，篇幅服从问题和证据。
 
 图表只在能降低理解成本时使用。量化图必须有可靠且可比较的数据；没有数据时使用时间轴、力场图、机制图或矩阵。具体图表契约见 [references/visual-guidelines.md](references/visual-guidelines.md)。
 
@@ -80,7 +80,7 @@ description: |
 1. 回到来源原文，确认每个承重句子能够由所引材料推出；
 2. 复算正文数字，检查单位、币种、时间和统计口径；
 3. 确认反向材料与正文中的限制一致，没有被删除或弱化；
-4. 把审计结果写入附录 A5 和 A6。
+4. 把审计结果反映到正文、A2 和 A3。
 
 审计失败时改写正文，或降级、删除 Claim；不修改账本去迁就结论。
 
@@ -89,7 +89,7 @@ description: |
 运行唯一的报告校验入口：
 
 ```bash
-python [skill目录]/scripts/validate_report.py report.md --strict
+python [skill目录]/scripts/validate_report.py report.md
 ```
 
 `validate_report.py` 只检查机器可验证的结构和证据一致性，不证明外部事实真实。
