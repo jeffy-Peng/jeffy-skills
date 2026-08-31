@@ -98,7 +98,10 @@ python [skill目录]/scripts/validate_report.py report.md
 
 ```bash
 python [skill目录]/scripts/render_report.py report.md output.pdf
+python [skill目录]/scripts/validate_report.py report.md --pdf output.pdf
 ```
+
+PDF 只通过本 Skill 的 `render_report.py` 生成，不另写 ReportLab 或其他 Markdown-to-PDF 实现，也不绕过 [assets/report.css](assets/report.css)。渲染依赖或中文字体不可用时，修复依赖后重试；无法修复时说明阻塞，不切换到另一套排版实现降级交付。
 
 标题取报告第一行 H1。渲染器会把 `[Sxx]` 引用转为可点击锚点。交付前按 visual guidelines 检查输出，并通读正文。
 

@@ -45,6 +45,13 @@ PLACEHOLDER_PATTERNS = (
     r"^\s*(?:#{1,6}\s*)?\[[^\]\n]+\]\s*$",
     r"\|\s*\[[^|\n]+\]\s*(?=\|)",
 )
+A4_WIDTH_POINTS = 595.28
+A4_HEIGHT_POINTS = 841.89
+PAGE_SIZE_TOLERANCE_POINTS = 5.0
+LITERAL_HTML_PATTERN = re.compile(
+    r"</?(?:br|figure|figcaption|svg|div|span|table|thead|tbody|tr|td|th)\b[^>]*>",
+    flags=re.IGNORECASE,
+)
 
 
 def _configure_utf8_console() -> None:
@@ -52,6 +59,69 @@ def _configure_utf8_console() -> None:
         reconfigure = getattr(stream, "reconfigure", None)
         if reconfigure:
             reconfigure(encoding="utf-8", errors="replace")
+
+
+def _read_pdf(pdf_path: Path) -> tuple[str, list[tuple[float, float]]]:
+    try:
+        from pypdf import PdfReader  # type: ignore
+    except ModuleNotFoundError:
+        try:
+            from PyPDF2 import PdfReader  # type: ignore
+        except ModuleNotFoundError as exc:
+            raise RuntimeError("Install pypdf or PyPDF2 to validate PDF output.") from exc
+
+    reader = PdfReader(str(pdf_path))
+    text_parts: list[str] = []
+    page_sizes: list[tuple[float, float]] = []
+    for page in reader.pages:
+        text_parts.append(page.extract_text() or "")
+        width = float(page.mediabox.width)
+        height = float(page.mediabox.height)
+        rotation = int(page.get("/Rotate", 0) or 0) % 360
+        if rotation in (90, 270):
+            width, height = height, width
+        page_sizes.append((width, height))
+    return "\n".join(text_parts), page_sizes
+
+
+def _validate_pdf_data(
+    pdf_text: str,
+    page_sizes: list[tuple[float, float]],
+) -> tuple[list[str], list[str]]:
+    errors: list[str] = []
+    warnings: list[str] = []
+    if not page_sizes:
+        errors.append("PDF has no pages.")
+    for page_number, (width, height) in enumerate(page_sizes, start=1):
+        if width > height:
+            errors.append(f"PDF page {page_number} is landscape; expected A4 portrait.")
+            continue
+        if (
+            abs(width - A4_WIDTH_POINTS) > PAGE_SIZE_TOLERANCE_POINTS
+            or abs(height - A4_HEIGHT_POINTS) > PAGE_SIZE_TOLERANCE_POINTS
+        ):
+            errors.append(
+                f"PDF page {page_number} is {width:.1f} x {height:.1f} pt; "
+                "expected A4 portrait."
+            )
+    literal_tag = LITERAL_HTML_PATTERN.search(pdf_text)
+    if literal_tag:
+        errors.append(f"PDF contains a literal HTML tag: {literal_tag.group(0)!r}.")
+    if len(pdf_text.strip()) < 100:
+        warnings.append("PDF text extraction returned very little text.")
+    if "\ufffd" in pdf_text:
+        warnings.append("PDF text contains Unicode replacement characters.")
+    return errors, warnings
+
+
+def validate_pdf(pdf_path: Path) -> tuple[list[str], list[str]]:
+    if not pdf_path.is_file() or pdf_path.stat().st_size < 1024:
+        return [f"PDF is missing or too small: {pdf_path}"], []
+    try:
+        pdf_text, page_sizes = _read_pdf(pdf_path)
+    except Exception as exc:
+        return [f"PDF validation failed: {exc}"], []
+    return _validate_pdf_data(pdf_text, page_sizes)
 
 
 def _split_body_and_appendix(md_text: str) -> tuple[str, str]:
@@ -400,6 +470,7 @@ def validate_markdown(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a 3d-deep-research report.")
     parser.add_argument("markdown", help="Markdown report path")
+    parser.add_argument("--pdf", help="Optional rendered PDF path")
     return parser.parse_args()
 
 
@@ -412,6 +483,10 @@ def main() -> None:
 
     md_text = markdown_path.read_text(encoding="utf-8")
     errors, warnings = validate_markdown(md_text, base_dir=markdown_path.parent)
+    if args.pdf:
+        pdf_errors, pdf_warnings = validate_pdf(Path(args.pdf).expanduser().resolve())
+        errors.extend(pdf_errors)
+        warnings.extend(pdf_warnings)
     for error in errors:
         print(f"[ERROR] {error}")
     for warning in warnings:
