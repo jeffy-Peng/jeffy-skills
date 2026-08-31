@@ -47,6 +47,14 @@ PLACEHOLDER_PATTERNS = [
     r"\bTBD\b",
 ]
 
+A4_WIDTH_POINTS = 595.28
+A4_HEIGHT_POINTS = 841.89
+PAGE_SIZE_TOLERANCE_POINTS = 5.0
+LITERAL_HTML_PATTERN = re.compile(
+    r"</?(?:br|figure|figcaption|svg|div|span|table|thead|tbody|tr|td|th)\b[^>]*>",
+    flags=re.IGNORECASE,
+)
+
 
 def _configure_utf8_console() -> None:
     for stream in (sys.stdout, sys.stderr):
@@ -55,7 +63,7 @@ def _configure_utf8_console() -> None:
             reconfigure(encoding="utf-8", errors="replace")
 
 
-def _read_pdf(pdf_path: Path) -> tuple[int, str]:
+def _read_pdf(pdf_path: Path) -> tuple[int, str, list[tuple[float, float]]]:
     try:
         from pypdf import PdfReader  # type: ignore
     except ModuleNotFoundError:
@@ -65,8 +73,17 @@ def _read_pdf(pdf_path: Path) -> tuple[int, str]:
             raise RuntimeError("Install pypdf or PyPDF2 to validate PDF content.") from exc
 
     reader = PdfReader(str(pdf_path))
-    text = "\n".join((page.extract_text() or "") for page in reader.pages)
-    return len(reader.pages), text
+    text_parts: list[str] = []
+    page_sizes: list[tuple[float, float]] = []
+    for page in reader.pages:
+        text_parts.append(page.extract_text() or "")
+        width = float(page.mediabox.width)
+        height = float(page.mediabox.height)
+        rotation = int(page.get("/Rotate", 0) or 0) % 360
+        if rotation in (90, 270):
+            width, height = height, width
+        page_sizes.append((width, height))
+    return len(reader.pages), "\n".join(text_parts), page_sizes
 
 
 def _split_body_and_appendix(md_text: str) -> tuple[str, str]:
@@ -367,15 +384,35 @@ def main() -> None:
             errors.append(f"PDF is missing or too small: {pdf_path}")
         else:
             try:
-                pages, pdf_text = _read_pdf(pdf_path)
+                pages, pdf_text, page_sizes = _read_pdf(pdf_path)
                 stats["pdf_pages"] = pages
                 stats["pdf_text_characters"] = len(pdf_text)
                 if pages < 1:
                     errors.append("PDF has no pages.")
+                for page_number, (width, height) in enumerate(page_sizes, start=1):
+                    if width > height:
+                        errors.append(
+                            f"PDF page {page_number} is landscape; expected A4 portrait."
+                        )
+                        continue
+                    if (
+                        abs(width - A4_WIDTH_POINTS) > PAGE_SIZE_TOLERANCE_POINTS
+                        or abs(height - A4_HEIGHT_POINTS) > PAGE_SIZE_TOLERANCE_POINTS
+                    ):
+                        errors.append(
+                            f"PDF page {page_number} is {width:.1f} x {height:.1f} pt; "
+                            "expected A4 portrait."
+                        )
                 if len(pdf_text.strip()) < 100:
                     warnings.append("PDF text extraction returned very little text.")
                 if "\ufffd" in pdf_text:
                     warnings.append("PDF text contains Unicode replacement characters.")
+                literal_tag = LITERAL_HTML_PATTERN.search(pdf_text)
+                if literal_tag:
+                    errors.append(
+                        "PDF contains a literal HTML tag: "
+                        f"{literal_tag.group(0)!r}."
+                    )
             except Exception as exc:
                 errors.append(f"PDF validation failed: {exc}")
 

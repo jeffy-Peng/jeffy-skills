@@ -125,24 +125,21 @@ description: |
 
 ### 阶段 8：验证、渲染与交付
 
-先运行：
+依次运行：
 
 ```bash
 python [skill目录]/scripts/validate_report.py report.md --strict
 python [skill目录]/scripts/render_report.py report.md output.pdf --title "研究对象立体分析报告" --engine auto
+python [skill目录]/scripts/validate_report.py report.md --pdf output.pdf --strict
 ```
 
 `render_report.py` 已内置 linkify 步骤：渲染时自动把 `[Sxx]` 引用转为指向来源账本的可点击锚点（HTML 与 PDF 均生效），可用 `--no-linkify` 关闭；`linkify_sources.py` 仍可对已有 HTML 单独使用。
 
 依赖说明：Markdown 转 HTML 需要 `python -m pip install markdown`（缺失时回退到 Codex 内置 Node.js + marked）；校验 PDF 文本需要 `pypdf` 或 `PyPDF2`；PDF 引擎按 `--engine auto` 自动选择 Chromium 或 WeasyPrint。
 
+PDF 只能通过本 Skill 的 `render_report.py` 生成。不要另写 Markdown-to-PDF、ReportLab 或其他 PDF 排版实现，也不要绕过 [assets/report.css](assets/report.css)。如果 Chromium、WeasyPrint 或中文字体不可用，安装依赖后重新渲染；无法修复时明确报告阻塞，不得切换到另一套排版实现降级交付。
+
 渲染后执行两份补丁的交付前自检清单（chart-allocation 第五步、readability-style 规则五），全部打勾后方可交付。
-
-旧命令保持兼容：
-
-```bash
-python [skill目录]/scripts/md_to_pdf.py report.md output.pdf --title "研究对象立体分析报告"
-```
 
 `--engine auto` 在 Windows 优先使用 Chromium，其他平台优先使用可用引擎；输出目录不存在时自动创建。默认保留同名 HTML。
 
@@ -150,7 +147,7 @@ PDF 生成后必须：
 
 1. 检查文件存在、大小和页数；
 2. 渲染代表性页面，至少检查封面、正文、表格/图表页和末页；
-3. 确认中文无缺字，图表无裁切/重叠，页眉页脚和首行缩进正确；
+3. 确认中文无缺字，图表无裁切/重叠，图题没有与图形分页，所有页面均为 A4 纵向；
 4. 将最终文件保存在稳定输出目录；可行时复制一份到桌面；
 5. 用户要求飞书交付时，把在线文档和 PDF 发送都视为完成条件，并分别验证。飞书 Markdown 不依赖复杂 inline SVG。
 

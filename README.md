@@ -89,6 +89,7 @@ npx skills add Arslan-jh/3d-deep-research --skill 3d-deep-research
 ```bash
 python scripts/validate_report.py report.md --strict
 python scripts/render_report.py report.md output.pdf --engine auto
+python scripts/validate_report.py report.md --pdf output.pdf --strict
 ```
 
 ## 仓库结构
