@@ -8,7 +8,7 @@ description: |
 
 把研究对象放进“时间—力量—机制”三维坐标：X 轴解释它如何走到今天，Y 轴解释关键时刻哪些力量同时作用，Z 轴解释关键力量为何这样行动。三轴交汇必须形成新的机制判断，而不是重述材料。
 
-默认交付完整 Markdown 报告；用户需要时再生成 HTML 或 PDF。不要把普通问答扩写成长报告。
+默认交付完整的 Markdown、HTML 和 PDF 三份报告；用户明确缩小交付范围时按其要求减少。不要把普通问答扩写成长报告。
 
 ## 必读资源
 
@@ -17,7 +17,7 @@ description: |
 1. 读取 [references/evidence-protocol.md](references/evidence-protocol.md)，建立来源与 Claim 账本并执行事实审计。
 2. 读取 [references/xyz-method.md](references/xyz-method.md)，执行 X/Y/Z 和交汇分析。
 3. 根据研究对象读取 [references/object-adapters.md](references/object-adapters.md) 的对应部分。
-4. 需要图表、HTML 或 PDF 时读取 [references/visual-guidelines.md](references/visual-guidelines.md)。
+4. 读取 [references/visual-guidelines.md](references/visual-guidelines.md)，用于 HTML/PDF 渲染和图表检查。
 5. 写作时复制 [assets/report-template.md](assets/report-template.md)，保留模板要求的章节和附录。
 
 ## 报告措辞
@@ -94,9 +94,10 @@ python [skill目录]/scripts/validate_report.py report.md
 
 `validate_report.py` 只检查机器可验证的结构和证据一致性，不证明外部事实真实。
 
-用户需要 PDF 时再运行：
+校验通过后默认生成 HTML 和 PDF，并校验 PDF：
 
 ```bash
+python [skill目录]/scripts/render_report.py report.md output.html
 python [skill目录]/scripts/render_report.py report.md output.pdf
 python [skill目录]/scripts/validate_report.py report.md --pdf output.pdf
 ```
@@ -105,7 +106,7 @@ python [skill目录]/scripts/validate_report.py report.md --pdf output.pdf
 
 PDF 只通过本 Skill 的 `render_report.py` 生成，不另写 ReportLab 或其他 Markdown-to-PDF 实现，也不绕过 [assets/report.css](assets/report.css)。渲染依赖或字体不可用时说明阻塞，不切换到其他引擎或排版实现降级交付。
 
-标题取报告第一行 H1。渲染器会把 `[Sxx]` 引用转为可点击锚点。交付前按 visual guidelines 检查输出，并通读正文。
+标题取报告第一行 H1。渲染器会把 `[Sxx]` 引用转为可点击锚点。交付前按 visual guidelines 检查输出，并通读正文。最终交付 `report.md`、`output.html` 和 `output.pdf`；用户明确只要其中部分时才省略。
 
 ## 质量红线
 
