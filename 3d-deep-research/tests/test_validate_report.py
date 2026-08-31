@@ -253,6 +253,24 @@ class ValidateReportTests(unittest.TestCase):
                 errors, _ = validate_report.validate_markdown(add_figure(broken_figure))
                 self.assertTrue(any(expected in error for error in errors), errors)
 
+    def test_pdf_layout_accepts_a4_portrait(self) -> None:
+        errors, warnings = validate_report._validate_pdf_data(
+            "可提取的正文" * 20,
+            [(595.28, 841.89), (595.28, 841.89)],
+        )
+
+        self.assertEqual(errors, [])
+        self.assertEqual(warnings, [])
+
+    def test_pdf_layout_rejects_landscape_and_literal_html(self) -> None:
+        errors, _ = validate_report._validate_pdf_data(
+            "研究时间<br/>资料截止" + "正文" * 50,
+            [(595.28, 841.89), (841.89, 595.28)],
+        )
+
+        self.assertTrue(any("page 2 is landscape" in error for error in errors), errors)
+        self.assertTrue(any("literal HTML tag" in error for error in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()
