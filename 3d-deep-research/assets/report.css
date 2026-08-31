@@ -55,12 +55,6 @@ body {
     line-height: 1.25;
 }
 
-.cover .subtitle {
-    font-size: 14pt;
-    color: #8c6f6f;
-    margin-bottom: 6mm;
-}
-
 .cover .meta {
     font-size: 10pt;
     color: #8c6f6f;
@@ -265,8 +259,12 @@ figure img {
     margin: 0 auto;
 }
 @media print {
-    figure img {
+    figure img,
+    figure svg {
         max-height: 150mm;
+    }
+
+    figure img {
         width: auto;
         max-width: 100%;
         object-fit: contain;

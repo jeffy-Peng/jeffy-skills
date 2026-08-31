@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from urllib.parse import unquote, urlsplit, urlunsplit
 
 from linkify_sources import linkify_html
 
@@ -102,9 +103,44 @@ def _split_report(md_text: str) -> tuple[str, str, str]:
     return title, meta_line, "\n".join(lines)
 
 
-def build_html(md_text: str) -> tuple[str, str, str]:
+def _resolve_local_media(html_body: str, base_dir: Path | None) -> str:
+    """Resolve relative image references against the Markdown directory."""
+    if base_dir is None:
+        return html_body
+
+    attribute = re.compile(
+        r'(<(?:img|image)\b[^>]*?\b(?:src|href|xlink:href)\s*=\s*)(["\'])(.*?)\2',
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+
+    def resolve(match: re.Match[str]) -> str:
+        value = match.group(3).strip()
+        parsed = urlsplit(value)
+        if (
+            not value
+            or parsed.scheme
+            or parsed.netloc
+            or value.startswith(("//", "#", "/"))
+        ):
+            return match.group(0)
+
+        local_path = (base_dir / unquote(parsed.path)).resolve().as_uri()
+        resolved = urlsplit(local_path)
+        rewritten = urlunsplit(
+            (resolved.scheme, resolved.netloc, resolved.path, parsed.query, parsed.fragment)
+        )
+        return f"{match.group(1)}{match.group(2)}{rewritten}{match.group(2)}"
+
+    return attribute.sub(resolve, html_body)
+
+
+def build_html(
+    md_text: str,
+    asset_base: Path | None = None,
+) -> tuple[str, str, str]:
     report_title, meta_line, body_md = _split_report(md_text)
     html_body, converter = markdown_to_html(body_md)
+    html_body = _resolve_local_media(html_body, asset_base)
 
     css = DEFAULT_CSS.read_text(encoding="utf-8")
     if "HEADER_TEXT" not in css:
@@ -266,7 +302,10 @@ def main() -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     md_text = input_path.read_text(encoding="utf-8")
     try:
-        rendered_html, report_title, converter = build_html(md_text)
+        rendered_html, report_title, converter = build_html(
+            md_text,
+            asset_base=input_path.parent,
+        )
         rendered_html, n_links, n_rows = linkify_html(rendered_html)
     except (OSError, RuntimeError, ValueError) as exc:
         raise SystemExit(f"HTML rendering failed: {exc}") from exc

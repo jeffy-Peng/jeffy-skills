@@ -6,10 +6,11 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 
-MAIN_NUMBERS = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5}
+REQUIRED_MAIN_SECTIONS = ["一", "二", "三", "四"]
 CLAIM_TYPES = {
     "fact",
     "causal",
@@ -29,6 +30,7 @@ INDEPENDENCE_MARKERS = {
     "unknown",
     "mixed",
     "独立",
+    "非独立",
     "同源",
     "未知",
 }
@@ -129,9 +131,47 @@ def _plain_text(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
-def _has_marker(value: str, markers: set[str]) -> bool:
-    lowered = value.lower()
-    return any(marker.lower() in lowered for marker in markers)
+def _contains_enum(value: str, markers: set[str]) -> bool:
+    return any(
+        re.search(
+            rf"(?<![\w-]){re.escape(marker)}(?![\w-])",
+            value,
+            flags=re.IGNORECASE,
+        )
+        for marker in markers
+    )
+
+
+def _validate_metadata(md_text: str) -> list[str]:
+    lines = md_text.splitlines()
+    first_content = next(
+        (index for index, line in enumerate(lines) if line.strip()),
+        None,
+    )
+    if first_content is None:
+        return ["The report metadata line is missing or malformed."]
+
+    next_content = next(
+        (line.strip() for line in lines[first_content + 1 :] if line.strip()),
+        "",
+    )
+    match = re.fullmatch(
+        r">\s*研究问题\s*[：:]\s*(?P<question>.+?)\s*\|\s*"
+        r"资料截止\s*[：:]\s*(?P<cutoff>\d{4}-\d{2}-\d{2})\s*\|\s*"
+        r"完成日期\s*[：:]\s*(?P<completed>\d{4}-\d{2}-\d{2})\s*",
+        next_content,
+    )
+    if not match or not _is_filled(match.group("question") if match else ""):
+        return ["The report metadata line is missing or malformed."]
+
+    try:
+        cutoff = date.fromisoformat(match.group("cutoff"))
+        completed = date.fromisoformat(match.group("completed"))
+    except ValueError:
+        return ["The report metadata contains an invalid ISO date."]
+    if completed < cutoff:
+        return ["The report completion date cannot precede the source cutoff date."]
+    return []
 
 
 def _is_filled(value: str) -> bool:
@@ -170,7 +210,7 @@ def _validate_sources(
             errors.append(f"Source {source_id} has no ISO date.")
         if not _is_filled(role):
             errors.append(f"Source {source_id} has no evidence role.")
-        elif not _has_marker(role, INDEPENDENCE_MARKERS):
+        elif not _contains_enum(role, INDEPENDENCE_MARKERS):
             errors.append(f"Source {source_id} does not state source independence.")
         if not _is_filled(limits):
             errors.append(f"Source {source_id} has no limitations.")
@@ -201,7 +241,7 @@ def _validate_claims(
         statement, claim_type, evidence, confidence, gap = row[1:6]
         if not _is_filled(statement):
             errors.append(f"Claim {claim_id} has no statement.")
-        if not _has_marker(claim_type, CLAIM_TYPES):
+        if not _contains_enum(claim_type, CLAIM_TYPES):
             errors.append(f"Claim {claim_id} has no recognized type.")
 
         reverse_marker = re.search(
@@ -225,9 +265,9 @@ def _validate_claims(
                 + "."
             )
 
-        if not _has_marker(confidence, CONFIDENCE_LEVELS):
+        if not _contains_enum(confidence, CONFIDENCE_LEVELS):
             errors.append(f"Claim {claim_id} has no confidence level.")
-        if not _has_marker(confidence, INDEPENDENCE_MARKERS):
+        if not _contains_enum(confidence, INDEPENDENCE_MARKERS):
             errors.append(f"Claim {claim_id} does not state evidence independence.")
         if not _is_filled(gap):
             errors.append(f"Claim {claim_id} has no evidence gap or disconfirmation condition.")
@@ -291,13 +331,18 @@ def validate_markdown(
     h1 = re.findall(r"^#\s+.+$", md_text, flags=re.MULTILINE)
     if len(h1) != 1 or first_content != h1[0]:
         errors.append("The report must start with exactly one H1 title.")
+    errors.extend(_validate_metadata(md_text))
 
-    main_sections = re.findall(r"^##\s+([一二三四五])、.+$", md_text, flags=re.MULTILINE)
-    sequence = [MAIN_NUMBERS[number] for number in main_sections]
-    if sequence not in ([1, 2, 3, 4], [1, 2, 3, 4, 5]):
+    main_sections = re.findall(
+        r"^##\s+([一二三四五六七八九十]+)、.+$",
+        md_text,
+        flags=re.MULTILINE,
+    )
+    valid_sequences = [REQUIRED_MAIN_SECTIONS, [*REQUIRED_MAIN_SECTIONS, "五"]]
+    if main_sections not in valid_sequences:
         errors.append(
             "Main sections must be 一 through 四, with 五 optional. "
-            f"Found: {sequence or 'none'}."
+            f"Found: {main_sections or 'none'}."
         )
 
     placeholders: list[str] = []
@@ -312,8 +357,8 @@ def validate_markdown(
     if not appendix_text:
         errors.append("The report has no appendix.")
 
-    a1_header, a1_rows, a1_malformed = _extract_table(md_text, "A1")
-    a2_header, a2_rows, a2_malformed = _extract_table(md_text, "A2")
+    a1_header, a1_rows, a1_malformed = _extract_table(appendix_text, "A1")
+    a2_header, a2_rows, a2_malformed = _extract_table(appendix_text, "A2")
     if len(a1_header) != 4 or not a1_rows:
         errors.append("A1 must contain a four-column source ledger with data rows.")
     if a1_malformed:
@@ -344,7 +389,7 @@ def validate_markdown(
             "Source ledger entries are unused: " + ", ".join(sorted(unused_sources)) + "."
         )
 
-    a3_text = _section_text(md_text, "A3")
+    a3_text = _section_text(appendix_text, "A3")
     if a3_text is None or not _is_filled(a3_text):
         errors.append("A3 must describe evidence boundaries.")
 

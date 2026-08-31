@@ -47,9 +47,9 @@ VALID_REPORT = """# 月球研究报告
 
 ### A2 关键判断与证据
 
-| Claim ID | 关键判断 | 类型与重要性 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |
+| Claim ID | 关键判断 | 判断类型 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |
 |---|---|---|---|---|---|
-| C01 | 月球极区存在水冰 | fact；影响核心结论 | 支持 S01；反向检索：检查任务更正和相反测量，未发现 | high；independent | 缺少原位储量测量；若后续原位测量不支持则修改判断 |
+| C01 | 月球极区存在水冰 | fact | 支持 S01；反向检索：检查任务更正和相反测量，未发现 | high；independent | 缺少原位储量测量；若后续原位测量不支持则修改判断 |
 
 ### A3 资料边界
 
@@ -94,7 +94,7 @@ class ValidateReportTests(unittest.TestCase):
             ),
             "A2 shape": (
                 VALID_REPORT.replace(
-                    "| Claim ID | 关键判断 | 类型与重要性 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
+                    "| Claim ID | 关键判断 | 判断类型 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
                     "| Claim ID | 关键判断 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
                     1,
                 ),
@@ -114,6 +114,61 @@ class ValidateReportTests(unittest.TestCase):
             with self.subTest(name=name):
                 errors, _ = validate_report.validate_markdown(report)
                 self.assertTrue(any(expected in error for error in errors), errors)
+
+    def test_metadata_is_required_and_valid(self) -> None:
+        cases = {
+            "missing": VALID_REPORT.replace(
+                "> 研究问题：月球是否存在水冰 | 资料截止：2026-08-28 | 完成日期：2026-08-29\n\n",
+                "",
+                1,
+            ),
+            "malformed": VALID_REPORT.replace("研究问题：", "问题：", 1),
+            "invalid date": VALID_REPORT.replace("2026-08-28", "2026-02-30", 1),
+            "reversed dates": VALID_REPORT.replace("完成日期：2026-08-29", "完成日期：2026-08-27", 1),
+        }
+
+        for name, report in cases.items():
+            with self.subTest(name=name):
+                errors, _ = validate_report.validate_markdown(report)
+                self.assertTrue(any("metadata" in error.lower() or "date" in error.lower() for error in errors), errors)
+
+    def test_enum_values_require_exact_tokens(self) -> None:
+        cases = {
+            "english substring": VALID_REPORT.replace("high；independent", "follow-up；independent", 1),
+            "chinese substring": VALID_REPORT.replace("high；independent", "中立；独立", 1),
+        }
+
+        for name, report in cases.items():
+            with self.subTest(name=name):
+                errors, _ = validate_report.validate_markdown(report)
+                self.assertTrue(any("confidence level" in error for error in errors), errors)
+
+    def test_non_independent_marker_is_valid(self) -> None:
+        report = VALID_REPORT.replace("independent", "非独立")
+
+        errors, _ = validate_report.validate_markdown(report)
+
+        self.assertEqual(errors, [])
+
+    def test_extra_numbered_section_fails(self) -> None:
+        report = VALID_REPORT.replace(
+            "## 附录：来源与证据边界",
+            "## 六、额外章节\n\n不允许的额外编号章节。[S01]\n\n## 附录：来源与证据边界",
+            1,
+        )
+
+        errors, _ = validate_report.validate_markdown(report)
+
+        self.assertTrue(any("Main sections" in error for error in errors), errors)
+
+    def test_ledgers_must_be_inside_appendix(self) -> None:
+        before_appendix, appendix = VALID_REPORT.split("## 附录：来源与证据边界", 1)
+        report = before_appendix + appendix + "\n\n## 附录：来源与证据边界\n"
+
+        errors, _ = validate_report.validate_markdown(report)
+
+        self.assertTrue(any("A1 must" in error for error in errors), errors)
+        self.assertTrue(any("A2 must" in error for error in errors), errors)
 
     def test_unresolved_template_placeholder_fails(self) -> None:
         report = VALID_REPORT.replace("# 月球研究报告", "# [研究对象]深度研究报告")
