@@ -10,7 +10,6 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from urllib.parse import unquote, urlsplit, urlunsplit
 
@@ -19,6 +18,11 @@ from linkify_sources import linkify_html
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CSS = SKILL_DIR / "assets" / "report.css"
+REQUIRED_WEASYPRINT_VERSION = "69.0"
+FONT_FILES = {
+    400: "NotoSansCJKsc-Regular.otf",
+    700: "NotoSansCJKsc-Bold.otf",
+}
 
 
 def _configure_utf8_console() -> None:
@@ -134,9 +138,31 @@ def _resolve_local_media(html_body: str, base_dir: Path | None) -> str:
     return attribute.sub(resolve, html_body)
 
 
+def _font_face_css(font_dir: Path) -> str:
+    missing = [name for name in FONT_FILES.values() if not (font_dir / name).is_file()]
+    if missing:
+        raise RuntimeError(
+            f"Missing required Noto CJK font(s) in {font_dir}: "
+            + ", ".join(missing)
+        )
+    rules = []
+    for weight, filename in FONT_FILES.items():
+        font_uri = (font_dir / filename).resolve().as_uri()
+        rules.append(
+            '@font-face {\n'
+            '  font-family: "Noto Sans CJK SC";\n'
+            f'  src: url("{font_uri}") format("opentype");\n'
+            '  font-style: normal;\n'
+            f'  font-weight: {weight};\n'
+            '}'
+        )
+    return "\n".join(rules)
+
+
 def build_html(
     md_text: str,
     asset_base: Path | None = None,
+    font_dir: Path | None = None,
 ) -> tuple[str, str, str]:
     report_title, meta_line, body_md = _split_report(md_text)
     html_body, converter = markdown_to_html(body_md)
@@ -147,6 +173,8 @@ def build_html(
         raise RuntimeError(f"Missing HEADER_TEXT placeholder in {DEFAULT_CSS}")
     css_header = report_title.replace("\\", "\\\\").replace('"', '\\"')
     css = css.replace("HEADER_TEXT", css_header)
+    if font_dir is not None:
+        css = _font_face_css(font_dir) + "\n" + css
 
     safe_title = html.escape(report_title, quote=True)
     meta_html = (
@@ -179,98 +207,26 @@ def build_html(
     return document, report_title, converter
 
 
-def _browser_candidates() -> list[Path]:
-    candidates: list[Path] = []
-    for name in ("chrome", "google-chrome", "chromium", "chromium-browser", "msedge"):
-        resolved = shutil.which(name)
-        if resolved:
-            candidates.append(Path(resolved))
-
-    if os.name == "nt":
-        candidates.extend(
-            Path(path)
-            for path in (
-                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-                r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-                r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
-                r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-            )
-        )
-    elif sys.platform == "darwin":
-        candidates.extend(
-            [
-                Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
-                Path("/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"),
-                Path("/Applications/Chromium.app/Contents/MacOS/Chromium"),
-            ]
-        )
-
-    seen: set[str] = set()
-    unique: list[Path] = []
-    for candidate in candidates:
-        key = str(candidate).lower()
-        if candidate.is_file() and key not in seen:
-            unique.append(candidate)
-            seen.add(key)
-    return unique
-
-
-def render_with_chromium(html_path: Path, output_path: Path) -> str:
-    browsers = _browser_candidates()
-    if not browsers:
-        raise RuntimeError("No Chrome, Chromium, or Edge executable was found.")
-
-    browser = browsers[0]
-    with tempfile.TemporaryDirectory(
-        prefix="3d-deep-research-chromium-",
-        ignore_cleanup_errors=True,
-    ) as profile:
-        result = subprocess.run(
-            [
-                str(browser),
-                "--headless",
-                "--disable-gpu",
-                "--no-pdf-header-footer",
-                "--allow-file-access-from-files",
-                "--run-all-compositor-stages-before-draw",
-                f"--user-data-dir={profile}",
-                f"--print-to-pdf={output_path.resolve()}",
-                html_path.resolve().as_uri(),
-            ],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            check=False,
-            timeout=120,
-        )
-
-    if result.returncode != 0:
-        detail = result.stderr.strip() or result.stdout.strip()
-        raise RuntimeError(f"Chromium exited with {result.returncode}: {detail}")
-    if not output_path.is_file() or output_path.stat().st_size < 1024:
-        raise RuntimeError("Chromium did not create a valid PDF.")
-    return f"chromium ({browser.name})"
-
-
 def render_with_weasyprint(html_text: str, input_path: Path, output_path: Path) -> str:
     try:
-        from weasyprint import HTML  # type: ignore
+        import weasyprint  # type: ignore
     except Exception as exc:
         raise RuntimeError(f"WeasyPrint is unavailable: {exc}") from exc
 
-    HTML(string=html_text, base_url=str(input_path.parent)).write_pdf(str(output_path))
+    version = getattr(weasyprint, "__version__", "unknown")
+    if version != REQUIRED_WEASYPRINT_VERSION:
+        raise RuntimeError(
+            f"WeasyPrint {REQUIRED_WEASYPRINT_VERSION} is required; found {version}. "
+            f"Install with `python -m pip install weasyprint=={REQUIRED_WEASYPRINT_VERSION}`."
+        )
+
+    weasyprint.HTML(
+        string=html_text,
+        base_url=str(input_path.parent),
+    ).write_pdf(str(output_path))
     if not output_path.is_file() or output_path.stat().st_size < 1024:
         raise RuntimeError("WeasyPrint did not create a valid PDF.")
-    return "weasyprint"
-
-
-def _engine_order(requested: str) -> list[str]:
-    if requested != "auto":
-        return [requested]
-    if os.name == "nt":
-        return ["chromium", "weasyprint"]
-    return ["weasyprint", "chromium"]
+    return f"weasyprint {version}"
 
 
 def parse_args() -> argparse.Namespace:
@@ -280,10 +236,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("input", help="Input Markdown path")
     parser.add_argument("output", help="Output .html or .pdf path")
     parser.add_argument(
-        "--engine",
-        choices=["auto", "chromium", "weasyprint"],
-        default="auto",
-        help="PDF engine (default: auto)",
+        "--font-dir",
+        default="fonts",
+        help="Directory containing NotoSansCJKsc-Regular.otf and Bold.otf; "
+        "relative paths resolve from the Markdown directory",
     )
     return parser.parse_args()
 
@@ -299,12 +255,20 @@ def main() -> None:
     if output_path.suffix.lower() not in {".html", ".pdf"}:
         raise SystemExit("Output path must end in .html or .pdf.")
 
+    font_dir: Path | None = None
+    if output_path.suffix.lower() == ".pdf":
+        font_dir = Path(args.font_dir).expanduser()
+        if not font_dir.is_absolute():
+            font_dir = input_path.parent / font_dir
+        font_dir = font_dir.resolve()
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     md_text = input_path.read_text(encoding="utf-8")
     try:
         rendered_html, report_title, converter = build_html(
             md_text,
             asset_base=input_path.parent,
+            font_dir=font_dir,
         )
         rendered_html, n_links, n_rows = linkify_html(rendered_html)
     except (OSError, RuntimeError, ValueError) as exc:
@@ -325,28 +289,19 @@ def main() -> None:
     )
     html_path.write_text(rendered_html, encoding="utf-8")
 
-    failures: list[str] = []
-    selected_engine = ""
-    for engine in _engine_order(args.engine):
+    temporary_pdf.unlink(missing_ok=True)
+    try:
+        selected_engine = render_with_weasyprint(
+            rendered_html,
+            input_path,
+            temporary_pdf,
+        )
+    except Exception as exc:
         temporary_pdf.unlink(missing_ok=True)
-        try:
-            if engine == "chromium":
-                selected_engine = render_with_chromium(html_path, temporary_pdf)
-            else:
-                selected_engine = render_with_weasyprint(
-                    rendered_html, input_path, temporary_pdf
-                )
-            break
-        except Exception as exc:
-            failures.append(f"{engine}: {exc}")
-
-    if not selected_engine:
-        temporary_pdf.unlink(missing_ok=True)
-        details = "\n".join(f"- {failure}" for failure in failures)
         raise SystemExit(
             "PDF rendering failed. Intermediate HTML was kept for debugging:\n"
-            f"{html_path}\n{details}"
-        )
+            f"{html_path}\n- {exc}"
+        ) from exc
 
     os.replace(temporary_pdf, output_path)
     html_path.unlink(missing_ok=True)

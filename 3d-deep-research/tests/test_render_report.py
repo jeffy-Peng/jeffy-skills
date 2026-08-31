@@ -55,6 +55,24 @@ class RenderReportTests(unittest.TestCase):
         self.assertIn('src="data:image/png;base64,abc"', output)
         self.assertIn('href="#symbol"', output)
 
+    def test_pdf_fonts_are_explicitly_embedded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            font_dir = Path(directory)
+            for filename in render_report.FONT_FILES.values():
+                (font_dir / filename).write_bytes(b"font")
+
+            css = render_report._font_face_css(font_dir)
+
+        self.assertIn("NotoSansCJKsc-Regular.otf", css)
+        self.assertIn("NotoSansCJKsc-Bold.otf", css)
+        self.assertIn("font-weight: 400", css)
+        self.assertIn("font-weight: 700", css)
+
+    def test_missing_pdf_font_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(RuntimeError, "Missing required Noto CJK font"):
+                render_report._font_face_css(Path(directory))
+
 
 if __name__ == "__main__":
     unittest.main()

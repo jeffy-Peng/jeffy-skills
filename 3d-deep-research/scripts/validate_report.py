@@ -48,6 +48,11 @@ PLACEHOLDER_PATTERNS = (
 A4_WIDTH_POINTS = 595.28
 A4_HEIGHT_POINTS = 841.89
 PAGE_SIZE_TOLERANCE_POINTS = 5.0
+REQUIRED_PDF_PRODUCER = "WeasyPrint 69.0"
+REQUIRED_PDF_FONTS = {
+    "Noto-Sans-CJK-SC",
+    "Noto-Sans-CJK-SC-Bold",
+}
 LITERAL_HTML_PATTERN = re.compile(
     r"</?(?:br|figure|figcaption|svg|div|span|table|thead|tbody|tr|td|th)\b[^>]*>",
     flags=re.IGNORECASE,
@@ -61,7 +66,9 @@ def _configure_utf8_console() -> None:
             reconfigure(encoding="utf-8", errors="replace")
 
 
-def _read_pdf(pdf_path: Path) -> tuple[str, list[tuple[float, float]]]:
+def _read_pdf(
+    pdf_path: Path,
+) -> tuple[str, list[tuple[float, float]], str, set[str]]:
     try:
         from pypdf import PdfReader  # type: ignore
     except ModuleNotFoundError:
@@ -73,6 +80,7 @@ def _read_pdf(pdf_path: Path) -> tuple[str, list[tuple[float, float]]]:
     reader = PdfReader(str(pdf_path))
     text_parts: list[str] = []
     page_sizes: list[tuple[float, float]] = []
+    font_names: set[str] = set()
     for page in reader.pages:
         text_parts.append(page.extract_text() or "")
         width = float(page.mediabox.width)
@@ -81,17 +89,40 @@ def _read_pdf(pdf_path: Path) -> tuple[str, list[tuple[float, float]]]:
         if rotation in (90, 270):
             width, height = height, width
         page_sizes.append((width, height))
-    return "\n".join(text_parts), page_sizes
+        resources = page.get("/Resources")
+        resources = resources.get_object() if resources else None
+        fonts = resources.get("/Font") if resources else None
+        fonts = fonts.get_object() if fonts else {}
+        for font_ref in fonts.values():
+            base_font = str(font_ref.get_object().get("/BaseFont", ""))
+            if base_font:
+                font_names.add(base_font.lstrip("/").split("+")[-1])
+    metadata = reader.metadata or {}
+    producer = str(metadata.get("/Producer", ""))
+    return "\n".join(text_parts), page_sizes, producer, font_names
 
 
 def _validate_pdf_data(
     pdf_text: str,
     page_sizes: list[tuple[float, float]],
+    producer: str,
+    font_names: set[str],
 ) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
     if not page_sizes:
         errors.append("PDF has no pages.")
+    if producer != REQUIRED_PDF_PRODUCER:
+        errors.append(
+            f"PDF producer is {producer or '<missing>'}; expected {REQUIRED_PDF_PRODUCER}."
+        )
+    missing_fonts = REQUIRED_PDF_FONTS - font_names
+    if missing_fonts:
+        errors.append(
+            "PDF does not embed required Noto CJK fonts: "
+            + ", ".join(sorted(missing_fonts))
+            + "."
+        )
     for page_number, (width, height) in enumerate(page_sizes, start=1):
         if width > height:
             errors.append(f"PDF page {page_number} is landscape; expected A4 portrait.")
@@ -118,10 +149,10 @@ def validate_pdf(pdf_path: Path) -> tuple[list[str], list[str]]:
     if not pdf_path.is_file() or pdf_path.stat().st_size < 1024:
         return [f"PDF is missing or too small: {pdf_path}"], []
     try:
-        pdf_text, page_sizes = _read_pdf(pdf_path)
+        pdf_text, page_sizes, producer, font_names = _read_pdf(pdf_path)
     except Exception as exc:
         return [f"PDF validation failed: {exc}"], []
-    return _validate_pdf_data(pdf_text, page_sizes)
+    return _validate_pdf_data(pdf_text, page_sizes, producer, font_names)
 
 
 def _split_body_and_appendix(md_text: str) -> tuple[str, str]:
