@@ -17,7 +17,7 @@ description: |
 1. 读取 [references/evidence-protocol.md](references/evidence-protocol.md)，建立来源与 Claim 账本并执行事实审计。
 2. 读取 [references/xyz-method.md](references/xyz-method.md)，执行 X/Y/Z 和交汇分析。
 3. 根据研究对象读取 [references/object-adapters.md](references/object-adapters.md) 的对应部分。
-4. 读取 [references/visual-guidelines.md](references/visual-guidelines.md)，用于 HTML/PDF 渲染和图表检查。
+4. 读取 [references/visual-guidelines.md](references/visual-guidelines.md)，用于分析阶段的视觉规划、HTML/PDF 渲染和图表检查。
 5. 写作时复制 [assets/report-template.md](assets/report-template.md)，保留模板要求的章节和附录。
 
 ## 报告措辞
@@ -67,11 +67,13 @@ description: |
 
 正文中的重要判断使用 `[S01]` 形式引用来源。三轴交汇需要说明历史选择、力场变化和内部机制如何共同造成结果，以及判断最可能错在哪个前提。
 
+在分析阶段识别支撑核心结论的关键比较、演化路径、主体关系和机制，并规划相应的视觉表达，随证据更新调整。不要等正文完成后才考虑配图；可在已有研究笔记中简记，无需新增独立账本。
+
 ### 4. 写作与视觉表达
 
 使用 [assets/report-template.md](assets/report-template.md) 的四个必选章节、按需保留的第五章和必要附录。章节标题使用自然语言，篇幅服从问题和证据。
 
-图表只在能降低理解成本时使用。量化图必须有可靠且可比较的数据；没有数据时使用时间轴、力场图、机制图或矩阵。具体图表契约见 [references/visual-guidelines.md](references/visual-guidelines.md)。
+关键关系用图能显著减少读者对照、记忆或推演负担时，应制作相应分析图；数量由需要解释的关系决定。不能以正文已有描述或缺少量化数据为由省略有价值的图。图、表与文字各取所长，避免重复和装饰。量化图必须有可靠且可比较的数据；具体触发条件、证据要求和图表契约见 [references/visual-guidelines.md](references/visual-guidelines.md)。
 
 ### 5. 执行事实审计
 
@@ -92,7 +94,7 @@ description: |
 python [skill目录]/scripts/validate_report.py report.md
 ```
 
-`validate_report.py` 只检查机器可验证的结构和证据一致性，不证明外部事实真实。
+`validate_report.py` 只检查机器可验证的结构和证据一致性，不证明外部事实真实，也不判断是否遗漏了有价值的图。交付前按 visual guidelines 复核核心关系的视觉表达；全文无图时必须执行零图复核。
 
 校验通过后默认生成 HTML 和 PDF，并校验 PDF：
 
