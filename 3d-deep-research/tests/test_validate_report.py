@@ -47,9 +47,9 @@ VALID_REPORT = """# 月球研究报告
 
 ### A2 关键判断与证据
 
-| Claim ID | 关键判断 | 判断类型 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |
+| Claim ID | 可证伪判断 | 类型／机制状态 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |
 |---|---|---|---|---|---|
-| C01 | 月球极区存在水冰 | fact | 支持 S01；反向检索：检查任务更正和相反测量，未发现 | high；independent | 缺少原位储量测量；若后续原位测量不支持则修改判断 |
+| C01 | 月球极区存在水冰 | fact | 支持 S01；independent | 反向检索：检查任务更正和相反测量，未发现 | high；缺少原位储量测量；若后续原位测量不支持则修改判断 |
 
 ### A3 资料边界
 
@@ -94,8 +94,8 @@ class ValidateReportTests(unittest.TestCase):
             ),
             "A2 shape": (
                 VALID_REPORT.replace(
-                    "| Claim ID | 关键判断 | 判断类型 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
-                    "| Claim ID | 关键判断 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
+                    "| Claim ID | 可证伪判断 | 类型／机制状态 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |",
+                    "| Claim ID | 可证伪判断 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |",
                     1,
                 ),
                 "A2 must",
@@ -134,8 +134,8 @@ class ValidateReportTests(unittest.TestCase):
 
     def test_enum_values_require_exact_tokens(self) -> None:
         cases = {
-            "english substring": VALID_REPORT.replace("high；independent", "follow-up；independent", 1),
-            "chinese substring": VALID_REPORT.replace("high；independent", "中立；独立", 1),
+            "english substring": VALID_REPORT.replace("high；缺少", "follow-up；缺少", 1),
+            "chinese substring": VALID_REPORT.replace("high；缺少", "中立；缺少", 1),
         }
 
         for name, report in cases.items():
@@ -147,6 +147,35 @@ class ValidateReportTests(unittest.TestCase):
         report = VALID_REPORT.replace("independent", "非独立")
 
         errors, _ = validate_report.validate_markdown(report)
+
+        self.assertEqual(errors, [])
+
+    def test_legacy_claim_ledger_is_still_valid(self) -> None:
+        report = VALID_REPORT.replace(
+            "| Claim ID | 可证伪判断 | 类型／机制状态 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |",
+            "| Claim ID | 关键判断 | 判断类型 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
+            1,
+        ).replace(
+            "| C01 | 月球极区存在水冰 | fact | 支持 S01；independent | 反向检索：检查任务更正和相反测量，未发现 | high；缺少原位储量测量；若后续原位测量不支持则修改判断 |",
+            "| C01 | 月球极区存在水冰 | fact | 支持 S01；反向检索：检查任务更正和相反测量，未发现 | high；independent | 缺少原位储量测量；若后续原位测量不支持则修改判断 |",
+            1,
+        )
+
+        errors, _ = validate_report.validate_markdown(report)
+
+        self.assertEqual(errors, [])
+
+    def test_new_schema_requires_mechanism_status(self) -> None:
+        report = VALID_REPORT.replace("| fact |", "| mechanism |", 1)
+
+        errors, _ = validate_report.validate_markdown(report)
+
+        self.assertTrue(any("mechanism evidence status" in error for error in errors), errors)
+
+        report_with_status = VALID_REPORT.replace(
+            "| fact |", "| mechanism · 案例中运行 |", 1
+        )
+        errors, _ = validate_report.validate_markdown(report_with_status)
 
         self.assertEqual(errors, [])
 
@@ -193,7 +222,7 @@ class ValidateReportTests(unittest.TestCase):
         self.assertTrue(any("duplicate Source ID S01" in error for error in errors), errors)
 
     def test_dangling_claim_source_fails(self) -> None:
-        report = VALID_REPORT.replace("支持 S01；反向检索", "支持 S99；反向检索")
+        report = VALID_REPORT.replace("支持 S01；independent", "支持 S99；independent", 1)
 
         errors, _ = validate_report.validate_markdown(report)
 
@@ -201,13 +230,13 @@ class ValidateReportTests(unittest.TestCase):
 
     def test_claim_requires_reverse_search_note(self) -> None:
         report = VALID_REPORT.replace(
-            "支持 S01；反向检索：检查任务更正和相反测量，未发现",
-            "支持 S01",
+            "反向检索：检查任务更正和相反测量，未发现",
+            " ",
         )
 
         errors, _ = validate_report.validate_markdown(report)
 
-        self.assertTrue(any("reverse-search" in error for error in errors), errors)
+        self.assertTrue(any("counterevidence" in error for error in errors), errors)
 
     def test_body_citation_must_resolve(self) -> None:
         report = VALID_REPORT.replace("公开测量支持月球极区存在水冰。[S01]", "公开测量支持月球极区存在水冰。[S99]")
