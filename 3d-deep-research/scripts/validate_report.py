@@ -23,6 +23,16 @@ CLAIM_TYPES = {
     "市场",
     "预测",
 }
+MECHANISM_STATUSES = {
+    "机制可行",
+    "案例中运行",
+    "解释力已确认",
+    "解释力未确认",
+    "possible",
+    "operating",
+    "confirmed",
+    "unconfirmed",
+}
 CONFIDENCE_LEVELS = {"high", "medium", "low", "高", "中", "低"}
 INDEPENDENCE_MARKERS = {
     "independent",
@@ -322,10 +332,17 @@ def _validate_sources(
 def _validate_claims(
     rows: list[list[str]],
     source_ids: set[str],
+    header: list[str] | None = None,
 ) -> tuple[list[str], set[str]]:
     errors: list[str] = []
     claim_ids: set[str] = set()
     used_sources: set[str] = set()
+
+    new_schema = bool(
+        header
+        and len(header) == 6
+        and ("机制状态" in header[2] or "mechanism status" in header[2].lower())
+    )
 
     for row_no, row in enumerate(rows, start=1):
         if len(row) != 6:
@@ -339,25 +356,48 @@ def _validate_claims(
             errors.append(f"A2 has duplicate Claim ID {claim_id}.")
         claim_ids.add(claim_id)
 
-        statement, claim_type, evidence, confidence, gap = row[1:6]
+        statement = row[1]
+        claim_type = row[2]
         if not _is_filled(statement):
             errors.append(f"Claim {claim_id} has no statement.")
         if not _contains_enum(claim_type, CLAIM_TYPES):
             errors.append(f"Claim {claim_id} has no recognized type.")
 
-        reverse_marker = re.search(
-            r"反向|替代|未解决|counter",
-            evidence,
-            flags=re.IGNORECASE,
-        )
-        support_part = evidence[: reverse_marker.start()] if reverse_marker else evidence
+        if new_schema:
+            support_part, counterevidence, confidence_gap = row[3:6]
+            evidence = f"{support_part} {counterevidence}"
+            confidence = confidence_gap
+            gap = confidence_gap
+            if not _is_filled(counterevidence):
+                errors.append(
+                    f"Claim {claim_id} has no counterevidence, alternative explanation, "
+                    "or reverse-search note."
+                )
+            causal_or_mechanism = _contains_enum(
+                claim_type, {"causal", "mechanism", "因果", "机制"}
+            )
+            if causal_or_mechanism and not _contains_enum(
+                claim_type, MECHANISM_STATUSES
+            ):
+                errors.append(f"Claim {claim_id} has no mechanism evidence status.")
+        else:
+            evidence, confidence, gap = row[3:6]
+            reverse_marker = re.search(
+                r"反向|替代|未解决|counter",
+                evidence,
+                flags=re.IGNORECASE,
+            )
+            support_part = evidence[: reverse_marker.start()] if reverse_marker else evidence
+            if not reverse_marker:
+                errors.append(
+                    f"Claim {claim_id} has no counterevidence or reverse-search note."
+                )
+
         supporting_sources = set(re.findall(r"S\d{2,}", support_part))
         claim_sources = set(re.findall(r"S\d{2,}", evidence))
         used_sources.update(claim_sources)
         if not supporting_sources:
             errors.append(f"Claim {claim_id} has no supporting Source ID.")
-        if not reverse_marker:
-            errors.append(f"Claim {claim_id} has no counterevidence or reverse-search note.")
         undefined = claim_sources - source_ids
         if undefined:
             errors.append(
@@ -368,7 +408,8 @@ def _validate_claims(
 
         if not _contains_enum(confidence, CONFIDENCE_LEVELS):
             errors.append(f"Claim {claim_id} has no confidence level.")
-        if not _contains_enum(confidence, INDEPENDENCE_MARKERS):
+        independence_value = support_part if new_schema else confidence
+        if not _contains_enum(independence_value, INDEPENDENCE_MARKERS):
             errors.append(f"Claim {claim_id} does not state evidence independence.")
         if not _is_filled(gap):
             errors.append(f"Claim {claim_id} has no evidence gap or disconfirmation condition.")
@@ -470,7 +511,7 @@ def validate_markdown(
         errors.append(f"A2 has {a2_malformed} malformed data row(s).")
 
     source_errors, source_ids = _validate_sources(a1_rows)
-    claim_errors, claim_source_ids = _validate_claims(a2_rows, source_ids)
+    claim_errors, claim_source_ids = _validate_claims(a2_rows, source_ids, a2_header)
     errors.extend(source_errors)
     errors.extend(claim_errors)
 
