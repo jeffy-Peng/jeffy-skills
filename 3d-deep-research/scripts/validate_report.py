@@ -7,7 +7,11 @@ import argparse
 import re
 import sys
 from datetime import date
+from html.parser import HTMLParser
+from math import isfinite
 from pathlib import Path
+
+from report_artifacts import MediaReferences, local_path, validate_manifest
 
 
 REQUIRED_MAIN_SECTIONS = ["一", "二", "三", "四"]
@@ -104,8 +108,19 @@ def _read_pdf(
         fonts = resources.get("/Font") if resources else None
         fonts = fonts.get_object() if fonts else {}
         for font_ref in fonts.values():
-            base_font = str(font_ref.get_object().get("/BaseFont", ""))
-            if base_font:
+            font = font_ref.get_object()
+            base_font = str(font.get("/BaseFont", ""))
+            descendants = font.get("/DescendantFonts", [])
+            candidates = [font, *(item.get_object() for item in descendants)]
+            embedded = False
+            for candidate in candidates:
+                descriptor = candidate.get("/FontDescriptor")
+                descriptor = descriptor.get_object() if descriptor else {}
+                for key in ("/FontFile", "/FontFile2", "/FontFile3"):
+                    stream = descriptor.get(key)
+                    if stream and stream.get_object().get_data():
+                        embedded = True
+            if base_font and embedded:
                 font_names.add(base_font.lstrip("/").split("+")[-1])
     metadata = reader.metadata or {}
     producer = str(metadata.get("/Producer", ""))
@@ -243,14 +258,11 @@ def _plain_text(value: str) -> str:
 
 
 def _contains_enum(value: str, markers: set[str]) -> bool:
-    return any(
-        re.search(
-            rf"(?<![\w-]){re.escape(marker)}(?![\w-])",
-            value,
-            flags=re.IGNORECASE,
-        )
-        for marker in markers
-    )
+    for marker in markers:
+        boundary = r"A-Za-z0-9_-" if marker.isascii() else r"\w-"
+        if re.search(rf"(?<![{boundary}]){re.escape(marker)}(?![{boundary}])", value, re.I):
+            return True
+    return False
 
 
 def _validate_metadata(md_text: str) -> list[str]:
@@ -291,6 +303,7 @@ def _is_filled(value: str) -> bool:
 
 def _validate_sources(
     rows: list[list[str]],
+    legacy_schema: bool = False,
 ) -> tuple[list[str], set[str]]:
     errors: list[str] = []
     source_ids: set[str] = set()
@@ -317,8 +330,22 @@ def _validate_sources(
             errors.append(f"Source {source_id} has no source details.")
         if not location_pattern.search(details + " " + limits):
             errors.append(f"Source {source_id} has no URL or file location.")
-        if not re.search(r"\b\d{4}-\d{2}-\d{2}\b", details):
+        if legacy_schema and not re.search(r"\b\d{4}-\d{2}-\d{2}\b", details):
             errors.append(f"Source {source_id} has no ISO date.")
+        for value in re.findall(r"\b\d{4}-\d{2}-\d{2}\b", details):
+            try:
+                date.fromisoformat(value)
+            except ValueError:
+                errors.append(f"Source {source_id} has an invalid ISO date: {value}.")
+        if not legacy_schema:
+            fields = _labeled_fields(details)
+            for label in ("发布者", "发布", "访问"):
+                if not _is_filled(fields.get(label, "")):
+                    errors.append(f"Source {source_id} is missing {label}.")
+            for label, unknown in (("发布", "未知"), ("访问", "不适用")):
+                value = fields.get(label, "")
+                if value != unknown and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+                    errors.append(f"Source {source_id} {label} must be an ISO date or {unknown}.")
         if not _is_filled(role):
             errors.append(f"Source {source_id} has no evidence role.")
         elif not _contains_enum(role, INDEPENDENCE_MARKERS):
@@ -329,10 +356,20 @@ def _validate_sources(
     return errors, source_ids
 
 
+def _labeled_fields(value: str) -> dict[str, str]:
+    fields = {}
+    for part in re.split(r"[；;]|<br\s*/?>", value):
+        match = re.match(r"\s*([^：:]+)[：:]\s*(.*?)\s*$", part)
+        if match:
+            fields[match.group(1)] = match.group(2)
+    return fields
+
+
 def _validate_claims(
     rows: list[list[str]],
     source_ids: set[str],
     header: list[str] | None = None,
+    legacy_schema: bool = False,
 ) -> tuple[list[str], set[str]]:
     errors: list[str] = []
     claim_ids: set[str] = set()
@@ -341,7 +378,7 @@ def _validate_claims(
     new_schema = bool(
         header
         and len(header) == 6
-        and ("机制状态" in header[2] or "mechanism status" in header[2].lower())
+        and ("机制状态" in header[2] or "证据范围" in header[2] or "mechanism status" in header[2].lower())
     )
 
     for row_no, row in enumerate(rows, start=1):
@@ -362,6 +399,8 @@ def _validate_claims(
             errors.append(f"Claim {claim_id} has no statement.")
         if not _contains_enum(claim_type, CLAIM_TYPES):
             errors.append(f"Claim {claim_id} has no recognized type.")
+        elif not legacy_schema and re.split(r"[；;]", claim_type)[0].strip().lower() not in CLAIM_TYPES:
+            errors.append(f"Claim {claim_id} must have exactly one type before its evidence fields.")
 
         if new_schema:
             support_part, counterevidence, confidence_gap = row[3:6]
@@ -376,11 +415,25 @@ def _validate_claims(
             causal_or_mechanism = _contains_enum(
                 claim_type, {"causal", "mechanism", "因果", "机制"}
             )
-            if causal_or_mechanism and not _contains_enum(
+            if not legacy_schema:
+                fields = _labeled_fields(confidence_gap)
+                for label in ("置信度", "缺口", "修订条件"):
+                    if not _is_filled(fields.get(label, "")):
+                        errors.append(f"Claim {claim_id} is missing {label}.")
+                confidence = fields.get("置信度", "")
+                gap = fields.get("缺口", "")
+                if causal_or_mechanism:
+                    scope = _labeled_fields(claim_type)
+                    for label in ("过程", "归因"):
+                        if not _is_filled(scope.get(label, "")):
+                            errors.append(f"Claim {claim_id} is missing mechanism evidence scope: {label}.")
+            elif causal_or_mechanism and not _contains_enum(
                 claim_type, MECHANISM_STATUSES
             ):
                 errors.append(f"Claim {claim_id} has no mechanism evidence status.")
         else:
+            if not legacy_schema:
+                errors.append("Legacy A2 schema requires --legacy-schema; migrate new reports to contract 3.")
             evidence, confidence, gap = row[3:6]
             reverse_marker = re.search(
                 r"反向|替代|未解决|counter",
@@ -406,7 +459,11 @@ def _validate_claims(
                 + "."
             )
 
-        if not _contains_enum(confidence, CONFIDENCE_LEVELS):
+        confidence_valid = (
+            _contains_enum(confidence, CONFIDENCE_LEVELS)
+            if legacy_schema else confidence.strip().lower() in CONFIDENCE_LEVELS
+        )
+        if not confidence_valid:
             errors.append(f"Claim {claim_id} has no confidence level.")
         independence_value = support_part if new_schema else confidence
         if not _contains_enum(independence_value, INDEPENDENCE_MARKERS):
@@ -419,6 +476,16 @@ def _validate_claims(
 
 def _inside(position: int, ranges: list[tuple[int, int]]) -> bool:
     return any(start <= position < end for start, end in ranges)
+
+
+class _SVGAttributes(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.items: list[dict[str, str | None]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "svg":
+            self.items.append(dict(attrs))
 
 
 def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
@@ -434,13 +501,22 @@ def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
             errors.append(f"Figure {index} has no non-empty figcaption.")
         if not re.search(r"\[S\d{2,}\]", figure):
             errors.append(f"Figure {index} has no Source ID.")
-        for svg in re.finditer(r"<svg\b([^>]*)>", figure, flags=re.IGNORECASE | re.DOTALL):
-            attributes = svg.group(1).lower()
-            for required in ("viewbox", "role=", "aria-label="):
-                if required not in attributes:
-                    errors.append(f"Figure {index} SVG is missing {required}.")
+        parser = _SVGAttributes()
+        parser.feed(figure)
+        for attributes in parser.items:
+            try:
+                box = [float(x) for x in re.split(r"[\s,]+", attributes.get("viewbox", "").strip())]
+                valid_box = len(box) == 4 and all(isfinite(x) for x in box) and box[2] > 0 and box[3] > 0
+            except (ValueError, AttributeError):
+                valid_box = False
+            if not valid_box:
+                errors.append(f"Figure {index} SVG has missing or invalid viewbox.")
+            if attributes.get("role") != "img":
+                errors.append(f"Figure {index} SVG requires role=img.")
+            if not (attributes.get("aria-label") or "").strip():
+                errors.append(f"Figure {index} SVG requires a non-empty aria-label= value.")
 
-    media = list(re.finditer(r"<img\b[^>]*>", md_text, flags=re.IGNORECASE))
+    media = list(re.finditer(r"<(?:img|image)\b[^>]*>", md_text, flags=re.IGNORECASE))
     media += list(re.finditer(r"!\[[^\]]*\]\([^)]+\)", md_text))
     media += list(re.finditer(r"<svg\b[^>]*>", md_text, flags=re.IGNORECASE))
     for match in media:
@@ -448,15 +524,13 @@ def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
             errors.append("An image or SVG appears outside a <figure> element.")
 
     if base_dir is not None:
-        refs = re.findall(r"<img[^>]+src=[\"']([^\"']+)[\"']", md_text, re.I)
+        media_parser = MediaReferences()
+        media_parser.feed(md_text)
+        refs = media_parser.refs
         refs += re.findall(r"!\[[^\]]*\]\(([^)\s]+)", md_text)
         for ref in sorted(set(refs)):
-            if re.match(r"^(https?://|data:)", ref):
-                continue
-            candidate = Path(ref)
-            if not candidate.is_absolute():
-                candidate = base_dir / candidate
-            if not candidate.is_file():
+            candidate = local_path(ref, base_dir)
+            if candidate is not None and not candidate.is_file():
                 errors.append(f"Image file not found: {ref}")
 
     return errors
@@ -465,6 +539,7 @@ def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
 def validate_markdown(
     md_text: str,
     base_dir: Path | None = None,
+    legacy_schema: bool = False,
 ) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -474,6 +549,10 @@ def validate_markdown(
     if len(h1) != 1 or first_content != h1[0]:
         errors.append("The report must start with exactly one H1 title.")
     errors.extend(_validate_metadata(md_text))
+    if legacy_schema:
+        warnings.append("Legacy schema mode: evidence contract 3 is not enforced.")
+    elif not re.search(r"^>\s*证据契约：3\s*$", md_text, re.M):
+        errors.append("New reports require > 证据契约：3; use --legacy-schema only for historical reports.")
 
     main_sections = re.findall(
         r"^##\s+([一二三四五六七八九十]+)、.+$",
@@ -481,7 +560,7 @@ def validate_markdown(
         flags=re.MULTILINE,
     )
     valid_sequences = [REQUIRED_MAIN_SECTIONS, [*REQUIRED_MAIN_SECTIONS, "五"]]
-    if main_sections not in valid_sequences:
+    if legacy_schema and main_sections not in valid_sequences:
         errors.append(
             "Main sections must be 一 through 四, with 五 optional. "
             f"Found: {main_sections or 'none'}."
@@ -510,12 +589,19 @@ def validate_markdown(
     if a2_malformed:
         errors.append(f"A2 has {a2_malformed} malformed data row(s).")
 
-    source_errors, source_ids = _validate_sources(a1_rows)
-    claim_errors, claim_source_ids = _validate_claims(a2_rows, source_ids, a2_header)
+    source_errors, source_ids = _validate_sources(a1_rows, legacy_schema)
+    claim_errors, claim_source_ids = _validate_claims(a2_rows, source_ids, a2_header, legacy_schema)
     errors.extend(source_errors)
     errors.extend(claim_errors)
 
     body_source_ids = set(re.findall(r"\[(S\d{2,})\]", body_text))
+    all_sources = set(re.findall(r"\[(S\d{2,})\]", md_text))
+    if all_sources - source_ids:
+        errors.append("Report references undefined Source IDs: " + ", ".join(sorted(all_sources - source_ids)))
+    for heading, content in re.findall(r"^(##\s+[^\n]+)\n(.*?)(?=^##\s+|\Z)", body_text, re.M | re.S):
+        content = re.sub(r"^#{3,6}\s+.*$", "", content, flags=re.M)
+        if not _is_filled(content):
+            errors.append(f"Empty analysis section: {heading}")
     if not body_source_ids:
         errors.append("The report body has no [Sxx] citations.")
     undefined_body_sources = body_source_ids - source_ids
@@ -543,6 +629,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a 3d-deep-research report.")
     parser.add_argument("markdown", help="Markdown report path")
     parser.add_argument("--pdf", help="Optional rendered PDF path")
+    parser.add_argument("--html", help="Optional rendered HTML path")
+    parser.add_argument("--legacy-schema", action="store_true", help="Read historical evidence ledgers; does not certify current contract")
     return parser.parse_args()
 
 
@@ -554,11 +642,19 @@ def main() -> None:
         raise SystemExit(f"Markdown report not found: {markdown_path}")
 
     md_text = markdown_path.read_text(encoding="utf-8")
-    errors, warnings = validate_markdown(md_text, base_dir=markdown_path.parent)
+    errors, warnings = validate_markdown(md_text, base_dir=markdown_path.parent, legacy_schema=args.legacy_schema)
     if args.pdf:
         pdf_errors, pdf_warnings = validate_pdf(Path(args.pdf).expanduser().resolve())
         errors.extend(pdf_errors)
         warnings.extend(pdf_warnings)
+    for artifact in (args.pdf, args.html):
+        if artifact:
+            if args.legacy_schema:
+                warnings.append("Legacy artifact identity is not verified; render again for current-contract delivery.")
+            else:
+                identity_errors, identity_warnings = validate_manifest(markdown_path, Path(artifact).expanduser().resolve())
+                errors.extend(identity_errors)
+                warnings.extend(identity_warnings)
     for error in errors:
         print(f"[ERROR] {error}")
     for warning in warnings:

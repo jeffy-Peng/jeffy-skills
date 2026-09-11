@@ -4,7 +4,7 @@
 
     @top-center {
         content: "HEADER_TEXT";
-        font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Droid Sans Fallback", Arial, sans-serif;
+        font-family: "Noto Sans CJK SC", "Microsoft YaHei", "Droid Sans Fallback", Arial, sans-serif;
         font-size: 8pt;
         color: #8c6f6f;
         border-bottom: 0.5pt solid #f0d9d9;
@@ -13,7 +13,7 @@
 
     @bottom-center {
         content: "第 " counter(page) " 页";
-        font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Droid Sans Fallback", Arial, sans-serif;
+        font-family: "Noto Sans CJK SC", "Microsoft YaHei", "Droid Sans Fallback", Arial, sans-serif;
         font-size: 8pt;
         color: #8c6f6f;
         border-top: 0.8pt solid #c00000;
@@ -32,7 +32,7 @@ html {
 }
 
 body {
-    font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Droid Sans Fallback", Arial, sans-serif;
+    font-family: "Noto Sans CJK SC", "Microsoft YaHei", "Droid Sans Fallback", Arial, sans-serif;
     font-size: 10.5pt;
     line-height: 1.75;
     color: #2f2727;
@@ -248,7 +248,7 @@ figure svg {
 }
 
 figure svg text {
-    font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Droid Sans Fallback", Arial, sans-serif;
+    font-family: "Noto Sans CJK SC", "Microsoft YaHei", "Droid Sans Fallback", Arial, sans-serif;
 }
 
 /* figure images: fit page box, cap height in print to avoid overflow/cropping */
