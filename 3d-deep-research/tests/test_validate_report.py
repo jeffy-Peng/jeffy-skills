@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import importlib.util
 import re
+import sys
 import unittest
 from pathlib import Path
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "validate_report.py"
+sys.path.insert(0, str(SCRIPT.parent))
 SPEC = importlib.util.spec_from_file_location("validate_report", SCRIPT)
 assert SPEC and SPEC.loader
 validate_report = importlib.util.module_from_spec(SPEC)
@@ -16,6 +18,8 @@ SPEC.loader.exec_module(validate_report)
 VALID_REPORT = """# 月球研究报告
 
 > 研究问题：月球是否存在水冰 | 资料截止：2026-08-28 | 完成日期：2026-08-29
+
+> 证据契约：3
 
 ## 一、核心结论
 
@@ -43,13 +47,13 @@ VALID_REPORT = """# 月球研究报告
 
 | Source ID | 来源与日期 | 证据作用 | 限制 |
 |---|---|---|---|
-| S01 | [NASA fact sheet](https://example.com/moon)；NASA；2026-08-01；访问 2026-08-29 | 支持 C01；原始材料；independent | 仅覆盖公开测量 |
+| S01 | [NASA fact sheet](https://example.com/moon)；发布者：NASA；发布：2026-08-01；访问：2026-08-29 | 支持 C01；原始材料；independent | 仅覆盖公开测量 |
 
 ### A2 关键判断与证据
 
-| Claim ID | 可证伪判断 | 类型／机制状态 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |
+| Claim ID | 可证伪判断 | 类型／证据范围 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |
 |---|---|---|---|---|---|
-| C01 | 月球极区存在水冰 | fact | 支持 S01；independent | 反向检索：检查任务更正和相反测量，未发现 | high；缺少原位储量测量；若后续原位测量不支持则修改判断 |
+| C01 | 月球极区存在水冰 | fact | 支持 S01；independent | 反向检索：检查任务更正和相反测量，未发现 | 置信度：high；缺口：缺少原位储量测量；修订条件：若后续原位测量不支持则修改判断 |
 
 ### A3 资料边界
 
@@ -80,10 +84,6 @@ class ValidateReportTests(unittest.TestCase):
                 VALID_REPORT.replace("# 月球研究报告", "月球研究报告", 1),
                 "exactly one H1",
             ),
-            "section four": (
-                VALID_REPORT.replace("## 四、它为什么这样运转", "### 它为什么这样运转", 1),
-                "Main sections",
-            ),
             "A1 shape": (
                 VALID_REPORT.replace(
                     "| Source ID | 来源与日期 | 证据作用 | 限制 |",
@@ -94,7 +94,7 @@ class ValidateReportTests(unittest.TestCase):
             ),
             "A2 shape": (
                 VALID_REPORT.replace(
-                    "| Claim ID | 可证伪判断 | 类型／机制状态 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |",
+                    "| Claim ID | 可证伪判断 | 类型／证据范围 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |",
                     "| Claim ID | 可证伪判断 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |",
                     1,
                 ),
@@ -134,8 +134,8 @@ class ValidateReportTests(unittest.TestCase):
 
     def test_enum_values_require_exact_tokens(self) -> None:
         cases = {
-            "english substring": VALID_REPORT.replace("high；缺少", "follow-up；缺少", 1),
-            "chinese substring": VALID_REPORT.replace("high；缺少", "中立；缺少", 1),
+            "english substring": VALID_REPORT.replace("置信度：high", "置信度：follow-up", 1),
+            "chinese substring": VALID_REPORT.replace("置信度：high", "置信度：中立", 1),
         }
 
         for name, report in cases.items():
@@ -152,43 +152,43 @@ class ValidateReportTests(unittest.TestCase):
 
     def test_legacy_claim_ledger_is_still_valid(self) -> None:
         report = VALID_REPORT.replace(
-            "| Claim ID | 可证伪判断 | 类型／机制状态 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |",
+            "| Claim ID | 可证伪判断 | 类型／证据范围 | 支持证据与独立性 | 替代解释／反向证据 | 置信度、缺口与反证条件 |",
             "| Claim ID | 关键判断 | 判断类型 | 支持与反向证据 | 置信度与独立性 | 缺口与反证条件 |",
             1,
         ).replace(
-            "| C01 | 月球极区存在水冰 | fact | 支持 S01；independent | 反向检索：检查任务更正和相反测量，未发现 | high；缺少原位储量测量；若后续原位测量不支持则修改判断 |",
+            "| C01 | 月球极区存在水冰 | fact | 支持 S01；independent | 反向检索：检查任务更正和相反测量，未发现 | 置信度：high；缺口：缺少原位储量测量；修订条件：若后续原位测量不支持则修改判断 |",
             "| C01 | 月球极区存在水冰 | fact | 支持 S01；反向检索：检查任务更正和相反测量，未发现 | high；independent | 缺少原位储量测量；若后续原位测量不支持则修改判断 |",
             1,
         )
 
-        errors, _ = validate_report.validate_markdown(report)
+        errors, _ = validate_report.validate_markdown(report, legacy_schema=True)
 
         self.assertEqual(errors, [])
 
-    def test_new_schema_requires_mechanism_status(self) -> None:
+    def test_new_schema_requires_process_and_attribution(self) -> None:
         report = VALID_REPORT.replace("| fact |", "| mechanism |", 1)
 
         errors, _ = validate_report.validate_markdown(report)
 
-        self.assertTrue(any("mechanism evidence status" in error for error in errors), errors)
+        self.assertTrue(any("mechanism evidence scope" in error for error in errors), errors)
 
         report_with_status = VALID_REPORT.replace(
-            "| fact |", "| mechanism · 案例中运行 |", 1
+            "| fact |", "| mechanism；过程：已有原位观测；归因：无法判断全部储量 |", 1
         )
         errors, _ = validate_report.validate_markdown(report_with_status)
 
         self.assertEqual(errors, [])
 
-    def test_extra_numbered_section_fails(self) -> None:
+    def test_extra_numbered_section_is_allowed(self) -> None:
         report = VALID_REPORT.replace(
             "## 附录：来源与证据边界",
-            "## 六、额外章节\n\n不允许的额外编号章节。[S01]\n\n## 附录：来源与证据边界",
+            "## 六、额外章节\n\n问题需要的额外分析。[S01]\n\n## 附录：来源与证据边界",
             1,
         )
 
         errors, _ = validate_report.validate_markdown(report)
 
-        self.assertTrue(any("Main sections" in error for error in errors), errors)
+        self.assertEqual(errors, [])
 
     def test_ledgers_must_be_inside_appendix(self) -> None:
         before_appendix, appendix = VALID_REPORT.split("## 附录：来源与证据边界", 1)
@@ -208,11 +208,11 @@ class ValidateReportTests(unittest.TestCase):
 
     def test_duplicate_source_id_fails(self) -> None:
         original = (
-            "| S01 | [NASA fact sheet](https://example.com/moon)；NASA；2026-08-01；访问 2026-08-29 | "
+            "| S01 | [NASA fact sheet](https://example.com/moon)；发布者：NASA；发布：2026-08-01；访问：2026-08-29 | "
             "支持 C01；原始材料；independent | 仅覆盖公开测量 |"
         )
         duplicate = (
-            "| S01 | [Duplicate](https://example.com/duplicate)；NASA；2026-08-02 | "
+            "| S01 | [Duplicate](https://example.com/duplicate)；发布者：NASA；发布：2026-08-02；访问：不适用 | "
             "补充 C01；independent | 仅覆盖摘要 |"
         )
         report = VALID_REPORT.replace(original, original + "\n" + duplicate)

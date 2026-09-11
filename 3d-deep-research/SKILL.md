@@ -18,7 +18,7 @@ description: |
 2. 读取 [references/xyz-method.md](references/xyz-method.md)，建立研究底图并执行 X/Y/Z、路径校正和覆盖复核。
 3. 根据研究对象读取 [references/object-adapters.md](references/object-adapters.md) 的对应部分。
 4. 读取 [references/visual-guidelines.md](references/visual-guidelines.md)，用于分析阶段的视觉规划、HTML/PDF 渲染和图表检查。
-5. 写作时复制 [assets/report-template.md](assets/report-template.md)，保留模板要求的章节和附录。
+5. 写作时复制 [assets/report-template.md](assets/report-template.md)，保留元数据与证据附录；正文可按问题重组。
 
 ## 报告措辞
 
@@ -35,11 +35,11 @@ description: |
 
 ### 0. 明确研究设定
 
-记录研究对象、对象类型、用户要做的决策、特别关注点、时间基准、范围边界和交付要求。对象或决策问题会显著改变结论时最多追问一次；其余情况直接开始。根据对象适配器建立研究底图，先确认主体边界、价值或作用结构、关键参与者及当前状态，再选择解释主线。
+记录研究对象、对象类型、用户要做的决策、特别关注点、时间基准、范围边界和交付要求。无法从上下文解决且会显著改变目标或正确性的问题才追问；其余情况直接开始。根据对象适配器建立研究底图，先确认主体边界、价值或作用结构、关键参与者及当前状态，再选择解释主线。
 
 复杂或持续时间较长的任务可以把上述设定记录为工作笔记；不要为简单任务强制创建独立过程文件。
 
-研究范围由问题和证据决定，不追求来源数、Claim 数、字数或图表数量。每个进入 A2 的关键判断和数字都必须通过证据门槛并完成审计；资料不足时缩小范围，不降低标准。
+研究范围由用户问题和证据决定，不追求来源数、Claim 数、字数或图表数量。每个进入 A2 的关键判断和数字都必须通过适用的证据门槛并完成审计；资料不足时缩小可确认结论的范围，保留未解决问题，不静默改变用户的研究目标。
 
 涉及“最新、现在、最近”时联网核实，并记录发布日期和访问日期。输出到用户指定位置；未指定时使用当前项目的 `output/`。
 
@@ -58,7 +58,7 @@ description: |
 
 在 `report.md` 附录 A1 和 A2 分别维护来源与 Claim 账本。来源使用稳定 ID（`S01`、`S02`），关键判断使用 Claim ID（`C01`、`C02`）。把“来源出处”和“证据作用”分开记录。
 
-研究过程中持续更新账本。每条关键判断的支持证据、替代解释、反向材料、独立性、置信度、资料缺口和反证条件，按 [references/evidence-protocol.md](references/evidence-protocol.md) 记录和判断；因果和机制判断还要标明证据达到“机制可行”“案例中运行”“解释力已确认”或“解释力未确认”的哪一层。不要凭感觉设定置信度或机制状态。
+研究过程中持续更新账本。每条关键判断的支持证据、替代解释、反向材料、独立性、置信度、资料缺口和修订条件，按 [references/evidence-protocol.md](references/evidence-protocol.md) 记录和判断；因果和机制判断分别记录过程证据与归因边界。过程已发生不等于它足以解释总体结果。
 
 证据不足时交付“已确认部分 + 资料缺口 + 下一步验证路径”。因果或机制证据不完整时降级表述，不补写猜测，也不因局部缺口停止整份交付。
 
@@ -74,7 +74,7 @@ description: |
 
 ### 4. 写作与视觉表达
 
-使用 [assets/report-template.md](assets/report-template.md) 的四个必选章节、按需保留的第五章和必要附录。第一章同时承担核心回答和对象底图；第四章既解释历史节点的因果机制，也解释当前系统如何产生价值、成本、风险或结果。章节标题使用自然语言，篇幅服从问题和证据。
+使用 [assets/report-template.md](assets/report-template.md) 的元数据与必要附录。正文先回答问题并建立对象底图，再按问题组织解释。模板的演化式目录是默认示例；横向比较或稳定机制研究可以围绕具体问题连续展开观察、原因和机制，不必补写无关历史。重组目录不免除证据审计、解释追踪和双重回返；删除空章节及没有解释增量的重复。
 
 关键关系用图能显著减少读者对照、记忆或推演负担时，应制作相应分析图；数量由需要解释的关系决定。不能以正文已有描述或缺少量化数据为由省略有价值的图。图、表与文字各取所长，避免重复和装饰。量化图必须有可靠且可比较的数据；具体触发条件、证据要求和图表契约见 [references/visual-guidelines.md](references/visual-guidelines.md)。
 
@@ -106,10 +106,12 @@ python [skill目录]/scripts/validate_report.py report.md
 ```bash
 python [skill目录]/scripts/render_report.py report.md output.html
 python [skill目录]/scripts/render_report.py report.md output.pdf
-python [skill目录]/scripts/validate_report.py report.md --pdf output.pdf
+python [skill目录]/scripts/validate_report.py report.md --html output.html --pdf output.pdf
 ```
 
 渲染前在 `report.md` 同级的 `fonts/` 放置 `NotoSansCJKsc-Regular.otf` 和 `NotoSansCJKsc-Bold.otf`，并安装 `WeasyPrint 69.0`。渲染器会检查并嵌入这两种字体。
+
+新报告使用模板中的 `证据契约：3`。校验历史报告时显式加 `--legacy-schema`，其通过只表示旧契约通过，不证明现行证据要求或产物一致性已满足。新交付不得用兼容模式绕过失败。渲染器为每个产物生成同名 `.manifest.json`，核对 Markdown、产物与本地资源摘要；保留这些构建凭据以防误发旧版本，正文或资源变更后重新渲染。摘要检查用于版本一致性，不证明事实或版面正确。
 
 PDF 只通过本 Skill 的 `render_report.py` 生成，不另写 ReportLab 或其他 Markdown-to-PDF 实现，也不绕过 [assets/report.css](assets/report.css)。渲染依赖或字体不可用时说明阻塞，不切换到其他引擎或排版实现降级交付。完成可行且已授权的依赖修复；PDF 仍阻塞时，提供已完成并通过适用检查的 Markdown，以及能够合规生成的 HTML，明确 PDF 尚未完成，不把部分交付称为完整交付。
 

@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import mimetypes
 import html
 import os
 import re
@@ -14,6 +16,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit, urlunsplit
 
 from linkify_sources import linkify_html
+from report_artifacts import MediaReferences, local_path, sha256, write_manifest
 
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
@@ -104,21 +107,30 @@ def _split_report(md_text: str) -> tuple[str, str, str]:
             lines[index] = ""
             break
 
-    return title, meta_line, "\n".join(lines)
+    body = "\n".join(lines)
+    body = re.sub(r"^>\s*证据契约：3\s*$", "", body, flags=re.MULTILINE)
+    return title, meta_line, body
 
 
-def _resolve_local_media(html_body: str, base_dir: Path | None) -> str:
+def _resolve_local_media(html_body: str, base_dir: Path | None, embed: bool = False) -> str:
     """Resolve relative image references against the Markdown directory."""
     if base_dir is None:
         return html_body
 
     attribute = re.compile(
-        r'(<(?:img|image)\b[^>]*?\b(?:src|href|xlink:href)\s*=\s*)(["\'])(.*?)\2',
+        r'(<(?:img|image|use)\b[^>]*?\b(?:src|href|xlink:href)\s*=\s*)(["\'])(.*?)\2',
         flags=re.IGNORECASE | re.DOTALL,
     )
 
     def resolve(match: re.Match[str]) -> str:
         value = match.group(3).strip()
+        path = local_path(html.unescape(value), base_dir)
+        if embed and path is not None:
+            mime = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+            encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+            fragment = urlsplit(value).fragment
+            uri = f"data:{mime};base64,{encoded}" + (f"#{fragment}" if fragment else "")
+            return f"{match.group(1)}{match.group(2)}{uri}{match.group(2)}"
         parsed = urlsplit(value)
         if (
             not value
@@ -128,8 +140,8 @@ def _resolve_local_media(html_body: str, base_dir: Path | None) -> str:
         ):
             return match.group(0)
 
-        local_path = (base_dir / unquote(parsed.path)).resolve().as_uri()
-        resolved = urlsplit(local_path)
+        local_uri = (base_dir / unquote(parsed.path)).resolve().as_uri()
+        resolved = urlsplit(local_uri)
         rewritten = urlunsplit(
             (resolved.scheme, resolved.netloc, resolved.path, parsed.query, parsed.fragment)
         )
@@ -166,7 +178,7 @@ def build_html(
 ) -> tuple[str, str, str]:
     report_title, meta_line, body_md = _split_report(md_text)
     html_body, converter = markdown_to_html(body_md)
-    html_body = _resolve_local_media(html_body, asset_base)
+    html_body = _resolve_local_media(html_body, asset_base, embed=True)
 
     css = DEFAULT_CSS.read_text(encoding="utf-8")
     if "HEADER_TEXT" not in css:
@@ -264,7 +276,24 @@ def main() -> None:
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     md_text = input_path.read_text(encoding="utf-8")
+    media = MediaReferences()
+    media.feed(md_text)
+    refs = media.refs + re.findall(r"!\[[^\]]*\]\(([^)\s]+)", md_text)
+    dependencies = [DEFAULT_CSS]
+    remote = []
+    for ref in refs:
+        path = local_path(ref, input_path.parent)
+        if path is not None:
+            dependencies.append(path)
+        elif ref.startswith(("https://", "http://", "//")):
+            remote.append(ref)
+    if font_dir is not None:
+        dependencies.extend(font_dir / name for name in FONT_FILES.values())
     try:
+        expected_inputs = {path: sha256(path) for path in {input_path, *dependencies}}
+        # Catch an edit between reading Markdown and taking the resource snapshot.
+        if input_path.read_text(encoding="utf-8") != md_text:
+            raise ValueError("Markdown changed while preparing render; render again.")
         rendered_html, report_title, converter = build_html(
             md_text,
             asset_base=input_path.parent,
@@ -276,6 +305,10 @@ def main() -> None:
 
     if output_path.suffix.lower() == ".html":
         output_path.write_text(rendered_html, encoding="utf-8")
+        try:
+            write_manifest(input_path, output_path, dependencies, remote, expected_inputs)
+        except (OSError, ValueError) as exc:
+            raise SystemExit(f"Artifact manifest failed; render again: {exc}") from exc
         print(f"[OK] HTML: {output_path}")
         print(f"[OK] Markdown converter: {converter}")
         print(f"[OK] Source links: {n_links}; ledger anchors: {n_rows}")
@@ -304,6 +337,10 @@ def main() -> None:
         ) from exc
 
     os.replace(temporary_pdf, output_path)
+    try:
+        write_manifest(input_path, output_path, dependencies, remote, expected_inputs)
+    except (OSError, ValueError) as exc:
+        raise SystemExit(f"Artifact manifest failed; render again: {exc}") from exc
     html_path.unlink(missing_ok=True)
     size_kb = output_path.stat().st_size / 1024
     print(f"[OK] PDF: {output_path} ({size_kb:.1f} KB)")
