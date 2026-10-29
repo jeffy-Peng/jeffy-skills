@@ -206,6 +206,23 @@ class ValidateReportTests(unittest.TestCase):
 
         self.assertTrue(any("placeholder" in error.lower() for error in errors), errors)
 
+    def test_svg_url_and_prose_url_are_not_placeholders(self) -> None:
+        figure = '<figure><svg viewBox="0 0 10 10" role="img" aria-label="示意"><defs><marker id="arrow"><path d="M0 0L2 1L0 2Z"/></marker></defs><path d="M1 1L8 8" marker-end="url(#arrow)"/></svg><figcaption>图 1：关系 [S01]</figcaption></figure>'
+        report = VALID_REPORT.replace("## 二、为什么会走到今天", "来源 URL 用于定位原文。\n\n" + figure + "\n\n## 二、为什么会走到今天")
+        self.assertEqual(validate_report.validate_markdown(report)[0], [])
+
+    def test_real_link_placeholders_report_location(self) -> None:
+        for fragment in ('[来源](URL)', '<a href="URL">来源</a>'):
+            report = VALID_REPORT + "\n" + fragment
+            errors, _ = validate_report.validate_markdown(report)
+            self.assertTrue(any("placeholder at line" in error and "URL" in error for error in errors), errors)
+
+    def test_reference_style_image_obeys_figure_and_file_checks(self) -> None:
+        report = VALID_REPORT + "\n![Plot][plot]\n\n[plot]: missing-reference.png\n"
+        errors, _ = validate_report.validate_markdown(report, base_dir=Path(__file__).parent)
+        self.assertTrue(any("outside a <figure>" in error for error in errors), errors)
+        self.assertTrue(any("missing-reference.png" in error for error in errors), errors)
+
     def test_duplicate_source_id_fails(self) -> None:
         original = (
             "| S01 | [NASA fact sheet](https://example.com/moon)；发布者：NASA；发布：2026-08-01；访问：2026-08-29 | "

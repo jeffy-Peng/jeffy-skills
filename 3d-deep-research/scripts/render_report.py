@@ -256,6 +256,26 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def collect_dependencies(md_text: str, base: Path, font_dir: Path | None) -> tuple[list[Path], list[str]]:
+    # Use the converter's actual output, including reference-style Markdown images.
+    converted, _ = markdown_to_html(md_text)
+    media = MediaReferences()
+    media.feed(converted)
+    dependencies = [DEFAULT_CSS, Path(__file__).resolve(),
+                    SKILL_DIR / "scripts" / "linkify_sources.py",
+                    SKILL_DIR / "scripts" / "report_artifacts.py"]
+    remote = []
+    for ref in media.refs:
+        path = local_path(ref, base)
+        if path is not None:
+            dependencies.append(path)
+        elif ref.startswith(("https://", "http://", "//")):
+            remote.append(ref)
+    if font_dir is not None:
+        dependencies.extend(font_dir / name for name in FONT_FILES.values())
+    return dependencies, remote
+
+
 def main() -> None:
     _configure_utf8_console()
     args = parse_args()
@@ -276,20 +296,8 @@ def main() -> None:
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     md_text = input_path.read_text(encoding="utf-8")
-    media = MediaReferences()
-    media.feed(md_text)
-    refs = media.refs + re.findall(r"!\[[^\]]*\]\(([^)\s]+)", md_text)
-    dependencies = [DEFAULT_CSS]
-    remote = []
-    for ref in refs:
-        path = local_path(ref, input_path.parent)
-        if path is not None:
-            dependencies.append(path)
-        elif ref.startswith(("https://", "http://", "//")):
-            remote.append(ref)
-    if font_dir is not None:
-        dependencies.extend(font_dir / name for name in FONT_FILES.values())
     try:
+        dependencies, remote = collect_dependencies(md_text, input_path.parent, font_dir)
         expected_inputs = {path: sha256(path) for path in {input_path, *dependencies}}
         # Catch an edit between reading Markdown and taking the resource snapshot.
         if input_path.read_text(encoding="utf-8") != md_text:

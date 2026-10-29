@@ -73,6 +73,22 @@ class RenderReportTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "Missing required Noto CJK font"):
                 render_report._font_face_css(Path(directory))
 
+    def test_reference_image_enters_manifest_and_invalidates_cache(self) -> None:
+        from report_artifacts import write_manifest, validate_manifest
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, output, chart = root / "report.md", root / "output.html", root / "plot.png"
+            text = "# Test\n\n![Plot][plot]\n\n[plot]: plot.png\n"
+            source.write_text(text, encoding="utf-8")
+            output.write_text("artifact", encoding="utf-8")
+            chart.write_bytes(b"image version one")
+            dependencies, remote = render_report.collect_dependencies(text, root, None)
+            self.assertIn(chart, dependencies)
+            write_manifest(source, output, dependencies, remote)
+            self.assertEqual(validate_manifest(source, output)[0], [])
+            chart.write_bytes(b"image version two")
+            self.assertTrue(validate_manifest(source, output)[0])
+
 
 if __name__ == "__main__":
     unittest.main()

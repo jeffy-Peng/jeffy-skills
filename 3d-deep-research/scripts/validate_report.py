@@ -55,7 +55,8 @@ PLACEHOLDER_PATTERNS = (
     r"\{\{[^}]+\}\}",
     r"\bTODO\b",
     r"\bTBD\b",
-    r"\bURL\b",
+    r"\]\(\s*URL\s*\)",
+    r"\b(?:href|src)\s*=\s*[\"']URL[\"']",
     r"^\s*(?:#{1,6}\s*)?\[[^\]\n]+\]\s*$",
     r"\|\s*\[[^|\n]+\]\s*(?=\|)",
 )
@@ -488,6 +489,24 @@ class _SVGAttributes(HTMLParser):
             self.items.append(dict(attrs))
 
 
+class _RenderedImages(MediaReferences):
+    def __init__(self) -> None:
+        super().__init__()
+        self.figure_depth = 0
+        self.outside = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "figure":
+            self.figure_depth += 1
+        if tag in {"img", "image", "svg"} and self.figure_depth == 0:
+            self.outside = True
+        super().handle_starttag(tag, attrs)
+
+    def handle_endtag(self, tag):
+        if tag == "figure":
+            self.figure_depth = max(0, self.figure_depth - 1)
+
+
 def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
     errors: list[str] = []
     figures = list(
@@ -523,10 +542,23 @@ def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
         if not _inside(match.start(), ranges):
             errors.append("An image or SVG appears outside a <figure> element.")
 
+    reference_refs = []
+    if re.search(r"!\[[^\]\n]*\](?!\()", md_text):
+        from render_report import markdown_to_html
+        try:
+            rendered, _ = markdown_to_html(md_text)
+            reference_media = _RenderedImages()
+            reference_media.feed(rendered)
+            reference_refs = reference_media.refs
+            if reference_media.outside:
+                errors.append("A rendered Markdown image appears outside a <figure> element.")
+        except RuntimeError as exc:
+            errors.append(f"Cannot validate reference-style images: {exc}")
+
     if base_dir is not None:
         media_parser = MediaReferences()
         media_parser.feed(md_text)
-        refs = media_parser.refs
+        refs = media_parser.refs + reference_refs
         refs += re.findall(r"!\[[^\]]*\]\(([^)\s]+)", md_text)
         for ref in sorted(set(refs)):
             candidate = local_path(ref, base_dir)
@@ -566,11 +598,13 @@ def validate_markdown(
             f"Found: {main_sections or 'none'}."
         )
 
-    placeholders: list[str] = []
+    placeholders: set[tuple[int, str]] = set()
     for pattern in PLACEHOLDER_PATTERNS:
-        placeholders.extend(re.findall(pattern, md_text, flags=re.IGNORECASE | re.MULTILINE))
-    if placeholders:
-        errors.append("Unresolved template placeholders were found.")
+        for match in re.finditer(pattern, md_text, flags=re.IGNORECASE | re.MULTILINE):
+            line = md_text.count("\n", 0, match.start()) + 1
+            placeholders.add((line, match.group(0).strip()[:100]))
+    for line, value in sorted(placeholders):
+        errors.append(f"Unresolved template placeholder at line {line}: {value!r}.")
     if re.search(r"```\s*mermaid\b", md_text, flags=re.IGNORECASE):
         errors.append("Unrendered Mermaid source found.")
 
@@ -660,7 +694,7 @@ def main() -> None:
     for warning in warnings:
         print(f"[WARN] {warning}")
     passed = not errors
-    print("[OK] Report validation passed." if passed else "[FAIL] Report validation failed.")
+    print("[OK] Structure and artifact consistency checks passed; content and visual review remain separate." if passed else "[FAIL] Structure or artifact consistency checks failed.")
     raise SystemExit(0 if passed else 1)
 
 
