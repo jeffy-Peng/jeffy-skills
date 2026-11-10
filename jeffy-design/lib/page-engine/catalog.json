@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "id": "BAR-001",
+      "type": "bar",
+      "inputs": "非负数值，类别等长",
+      "owns": [
+        "柱体几何"
+      ],
+      "shared": [
+        "categories",
+        "numeric-axis",
+        "legend"
+      ],
+      "engine": "page-engine"
+    },
+    {
+      "id": "LINE-001",
+      "type": "line",
+      "inputs": "数值或null，类别等长",
+      "modes": [
+        "raw",
+        "cumulative",
+        "index"
+      ],
+      "shapes": [
+        "linear",
+        "step"
+      ],
+      "owns": [
+        "折线路径",
+        "数据点"
+      ],
+      "shared": [
+        "categories",
+        "numeric-axis",
+        "legend"
+      ],
+      "engine": "page-engine"
+    }
+  ],
+  "canvas": {
+    "width": 1280,
+    "height": 720
+  },
+  "status": "首批验证：柱、线、同图组合"
+}

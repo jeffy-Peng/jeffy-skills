@@ -1,0 +1,224 @@
+{
+  "catalogRows": 30,
+  "aliasSearch": "passed",
+  "previews": [
+    {
+      "id": "BAR-001",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "BAR-002",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "BAR-003",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "BAR-005",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "BAR-006",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "BAR-007",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "LINE-001",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "PIE-001",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "SCATTER-001",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "TABLE-001",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "TABLE-002",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "MATRIX-001",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "REL-001",
+      "sheet": "原方案（旧状态待核对）",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "REL-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "FLOW-001",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "TIME-001",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "TIME-002",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "REL-003",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "REL-006",
+      "sheet": "统一组件",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "HEAT-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "DIST-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "SANKEY-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "FUNNEL-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "LOOP-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "SET-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "BOX-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "RADAR-001",
+      "sheet": "简洁线条",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "FLOW-002",
+      "sheet": "草稿预览",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "REL-002",
+      "sheet": "草稿预览",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "REL-004",
+      "sheet": "草稿预览",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    },
+    {
+      "id": "REL-005",
+      "sheet": "草稿预览",
+      "pageErrors": [],
+      "feedback": "",
+      "loaded": true
+    }
+  ],
+  "scope": "初始加载检查，不等于参数和数据边界回归"
+}

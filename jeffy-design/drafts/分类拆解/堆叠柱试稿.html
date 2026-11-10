@@ -1,0 +1,73 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>分类拆解 · 堆叠柱试稿</title><style>*{box-sizing:border-box}body{--paper:#ffffff;--ink:#222222;--body:#444444;--grid:#dddddd;--muted:#8a8a8a;--p1:#222222;--p2:#5a5a5a;--p3:#9a9a9a;--p4:#d6d6d6;margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 Georgia,'Noto Serif SC',SimSun,serif}button,a{font:inherit;color:inherit}button{cursor:pointer;border:0;background:transparent;padding:5px 14px}button[aria-pressed=true]{background:var(--ink);color:var(--paper)}main{max-width:1500px;margin:auto;padding:35px 4.6vw}header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:20px}h1{font-weight:400;font-size:28px;line-height:1.18;letter-spacing:0;margin:0}h2{font-size:20px;margin:0;font-weight:600}small,.meta{font:12px/1.5 Georgia,SimSun,serif;letter-spacing:.06em;color:var(--body)}.switch{border:1px solid var(--grid);display:flex;margin-left:auto}.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px;margin:26px 0 18px}.panel{border-top:1px solid var(--grid);padding:14px 0 0}.panel h2{margin:3px 0 1px}.panel svg{display:block;width:100%;height:auto}svg text{font-family:inherit}.standard{border-top:1px solid var(--ink);padding-top:12px;margin-top:26px}.standard p{margin:8px 0 0;color:var(--body)}a{text-underline-offset:4px}@media(max-width:800px){.pair{grid-template-columns:1fr}}body,small,.meta,button{font-family:Georgia,'Noto Serif SC','Source Han Serif SC',serif}</style><body><main><header><div><small>数值比较　/　分类拆解</small><h1>分类拆解</h1></div><div class="switch" aria-label="视图"><button data-mode="abs" aria-pressed="true">绝对量</button><button data-mode="pct" aria-pressed="false">百分比</button></div></header><div class="pair"><article class="panel"><small>试稿 S1</small><h2>纵向堆叠柱</h2><span class="meta">看每个类别的总量和构成</span><svg viewBox="0 0 570 312" data-form="A" role="img" aria-label="纵向堆叠柱，类别 A 至 D，每类分四项"></svg></article><article class="panel"><small>试稿 S2</small><h2>横向堆叠条</h2><span class="meta">名称长或分项多时改用</span><svg viewBox="0 0 570 312" data-form="B" role="img" aria-label="横向堆叠条，类别 A 至 D，每类分四项"></svg></article></div><small>A 至 D 与分项名均为占位，两种方向共用同一组数据。切换按钮只是试稿里比较值域用，入库版不带。</small><section class="standard"><h2>草案标准</h2><p>本组回答每个类别由哪几项组成，不是比较两个对象。分项按固定顺序叠，第一项贴底，颜色从深到浅，最深给需要先读的一项。分项至少两项、进入图例，直接标注的名称不能代替图例。数值标在各段右端，纵向旋成竖排贴段中，这段标注用段内对比色，纵向旋 90 度竖排，横向横排；合计纵向标在柱顶，横向标在块末；纵向放 5 个类别以内、分项 4 项以内且名称短，名称长或分项多改用横向。总览用百分比，要看规模用绝对量，两者别混。图表标题顶部居中，轴线在主轴正端带外侧半箭头，分项走另一条轴，不画箭头。分项多于一项时零线为实线，低于 100% 的分项按实值堆叠，合计不足 100% 不补到顶。</p></section></main><script>
+// 修改 data 即可替换类别、分项名与各分项数值；两种方向共用这一数据结构。
+const parts=['分项一','分项二','分项三','分项四'];
+const data=[{label:'A',values:[5.2,3.8,2.4,1.1]},{label:'B',values:[4.6,3.2,2.1,1.0]},{label:'C',values:[3.9,2.6,1.8,.8]},{label:'D',values:[3.1,2.2,1.4,.7]}];
+const unit='单位', chartTitle='图表标题', valueAxis='名称 / '+unit;
+const ns='http://www.w3.org/2000/svg';
+function node(svg,tag,attrs,msg){const n=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(msg!==undefined)n.textContent=msg;svg.append(n);return n}
+function draw(svg){
+ svg.replaceChildren();
+ const form=svg.dataset.form,horizontal=form==='B';
+ const pct=data.some(d=>d.pct);
+ const vals=d=>pct?d.values.map(v=>v/d.values.reduce((a,b)=>a+b,0)*100):d.values;
+ const longest=Math.max(...data.map(d=>Array.from(d.label).length));
+ const left=horizontal?Math.max(55,16+longest*15):65,right=horizontal?505:545,top=47,bottom=248;
+ const maxv=pct?100:Math.max(...data.map(d=>vals(d).reduce((a,b)=>a+b,0)));
+ const power=10**Math.floor(Math.log10(maxv/4));
+ let step=([1,2,2.5,5,10].find(x=>x*power>=maxv/4)||10)*power;
+ let limit=pct?100:Math.ceil(maxv/step)*step;
+ if(pct)step=25;
+ const text=(x,y,s,anchor='start',size=14,k='',fill='var(--body)')=>{const n=node(svg,'text',{x,y,'text-anchor':anchor,'font-size':size,...(k?{'data-k':k}:{}),...(fill?{fill}:{})},s);n.style.fill='';return n};
+ const paint=i=>['var(--p1)','var(--p2)','var(--p3)','var(--p4)'][i%4],ink=['#f0f0f0','#f0f0f0','#e0e0e0','#222222'];
+ node(svg,'title',{},data.map(d=>d.label+'：'+parts.map((p,j)=>p+' '+vals(d)[j].toFixed(pct?1:1)+'%').join('，')).join('；'));
+ text(285,25,chartTitle,'middle',20,'title','var(--ink)').setAttribute('font-weight','600');
+ const widths=parts.map(p=>{const t=text(0,310,p,'start',11.5,'');const w=t.getComputedTextLength();t.remove();return w});
+ const sw=12,sh=8,pad=6,gap=18,total=widths.reduce((a,w)=>a+sw+pad+w,0)+gap*(parts.length-1);
+ let lx=285-total/2;
+ parts.forEach((p,j)=>{node(svg,'rect',{x:lx,y:302,width:sw,height:sh,fill:paint(j)});text(lx+sw+pad,310,p,'start',11.5,'legend');lx+=sw+pad+widths[j]+gap});
+ node(svg,'path',{d:'M'+left+' '+top+' V'+bottom+' H'+right,stroke:'var(--ink)',fill:'none','stroke-width':1.3});
+ node(svg,'path',{d:`M${left} ${top+1}v-8l-3 4 M${right-1} ${bottom}h9l-4 3`,fill:'none',stroke:'var(--ink)','stroke-width':1.3});
+ if(horizontal)text(right,bottom+50,valueAxis,'end',12);
+ else{const t=text(17,(top+bottom)/2,valueAxis,'middle',14);t.setAttribute('transform','rotate(-90 17 '+((top+bottom)/2)+')')}
+ for(let k=0;k*step<=limit+1e-9;k++){
+  const v=k*step,x=left+(right-left)*v/limit,y=bottom-(bottom-top)*v/limit;
+  if(v>0)node(svg,'line',horizontal?{x1:x,y1:top,x2:x,y2:bottom,stroke:'var(--grid)'}:{x1:left,y1:y,x2:right,y2:y,stroke:'var(--grid)'});
+  const tick=Number.isInteger(v)?v:+v.toFixed(2);
+  if(horizontal)text(x,bottom+22,tick,'middle',12,'tick');else text(left-9,y+4,tick,'end',12,'tick');
+ }
+ const fmt=v=>pct?v.toFixed(1)+'%':(Number.isInteger(v)?String(v):v.toFixed(1));
+ const lab=(x,y,s,a,size,j)=>text(x,y,s,a,size,'value',ink[j]);
+ data.forEach((d,i)=>{
+  const vs=vals(d);
+  if(horizontal){
+   const band=(bottom-top)/data.length,barH=Math.min(26,band*.46),mid=top+band*(i+.5),y=mid-barH/2;
+   let acc=0;
+   vs.forEach((v,j)=>{
+    const x0=left+(right-left)*acc/limit,x1=left+(right-left)*(acc+v)/limit;
+    node(svg,'rect',{x:x0,y,width:x1-x0,height:barH,fill:paint(j)});
+    if(x1-x0>34)lab(x1-6,y+barH/2+4.5,fmt(v),'end',12,j);
+    acc+=v;
+   });
+   text(right+14,mid+5,pct?'100%':fmt(vs.reduce((a,b)=>a+b,0)),'start',14,'total');
+   text(left-12,mid+5,d.label,'end',15,'cat');
+  }else{
+   const band=(right-left)/data.length,barW=Math.min(56,band*.46),mid=left+band*(i+.5),x=mid-barW/2;
+   let acc=0;
+   vs.forEach((v,j)=>{
+    const y1=bottom-(bottom-top)*acc/limit,y0=bottom-(bottom-top)*(acc+v)/limit;
+    node(svg,'rect',{x,y:y0,width:barW,height:y1-y0,fill:paint(j)});
+    if(y1-y0>30)lab(x+barW/2,(y0+y1)/2+4,fmt(v),'middle',11,j);
+    acc+=v;
+   });
+   text(mid,bottom+25,d.label,'middle',14,'cat');
+   if(!pct){text(x+barW/2,bottom-(bottom-top)*acc/limit-8,fmt(vs.reduce((a,b)=>a+b,0)),'middle',13,'total')}
+  }
+ });
+}
+document.querySelectorAll('svg').forEach(draw);
+document.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+ data.forEach(d=>{d.pct=b.dataset.mode==='pct'});
+ document.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+ document.querySelectorAll('svg').forEach(draw);
+});
+</script></body></html>

@@ -1,0 +1,225 @@
+{
+  "results": [
+    {
+      "name": "grouped-horizontal",
+      "material": "BAR-002",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "stacked-horizontal-value",
+      "material": "BAR-003",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "stacked-horizontal-percent",
+      "material": "BAR-003",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "waterfall-horizontal",
+      "material": "BAR-006",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": true,
+      "errors": []
+    },
+    {
+      "name": "timeline-horizontal-time",
+      "material": "TIME-001",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "timeline-horizontal-equal",
+      "material": "TIME-001",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "hierarchy-horizontal",
+      "material": "REL-001",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "grouped-vertical",
+      "material": "BAR-002",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "stacked-vertical-value",
+      "material": "BAR-003",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "stacked-vertical-percent",
+      "material": "BAR-003",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "waterfall-vertical",
+      "material": "BAR-006",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": true,
+      "errors": []
+    },
+    {
+      "name": "timeline-vertical-time",
+      "material": "TIME-001",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "timeline-vertical-equal",
+      "material": "TIME-001",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "hierarchy-vertical",
+      "material": "REL-001",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "six-categories-three-series",
+      "material": "BAR-002",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "stacked-zero-total",
+      "material": "BAR-003",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": true,
+      "errors": []
+    },
+    {
+      "name": "waterfall-negative-end",
+      "material": "BAR-006",
+      "expected": null,
+      "pass": true,
+      "codes": [],
+      "invariant": true,
+      "errors": []
+    },
+    {
+      "name": "grouped-negative-rejected",
+      "material": "BAR-002",
+      "expected": "DATA",
+      "pass": true,
+      "codes": [
+        "DATA"
+      ],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "timeline-bad-date",
+      "material": "TIME-001",
+      "expected": "DATA",
+      "pass": true,
+      "codes": [
+        "DATA"
+      ],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "timeline-duplicate-id",
+      "material": "TIME-001",
+      "expected": "DATA",
+      "pass": true,
+      "codes": [
+        "DATA"
+      ],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "hierarchy-empty-root",
+      "material": "REL-001",
+      "expected": "DATA",
+      "pass": true,
+      "codes": [
+        "DATA"
+      ],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "hierarchy-small-slot",
+      "material": "REL-001",
+      "expected": "CAPACITY",
+      "pass": true,
+      "codes": [
+        "CAPACITY"
+      ],
+      "invariant": null,
+      "errors": []
+    },
+    {
+      "name": "grouped-small-slot",
+      "material": "BAR-002",
+      "expected": "CAPACITY",
+      "pass": true,
+      "codes": [
+        "CAPACITY",
+        "LAYOUT"
+      ],
+      "invariant": null,
+      "errors": []
+    }
+  ],
+  "scope": "参数与异常输入、固定主题字号、零总量和瀑布累计；静态适配，不验证整页动效"
+}

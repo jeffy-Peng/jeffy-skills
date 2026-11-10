@@ -1,0 +1,267 @@
+{
+  "updated": "2026-11-11",
+  "counts": {
+    "entries": 30,
+    "drafts": 4,
+    "composition": 12,
+    "samePlot": 2
+  },
+  "referencesChecked": 87,
+  "missing": [],
+  "dependencies": [
+    {
+      "preview": "assets\\简洁线条组件\\TREE-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\散点图组件\\SCATTER-001.html",
+      "script": "scatter.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\矩阵组件\\MATRIX-001.html",
+      "script": "matrix.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\时间组件\\TIME-001.html",
+      "script": "timeline.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-003.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-003.html",
+      "script": "bar.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-003.html",
+      "script": "../共用/motion.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\SANKEY-001.html",
+      "script": "charts.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\表格组件\\TABLE-001.html",
+      "script": "table.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\HEAT-001.html",
+      "script": "charts.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-001.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-001.html",
+      "script": "bar.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-001.html",
+      "script": "../共用/motion.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\DIST-001.html",
+      "script": "charts.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\SET-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\LOOP-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\架构关系组件\\REL-003.html",
+      "script": "containment.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\占比图组件\\PIE-001.html",
+      "script": "pie.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\占比图组件\\PIE-001.html",
+      "script": "../共用/motion.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\折线图组件\\LINE-001.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\折线图组件\\LINE-001.html",
+      "script": "line.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\折线图组件\\LINE-001.html",
+      "script": "../共用/motion.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\FUNNEL-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-006.html",
+      "script": "advanced-bar.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-007.html",
+      "script": "advanced-bar.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分布与轮廓组件\\RADAR-001.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分布与轮廓组件\\RADAR-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分布与轮廓组件\\BOX-001.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分布与轮廓组件\\BOX-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\中心辐射\\REL-005.html",
+      "script": "hub.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\表格组件\\TABLE-002.html",
+      "script": "table.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-005.html",
+      "script": "advanced-bar.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-002.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-002.html",
+      "script": "bar.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-002.html",
+      "script": "../共用/motion.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\交换关系\\REL-002.html",
+      "script": "exchange.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\分层架构\\REL-004.html",
+      "script": "layers.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\时间组件\\TIME-002.html",
+      "script": "duration.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\架构关系组件\\REL-001.html",
+      "script": "hierarchy.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\流程图组件\\FLOW-001.html",
+      "script": "../共用/line-labels.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\流程图组件\\FLOW-001.html",
+      "script": "flow.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\架构关系组件\\REL-006.html",
+      "script": "../共用/line-labels.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\架构关系组件\\REL-006.html",
+      "script": "network.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\泳道图\\FLOW-002.html",
+      "script": "swimlane.js",
+      "exists": true
+    }
+  ],
+  "legacyPreviews": [
+    {
+      "path": "两组数值对比/BAR-002-A.html",
+      "classification": "历史跳转入口",
+      "target": "../柱状图组件/BAR-002.html"
+    },
+    {
+      "path": "两组数值对比/BAR-002-B.html",
+      "classification": "历史跳转入口",
+      "target": "../柱状图组件/BAR-002.html?direction=horizontal"
+    },
+    {
+      "path": "分类拆解/BAR-003-A.html",
+      "classification": "历史跳转入口",
+      "target": "../柱状图组件/BAR-003.html"
+    },
+    {
+      "path": "分类拆解/BAR-003-B.html",
+      "classification": "历史跳转入口",
+      "target": "../柱状图组件/BAR-003.html?direction=horizontal"
+    },
+    {
+      "path": "单系列柱状图/BAR-001-A.html",
+      "classification": "历史跳转入口",
+      "target": "../柱状图组件/BAR-001.html"
+    },
+    {
+      "path": "单系列柱状图/BAR-001-B.html",
+      "classification": "历史跳转入口",
+      "target": "../柱状图组件/BAR-001.html?direction=horizontal"
+    }
+  ],
+  "draftCopies": "同ID的历史草稿不重复登记；BAR-004并入BAR-002；TREE-001为REL-001方案文件。",
+  "scope": "文件、引用和登记核对；不代表全库数据、动效或语义回归"
+}

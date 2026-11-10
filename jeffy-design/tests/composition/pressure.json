@@ -1,0 +1,586 @@
+{
+  "theme": "mono",
+  "pages": [
+    {
+      "id": "business",
+      "title": "订单增长50%，净成交额下降10%",
+      "question": "订单增长为什么没有带来更多留存金额？",
+      "claim": "客单价下降与退款增加共同抵消订单增长。",
+      "readingOrder": [
+        "trend",
+        "share",
+        "takeaway",
+        "audit"
+      ],
+      "components": [
+        {
+          "id": "trend",
+          "material": "LINE-001",
+          "purpose": "用同基期指数对比订单、成交额和净成交额的分化",
+          "box": {
+            "x": 64,
+            "y": 165,
+            "width": 620,
+            "height": 300
+          },
+          "data": {
+            "title": "",
+            "metric": "基期指数",
+            "unit": "1月=100",
+            "labels": [
+              "1月",
+              "6月"
+            ],
+            "series": [
+              {
+                "name": "订单",
+                "values": [
+                  100,
+                  150
+                ]
+              },
+              {
+                "name": "成交额",
+                "values": [
+                  100,
+                  112.5
+                ]
+              },
+              {
+                "name": "净成交额",
+                "values": [
+                  100,
+                  90
+                ]
+              }
+            ]
+          },
+          "options": {
+            "points": true,
+            "zero": false,
+            "mode": "raw"
+          }
+        },
+        {
+          "id": "share",
+          "material": "PIE-001",
+          "purpose": "解释6月成交额退款与留存的构成",
+          "box": {
+            "x": 724,
+            "y": 165,
+            "width": 492,
+            "height": 300
+          },
+          "data": {
+            "title": "",
+            "data": [
+              {
+                "label": "退款",
+                "value": 5.4
+              },
+              {
+                "label": "留存",
+                "value": 17.1
+              }
+            ],
+            "centerLabel": "成交额 / 万元"
+          },
+          "options": {
+            "donut": true,
+            "percent": true
+          }
+        },
+        {
+          "id": "audit",
+          "material": "TABLE-001",
+          "purpose": "逐项核对两个月的金额口径",
+          "box": {
+            "x": 64,
+            "y": 513,
+            "width": 1152,
+            "height": 141
+          },
+          "data": {
+            "title": "",
+            "columns": [
+              "时期",
+              "订单数（单）",
+              "客单价（元）",
+              "成交额（万元）",
+              "退款比例",
+              "净成交额（万元）"
+            ],
+            "rows": [
+              [
+                "1月",
+                1000,
+                200,
+                20,
+                "5%",
+                19
+              ],
+              [
+                "6月",
+                1500,
+                150,
+                22.5,
+                "24%",
+                17.1
+              ]
+            ],
+            "note": ""
+          },
+          "options": {}
+        }
+      ],
+      "text": [
+        {
+          "id": "trend-title",
+          "text": "同基期比较：订单与金额明显分化",
+          "box": {
+            "x": 64,
+            "y": 136,
+            "width": 620,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "share-title",
+          "text": "6月退款比例升至24%",
+          "box": {
+            "x": 724,
+            "y": 136,
+            "width": 492,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "takeaway",
+          "text": "订单 × 客单价得到成交额；再扣退款得到净成交额。净成交额不等于平台收入。",
+          "box": {
+            "x": 64,
+            "y": 475,
+            "width": 1152,
+            "height": 36
+          },
+          "role": "body"
+        }
+      ],
+      "speakerNotes": "先看趋势图，统一以一月为一百，订单升至一百五十，成交额只有一百一十二点五，净成交额降至九十。右侧六月退款占金额百分之二十四，留存十七点一万元。下表用原始量价金额核对：订单增加五成，但客单价下降四分之一，所以成交额只增长百分之十二点五；再加上退款比例上升，净成交额最终下降百分之十。这里不具备平台收入及利润数据。",
+      "source": "来源：合成测试数据与机制假设，非真实企业事实。",
+      "review": {
+        "content": "净成交额计算复核通过",
+        "expression": "人工复核阅读顺序与原始数据闭环"
+      }
+    },
+    {
+      "id": "mechanism",
+      "title": "平台管订单，支付机构处理资金",
+      "question": "订单流和资金流由谁承接，争议如何影响结算？",
+      "claim": "交易组织与资金处理分属不同主体；争议需要先处理。",
+      "readingOrder": [
+        "trade",
+        "money",
+        "roles",
+        "flow",
+        "boundary"
+      ],
+      "components": [
+        {
+          "id": "trade",
+          "material": "REL-006",
+          "purpose": "说明订单与履约关系",
+          "box": {
+            "x": 64,
+            "y": 167,
+            "width": 550,
+            "height": 245
+          },
+          "data": {
+            "nodes": [
+              {
+                "id": "p",
+                "title": "平台"
+              },
+              {
+                "id": "u",
+                "title": "买家"
+              },
+              {
+                "id": "s",
+                "title": "商家"
+              }
+            ],
+            "edges": [
+              {
+                "from": "u",
+                "to": "p",
+                "label": "下单"
+              },
+              {
+                "from": "p",
+                "to": "s",
+                "label": "订单"
+              },
+              {
+                "from": "s",
+                "to": "u",
+                "label": "履约"
+              }
+            ]
+          },
+          "options": {
+            "arrows": true,
+            "labels": true
+          },
+          "entities": {
+            "buyer": "买家"
+          }
+        },
+        {
+          "id": "money",
+          "material": "REL-006",
+          "purpose": "单独追踪付款和结算",
+          "box": {
+            "x": 666,
+            "y": 167,
+            "width": 550,
+            "height": 245
+          },
+          "data": {
+            "nodes": [
+              {
+                "id": "b",
+                "title": "支付"
+              },
+              {
+                "id": "u",
+                "title": "买家"
+              },
+              {
+                "id": "s",
+                "title": "商家"
+              }
+            ],
+            "edges": [
+              {
+                "from": "u",
+                "to": "b",
+                "label": "付款"
+              },
+              {
+                "from": "b",
+                "to": "s",
+                "label": "结算"
+              }
+            ]
+          },
+          "options": {
+            "arrows": true,
+            "labels": true
+          },
+          "entities": {
+            "buyer": "买家"
+          }
+        },
+        {
+          "id": "flow",
+          "material": "FLOW-001",
+          "purpose": "展示售后复核回路；不把争议当作正常结算",
+          "box": {
+            "x": 64,
+            "y": 473,
+            "width": 1152,
+            "height": 145
+          },
+          "data": {
+            "title": "",
+            "nodes": [
+              {
+                "id": "a",
+                "title": "订单",
+                "type": "start"
+              },
+              {
+                "id": "b",
+                "title": "履约",
+                "type": "process"
+              },
+              {
+                "id": "c",
+                "title": "争议？",
+                "type": "decision"
+              },
+              {
+                "id": "d",
+                "title": "结算",
+                "type": "end"
+              },
+              {
+                "id": "e",
+                "title": "复核",
+                "type": "process"
+              }
+            ],
+            "edges": [
+              {
+                "from": "a",
+                "to": "b"
+              },
+              {
+                "from": "b",
+                "to": "c"
+              },
+              {
+                "from": "c",
+                "to": "d",
+                "label": "否"
+              },
+              {
+                "from": "c",
+                "to": "e",
+                "label": "是"
+              },
+              {
+                "from": "e",
+                "to": "b",
+                "label": "重处理",
+                "feedback": true
+              }
+            ]
+          },
+          "options": {
+            "direction": "horizontal",
+            "details": false
+          }
+        }
+      ],
+      "text": [
+        {
+          "id": "trade-title",
+          "text": "订单与履约",
+          "box": {
+            "x": 64,
+            "y": 136,
+            "width": 550,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "money-title",
+          "text": "付款与结算",
+          "box": {
+            "x": 666,
+            "y": 136,
+            "width": 550,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "roles",
+          "text": "平台组织订单并向商家收佣金；支付机构按约定处理支付结算。两图中的买家、商家是同一主体。",
+          "box": {
+            "x": 64,
+            "y": 422,
+            "width": 1152,
+            "height": 43
+          },
+          "role": "body"
+        },
+        {
+          "id": "boundary",
+          "text": "本例“复核→履约”仅表示重新处理；完整业务还应按处理结果增加退款、取消等分支，不能据此推定资金托管方式。",
+          "box": {
+            "x": 64,
+            "y": 622,
+            "width": 1152,
+            "height": 32
+          },
+          "role": "body"
+        }
+      ],
+      "bindings": [
+        {
+          "id": "buyer",
+          "members": [
+            {
+              "component": "trade",
+              "field": "nodes.1.title"
+            },
+            {
+              "component": "money",
+              "field": "nodes.1.title"
+            }
+          ]
+        }
+      ],
+      "source": "来源：合成测试数据与机制假设，非真实企业事实。",
+      "speakerNotes": "左图看订单，买家向平台下单，平台把订单交给商家，商家履约。右图看资金，买家向支付机构付款，支付机构按约定结算给商家，两图中买家和商家都是相同主体。平台佣金在说明中单独写清。底部只展示争议复核并返回重新处理的回路，退款或终止结果并未被画出，因此这里只能用于解释局部处理机制，不代表完整售后流程。",
+      "review": {
+        "content": "明确局部流程边界，未声称涵盖所有售后结果",
+        "expression": "人工检查两张图的主体对应"
+      }
+    },
+    {
+      "id": "decision",
+      "title": "A得分最高，只有B通过准入",
+      "question": "评分最高是否代表可以选？",
+      "claim": "硬约束先于加权评分；只有B可进入下一轮。",
+      "readingOrder": [
+        "gate",
+        "score",
+        "conclusion",
+        "calculation"
+      ],
+      "components": [
+        {
+          "id": "score",
+          "material": "BAR-001",
+          "purpose": "比较评分，说明高分不能抵消准入失败",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 475,
+            "height": 280
+          },
+          "data": {
+            "title": "",
+            "metric": "加权评分",
+            "unit": "分",
+            "series": [
+              "加权评分"
+            ],
+            "data": [
+              {
+                "label": "方案 A",
+                "values": [
+                  87.5
+                ]
+              },
+              {
+                "label": "方案 B",
+                "values": [
+                  80
+                ]
+              },
+              {
+                "label": "方案 C",
+                "values": [
+                  75.5
+                ]
+              }
+            ]
+          },
+          "options": {
+            "kind": "single",
+            "direction": "horizontal"
+          }
+        },
+        {
+          "id": "gate",
+          "material": "TABLE-002",
+          "purpose": "以可核对数据检查准入门槛",
+          "box": {
+            "x": 569,
+            "y": 170,
+            "width": 647,
+            "height": 280
+          },
+          "data": {
+            "title": "",
+            "columns": [
+              "方案",
+              "境内存储",
+              "年成本≤80万",
+              "恢复时间≤30分",
+              "准入结果"
+            ],
+            "rows": [
+              [
+                "A",
+                "不满足",
+                "90万 · 不满足",
+                "15分 · 满足",
+                "淘汰"
+              ],
+              [
+                "B",
+                "满足",
+                "78万 · 满足",
+                "25分 · 满足",
+                "唯一可行"
+              ],
+              [
+                "C",
+                "满足",
+                "60万 · 满足",
+                "40分 · 不满足",
+                "淘汰"
+              ]
+            ],
+            "note": ""
+          },
+          "options": {
+            "focus": 4
+          }
+        }
+      ],
+      "text": [
+        {
+          "id": "score-title",
+          "text": "软指标：表现评分",
+          "box": {
+            "x": 64,
+            "y": 136,
+            "width": 475,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "gate-title",
+          "text": "硬约束：先决定能否入选",
+          "box": {
+            "x": 569,
+            "y": 136,
+            "width": 647,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "conclusion",
+          "text": "A：存储与成本不达标；C：恢复时间不达标。B通过准入，只代表可以继续验证，并非直接批准采购。",
+          "box": {
+            "x": 64,
+            "y": 472,
+            "width": 1152,
+            "height": 62
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "calculation",
+          "text": "性能 / 易用 / 集成 / 运维权重为40% / 30% / 20% / 10%。A：95 / 90 / 70 / 85 → 87.5；B：75 / 80 / 90 / 80 → 80；C：70 / 70 / 95 / 75 → 75.5。",
+          "box": {
+            "x": 64,
+            "y": 554,
+            "width": 1152,
+            "height": 70
+          },
+          "role": "body"
+        }
+      ],
+      "source": "来源：合成测试数据与机制假设，非真实企业事实。",
+      "speakerNotes": "先看准入表。A境内存储不满足，年成本也高于八十万元；C恢复需要四十分钟，超过三十分钟门槛。只有B全部满足。再看评分，A的八十七点五分确实最高，但分数不能补偿硬约束失败。B八十分，只能据此进入下一轮实际验证，不能跳过验证直接采购。下方保留分项和权重，可以复算三个总分。",
+      "review": {
+        "content": "加权分与准入条件人工复核",
+        "expression": "先表后图，避免总分先入为主"
+      }
+    }
+  ]
+}

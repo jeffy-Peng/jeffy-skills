@@ -1,0 +1,364 @@
+{
+  "theme": "mono",
+  "pages": [
+    {
+      "id": "compare",
+      "title": "同一组数据：比较数量与构成",
+      "question": "不同对象的数量与组成如何比较？",
+      "claim": "左图比较分项绝对数量，右图比较组成比例。",
+      "readingOrder": [
+        "group",
+        "stack",
+        "explain"
+      ],
+      "components": [
+        {
+          "id": "group",
+          "material": "BAR-002",
+          "purpose": "比较同类别下两系列的绝对数量",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 550,
+            "height": 370
+          },
+          "data": {
+            "title": "",
+            "metric": "数量",
+            "unit": "单位",
+            "series": [
+              "项目 X",
+              "项目 Y"
+            ],
+            "data": [
+              {
+                "label": "A",
+                "values": [
+                  12,
+                  9
+                ]
+              },
+              {
+                "label": "B",
+                "values": [
+                  9,
+                  11
+                ]
+              },
+              {
+                "label": "C",
+                "values": [
+                  6,
+                  8
+                ]
+              },
+              {
+                "label": "D",
+                "values": [
+                  15,
+                  10
+                ]
+              }
+            ]
+          },
+          "options": {
+            "direction": "vertical"
+          }
+        },
+        {
+          "id": "stack",
+          "material": "BAR-003",
+          "purpose": "比较各类别中两分项的构成比例",
+          "box": {
+            "x": 666,
+            "y": 170,
+            "width": 550,
+            "height": 370
+          },
+          "data": {
+            "title": "",
+            "metric": "数量",
+            "unit": "单位",
+            "series": [
+              "项目 X",
+              "项目 Y"
+            ],
+            "data": [
+              {
+                "label": "A",
+                "values": [
+                  12,
+                  9
+                ]
+              },
+              {
+                "label": "B",
+                "values": [
+                  9,
+                  11
+                ]
+              },
+              {
+                "label": "C",
+                "values": [
+                  6,
+                  8
+                ]
+              },
+              {
+                "label": "D",
+                "values": [
+                  15,
+                  10
+                ]
+              }
+            ]
+          },
+          "options": {
+            "direction": "vertical",
+            "mode": "percent"
+          }
+        }
+      ],
+      "text": [
+        {
+          "id": "g-title",
+          "text": "分组比较：读绝对数量",
+          "box": {
+            "x": 64,
+            "y": 136,
+            "width": 550,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "s-title",
+          "text": "100%堆叠：读组成比例",
+          "box": {
+            "x": 666,
+            "y": 136,
+            "width": 550,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "explain",
+          "text": "两个图复用同一组输入。右图每个对象归一到100%，只能比较构成，不能从柱高判断总量；不同对象的分项必须使用同一口径。",
+          "box": {
+            "x": 64,
+            "y": 566,
+            "width": 1152,
+            "height": 70
+          },
+          "role": "body"
+        }
+      ],
+      "speakerNotes": "左图用分组柱比较X和Y的绝对数量，右图是同一数据的百分比堆叠。右图总长度相同，只解释比例，不表示总量相等。两图都由已有柱状图素材生成，没有复制另一套图表代码。",
+      "source": "来源：素材适配合成数据；非真实业务结论。"
+    },
+    {
+      "id": "waterfall",
+      "title": "100加45减25加10，结果为130",
+      "question": "多项增减如何共同形成结果？",
+      "claim": "增加与减少按输入顺序累计，最终合计130万元。",
+      "readingOrder": [
+        "water",
+        "explain"
+      ],
+      "components": [
+        {
+          "id": "water",
+          "material": "BAR-006",
+          "purpose": "核对正负变化与累计终点",
+          "box": {
+            "x": 64,
+            "y": 165,
+            "width": 1152,
+            "height": 390
+          },
+          "data": {
+            "title": "",
+            "metric": "金额",
+            "unit": "万元",
+            "data": [
+              {
+                "label": "起点",
+                "value": 100
+              },
+              {
+                "label": "新增",
+                "value": 45
+              },
+              {
+                "label": "流失",
+                "value": -25
+              },
+              {
+                "label": "调整",
+                "value": 10
+              }
+            ]
+          },
+          "options": {
+            "direction": "vertical"
+          }
+        }
+      ],
+      "text": [
+        {
+          "id": "explain",
+          "text": "起点100万元，新增45万元，流失25万元，再调整增加10万元，最终130万元。合计柱由组件计算，不另填一个可能不一致的结果。",
+          "box": {
+            "x": 64,
+            "y": 577,
+            "width": 1152,
+            "height": 65
+          },
+          "role": "body"
+        }
+      ],
+      "speakerNotes": "从起点一百开始，新增四十五，扣除流失二十五，再增加调整十。中间柱表示相对上一阶段的变化，终点合计为一百三十。负值向下，正值向上，不能把每个变化量误读成独立总量。",
+      "source": "来源：素材适配合成数据；非真实业务结论。"
+    },
+    {
+      "id": "time-tree",
+      "title": "时间先后与结构归属，各用一张图",
+      "question": "事件顺序和模块归属能否共存且保持可读？",
+      "claim": "时间线表达事件发生时点，层级图表达归属，不将两者混为流程。",
+      "readingOrder": [
+        "timeline",
+        "hierarchy",
+        "explain"
+      ],
+      "components": [
+        {
+          "id": "timeline",
+          "material": "TIME-001",
+          "purpose": "按时间比例放置四个事件",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 160
+          },
+          "data": {
+            "events": [
+              {
+                "id": "A",
+                "date": "2026-01-01",
+                "title": "节点 A",
+                "body": "标准说明"
+              },
+              {
+                "id": "B",
+                "date": "2026-04-01",
+                "title": "节点 B",
+                "body": "标准说明"
+              },
+              {
+                "id": "C",
+                "date": "2026-07-01",
+                "title": "节点 C",
+                "body": "标准说明"
+              },
+              {
+                "id": "D",
+                "date": "2026-10-01",
+                "title": "节点 D",
+                "body": "标准说明"
+              }
+            ]
+          },
+          "options": {
+            "direction": "horizontal",
+            "spacing": "time",
+            "details": false
+          }
+        },
+        {
+          "id": "hierarchy",
+          "material": "REL-001",
+          "purpose": "展示一根两支四叶的归属结构",
+          "box": {
+            "x": 64,
+            "y": 384,
+            "width": 1152,
+            "height": 200
+          },
+          "data": {
+            "title": "",
+            "root": {
+              "title": "模块 A",
+              "children": [
+                {
+                  "title": "模块 B",
+                  "children": [
+                    {
+                      "title": "B1"
+                    },
+                    {
+                      "title": "B2"
+                    }
+                  ]
+                },
+                {
+                  "title": "模块 C",
+                  "children": [
+                    {
+                      "title": "C1"
+                    },
+                    {
+                      "title": "C2"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "options": {
+            "direction": "vertical"
+          }
+        }
+      ],
+      "text": [
+        {
+          "id": "t-title",
+          "text": "事件时点：按真实日期间距",
+          "box": {
+            "x": 64,
+            "y": 136,
+            "width": 1152,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "h-title",
+          "text": "结构归属：连线不表示时间顺序",
+          "box": {
+            "x": 64,
+            "y": 345,
+            "width": 1152,
+            "height": 27
+          },
+          "role": "cardTitle"
+        },
+        {
+          "id": "explain",
+          "text": "这是同页容量验证，两图不共享业务因果关系。日期改变会重算位置；分支增加会重算层级，空间不足会返回原因。",
+          "box": {
+            "x": 64,
+            "y": 610,
+            "width": 1152,
+            "height": 44
+          },
+          "role": "body"
+        }
+      ],
+      "speakerNotes": "上图按日期比例安排事件，下面按父子关系表示结构。它们回答不同问题，这里仅用于验证素材共存，不声称某个事件触发了某个模块。层级结构本轮接入root和children输入版本，简洁线条的另一款方案尚未迁移。",
+      "source": "来源：素材适配合成数据；非真实业务结论。"
+    }
+  ]
+}

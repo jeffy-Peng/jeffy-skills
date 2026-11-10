@@ -1,0 +1,85 @@
+{
+  "BAR-001": {
+    "file": "柱状图组件/bar.js",
+    "cut": "const sample=",
+    "fn": "renderChart",
+    "defaults": {
+      "kind": "single"
+    }
+  },
+  "LINE-001": {
+    "file": "折线图组件/line.js",
+    "cut": "const sample=",
+    "fn": "renderLine",
+    "defaults": {}
+  },
+  "PIE-001": {
+    "file": "占比图组件/pie.js",
+    "cut": "const sample=",
+    "fn": "renderPie",
+    "defaults": {}
+  },
+  "REL-006": {
+    "file": "架构关系组件/network.js",
+    "cut": "function refresh()",
+    "fn": "renderNetwork",
+    "defaults": {}
+  },
+  "FLOW-001": {
+    "file": "流程图组件/flow.js",
+    "cut": "const sample=",
+    "fn": "renderFlow",
+    "defaults": {}
+  },
+  "TABLE-001": {
+    "file": "表格组件/table.js",
+    "cut": "const detailSample=",
+    "fn": "renderTable",
+    "defaults": {}
+  },
+  "TABLE-002": {
+    "file": "表格组件/table.js",
+    "cut": "const detailSample=",
+    "fn": "renderTable",
+    "defaults": {}
+  },
+  "BAR-002": {
+    "file": "柱状图组件/bar.js",
+    "cut": "const sample=",
+    "fn": "renderChart",
+    "defaults": {
+      "kind": "grouped"
+    }
+  },
+  "BAR-003": {
+    "file": "柱状图组件/bar.js",
+    "cut": "const sample=",
+    "fn": "renderChart",
+    "defaults": {
+      "kind": "stacked"
+    }
+  },
+  "BAR-006": {
+    "file": "柱状图组件/advanced-bar.js",
+    "cut": "const kind=document.body",
+    "fn": "renderChart",
+    "defaults": {
+      "kind": "waterfall"
+    }
+  },
+  "TIME-001": {
+    "file": "时间组件/timeline.js",
+    "cut": "const sample=",
+    "fn": "renderTimeline",
+    "defaults": {
+      "details": false
+    }
+  },
+  "REL-001": {
+    "file": "架构关系组件/hierarchy.js",
+    "cut": "function refresh()",
+    "fn": "renderHierarchy",
+    "defaults": {},
+    "sheet": "原方案（root/children 接口）"
+  }
+}

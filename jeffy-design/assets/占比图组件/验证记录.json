@@ -1,0 +1,142 @@
+[
+  [
+    "普通",
+    false,
+    {
+      "total": 100,
+      "segments": 4,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "普通",
+    true,
+    {
+      "total": 100,
+      "segments": 4,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "极小分块",
+    false,
+    {
+      "total": 100,
+      "segments": 4,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "极小分块",
+    true,
+    {
+      "total": 100,
+      "segments": 4,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "含零",
+    false,
+    {
+      "total": 100,
+      "segments": 4,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "含零",
+    true,
+    {
+      "total": 100,
+      "segments": 4,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "单块",
+    false,
+    {
+      "total": 100,
+      "segments": 1,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "单块",
+    true,
+    {
+      "total": 100,
+      "segments": 1,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "小数",
+    false,
+    {
+      "total": 0.006,
+      "segments": 3,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "小数",
+    true,
+    {
+      "total": 0.006,
+      "segments": 3,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "大数",
+    false,
+    {
+      "total": 600000000,
+      "segments": 3,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "大数",
+    true,
+    {
+      "total": 600000000,
+      "segments": 3,
+      "width": 900,
+      "height": 622
+    }
+  ],
+  [
+    "长名称",
+    false,
+    {
+      "total": 100,
+      "segments": 5,
+      "width": 1029.7967224121094,
+      "height": 654
+    }
+  ],
+  [
+    "长名称",
+    true,
+    {
+      "total": 100,
+      "segments": 5,
+      "width": 1031.3614196777344,
+      "height": 654
+    }
+  ]
+]

@@ -1,0 +1,25 @@
+{
+  "name": "jeffy-design",
+  "version": "0.8.0",
+  "private": true,
+  "type": "module",
+  "description": "Content-first presentation design with reusable materials, themes, composition and validation.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "shot": "node scripts/shot.mjs",
+    "test": "node scripts/test-compose.mjs",
+    "catalog": "python scripts/build-catalog.py",
+    "example:pressure": "node scripts/build-composition.mjs tests/composition/pressure.json build/pressure/index.html",
+    "example:extended": "node scripts/build-composition.mjs tests/composition/extended.json build/extended/index.html",
+    "verify:pressure": "node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation.json",
+    "verify:extended": "node scripts/verify-page.mjs build/extended/index.html build/extended/validation.json",
+    "test:composition": "node scripts/test-composition.mjs build/reports/composition.json",
+    "test:adapters": "node scripts/test-composition-extended.mjs build/reports/adapters.json"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

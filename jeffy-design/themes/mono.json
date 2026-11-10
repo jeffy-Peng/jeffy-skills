@@ -1,0 +1,107 @@
+{
+  "name": "mono",
+  "label": "黑白灰",
+  "fonts": {
+    "ea": "Noto Serif SC",
+    "latin": "Georgia"
+  },
+  "colors": {
+    "ink": "222222",
+    "body": "444444",
+    "muted": "777777",
+    "line": "DDDDDD",
+    "soft": "F3F3F3",
+    "accent": "222222",
+    "accent2": "888888",
+    "paper": "FFFFFF",
+    "inverse": "222222",
+    "muted_inv": "A8A29A"
+  },
+  "scale": [
+    {
+      "role": "title",
+      "size": 48,
+      "lineHeight": 1.18,
+      "weight": 300,
+      "tracking": "-1.2px",
+      "color": "ink"
+    },
+    {
+      "role": "index",
+      "size": 38,
+      "lineHeight": 1,
+      "weight": 300,
+      "tracking": "-1px",
+      "color": "accent",
+      "font": "latin"
+    },
+    {
+      "role": "cardTitle",
+      "size": 20,
+      "lineHeight": 1.3,
+      "weight": 600,
+      "tracking": "0.2px",
+      "color": "ink"
+    },
+    {
+      "role": "body",
+      "size": 16,
+      "lineHeight": 1.9,
+      "weight": 400,
+      "tracking": "0",
+      "color": "body"
+    },
+    {
+      "role": "english",
+      "size": 12.5,
+      "lineHeight": 1.7,
+      "weight": 400,
+      "tracking": "0.1px",
+      "color": "muted",
+      "font": "latin"
+    },
+    {
+      "role": "pill",
+      "size": 14.5,
+      "lineHeight": 1.4,
+      "weight": 400,
+      "tracking": "0.3px",
+      "color": "body"
+    },
+    {
+      "role": "label",
+      "size": 11,
+      "lineHeight": 1.5,
+      "weight": 500,
+      "tracking": "2.5px",
+      "color": "muted"
+    },
+    {
+      "role": "source",
+      "size": 11,
+      "lineHeight": 1.6,
+      "weight": 400,
+      "tracking": "0",
+      "color": "muted"
+    },
+    {
+      "role": "pageNo",
+      "size": 10,
+      "lineHeight": 1,
+      "weight": 400,
+      "tracking": "1px",
+      "color": "muted",
+      "font": "latin",
+      "tabular": true
+    }
+  ],
+  "paragraph": {
+    "beforePx": 8,
+    "afterPx": 0
+  },
+  "rules": {
+    "headerWidthPx": 1,
+    "headerGapPx": 26,
+    "dividerWidthPx": 1
+  }
+}

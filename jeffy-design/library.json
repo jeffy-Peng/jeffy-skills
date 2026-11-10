@@ -1,0 +1,3140 @@
+{
+  "version": "0.1.0",
+  "layouts": [
+    {"id":"M01","name":"自由模块组合","cat":"composition","sub":"modules","use":"按阅读任务组合图、文与证据","slots":["modules","arrange","conclusion","footnote"]},
+    {
+      "id": "P01",
+      "name": "三栏分带",
+      "cat": "grid",
+      "sub": "three",
+      "use": "三块并列，其中一块铺实色做主角；每块中文正文下挂一行英文译文",
+      "when": "一页讲三件并列的事，其中一件明显更重要；需要中英对照时用。",
+      "slots": [
+        "title",
+        "bands(modules+base)",
+        "items[].no/title/body/en",
+        "emphasis",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          10,
+          22
+        ],
+        "item.body": [
+          14,
+          40
+        ],
+        "item.en": [
+          30,
+          90
+        ]
+      }
+    },
+    {
+      "id": "P02",
+      "name": "观点页",
+      "cat": "text",
+      "sub": "statement",
+      "use": "一句话加一个数字，靠尺度和留白撑画面",
+      "when": "整页只讲一个结论，并且有一个足够大的数字。",
+      "slots": [
+        "kicker?",
+        "title",
+        "lead",
+        "hero.num",
+        "hero.label",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          10,
+          24
+        ],
+        "lead": [
+          30,
+          90
+        ]
+      }
+    },
+    {
+      "id": "P03",
+      "name": "三栏分隔",
+      "cat": "grid",
+      "sub": "three",
+      "use": "三栏用竖线隔开，不铺色块，底部收一句结论",
+      "when": "三块分量相当、没有主角，需要在页脚压一句总结时用。",
+      "slots": [
+        "title",
+        "items×3（no/title/body/en）",
+        "conclusion",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          10,
+          22
+        ],
+        "item.body": [
+          14,
+          40
+        ],
+        "conclusion": [
+          10,
+          40
+        ]
+      }
+    },
+    {
+      "id": "P04",
+      "name": "双栏观点",
+      "cat": "grid",
+      "sub": "two-sym",
+      "use": "两边各陈述一个观点，中缝一条竖线隔开，中英各自成对",
+      "when": "两种立场、两种判断并列陈述，谁也不压谁。",
+      "slots": [
+        "title",
+        "sides×2（title + blocks[zh/en]）",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          8,
+          20
+        ],
+        "block.zh": [
+          10,
+          40
+        ],
+        "block.en": [
+          20,
+          80
+        ]
+      }
+    },
+    {
+      "id": "P05",
+      "name": "双栏对照",
+      "cat": "grid",
+      "sub": "two-sym",
+      "use": "两个对象按同一组条目逐行对齐，行间细线",
+      "when": "做选型对比、方案比选，条目同名才能横向读。",
+      "slots": [
+        "title",
+        "columns×2（name + rows[k/zh/en]）",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          8,
+          20
+        ],
+        "row.zh": [
+          8,
+          32
+        ],
+        "row.en": [
+          16,
+          64
+        ]
+      }
+    },
+    {
+      "id": "P06",
+      "name": "图文对读",
+      "cat": "grid",
+      "sub": "two-sym",
+      "use": "两张图并排，各配一句说明",
+      "when": "有图可用，且两张图需要对照着看时。没有图就别用这张。",
+      "slots": [
+        "title",
+        "items×2（figure/caption/zh/en）",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          8,
+          20
+        ],
+        "caption": [
+          4,
+          12
+        ],
+        "zh": [
+          10,
+          36
+        ]
+      }
+    },
+    {
+      "id": "P07",
+      "name": "指标并列",
+      "cat": "grid",
+      "sub": "two-sym",
+      "use": "两个指标各占一块浅底，数字居中放大",
+      "when": "两个数字同等重要，需要并排解读。",
+      "slots": [
+        "title",
+        "items×2（label/value/zh/en）",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          8,
+          20
+        ],
+        "value": [
+          2,
+          8
+        ],
+        "zh": [
+          10,
+          36
+        ]
+      }
+    },
+    {
+      "id": "C01",
+      "name": "主张与依据",
+      "cat": "grid",
+      "sub": "two-main",
+      "use": "卡片族 g0 v0",
+      "when": "需要「主张与依据」这种结构时用。",
+      "slots": [
+        "title",
+        "hero",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C02",
+      "name": "摘要与明细",
+      "cat": "grid",
+      "sub": "two-main",
+      "use": "卡片族 g0 v1",
+      "when": "需要「摘要与明细」这种结构时用。",
+      "slots": [
+        "title",
+        "hero",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C03",
+      "name": "摘录与批注",
+      "cat": "grid",
+      "sub": "two-main",
+      "use": "卡片族 g0 v2",
+      "when": "需要「摘录与批注」这种结构时用。",
+      "slots": [
+        "title",
+        "hero",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C04",
+      "name": "现状与例外",
+      "cat": "grid",
+      "sub": "two-main",
+      "use": "卡片族 g0 v3",
+      "when": "需要「现状与例外」这种结构时用。",
+      "slots": [
+        "title",
+        "hero",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C05",
+      "name": "三项原则",
+      "cat": "grid",
+      "sub": "multi",
+      "use": "卡片族 g1 v0，3 栏",
+      "when": "需要「三项原则」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C06",
+      "name": "四类对象",
+      "cat": "grid",
+      "sub": "multi",
+      "use": "卡片族 g1 v1，4 栏",
+      "when": "需要「四类对象」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C07",
+      "name": "并列指标",
+      "cat": "grid",
+      "sub": "multi",
+      "use": "卡片族 g1 v2，3 栏",
+      "when": "需要「并列指标」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C08",
+      "name": "方案横向比较",
+      "cat": "grid",
+      "sub": "multi",
+      "use": "卡片族 g1 v3，3 栏",
+      "when": "需要「方案横向比较」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C09",
+      "name": "条件与结果",
+      "cat": "grid",
+      "sub": "four",
+      "use": "卡片族 g2 v0",
+      "when": "需要「条件与结果」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C10",
+      "name": "四项指标快照",
+      "cat": "grid",
+      "sub": "four",
+      "use": "卡片族 g2 v1",
+      "when": "需要「四项指标快照」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C11",
+      "name": "四个研究问题",
+      "cat": "grid",
+      "sub": "four",
+      "use": "卡片族 g2 v2",
+      "when": "需要「四个研究问题」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C12",
+      "name": "二维定位",
+      "cat": "grid",
+      "sub": "four",
+      "use": "卡片族 g2 v3",
+      "when": "需要「二维定位」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C13",
+      "name": "六项能力",
+      "cat": "grid",
+      "sub": "cards",
+      "use": "卡片族 g3 v0，3 栏",
+      "when": "需要「六项能力」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C14",
+      "name": "八项检查",
+      "cat": "grid",
+      "sub": "cards",
+      "use": "卡片族 g3 v1，4 栏",
+      "when": "需要「八项检查」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C15",
+      "name": "六份材料索引",
+      "cat": "grid",
+      "sub": "cards",
+      "use": "卡片族 g3 v2，3 栏",
+      "when": "需要「六份材料索引」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C16",
+      "name": "两组行动清单",
+      "cat": "grid",
+      "sub": "cards",
+      "use": "卡片族 g3 v3，3 栏",
+      "when": "需要「两组行动清单」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C17",
+      "name": "核心结论与三项依据",
+      "cat": "grid",
+      "sub": "main-plus",
+      "use": "卡片族 g4 v0",
+      "when": "需要「核心结论与三项依据」这种结构时用。",
+      "slots": [
+        "title",
+        "hero",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C18",
+      "name": "关键指标与解释",
+      "cat": "grid",
+      "sub": "main-plus",
+      "use": "卡片族 g4 v1",
+      "when": "需要「关键指标与解释」这种结构时用。",
+      "slots": [
+        "title",
+        "hero",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C19",
+      "name": "推荐方案与备选",
+      "cat": "grid",
+      "sub": "main-plus",
+      "use": "卡片族 g4 v2",
+      "when": "需要「推荐方案与备选」这种结构时用。",
+      "slots": [
+        "title",
+        "hero",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "C20",
+      "name": "主问题与线索",
+      "cat": "grid",
+      "sub": "main-plus",
+      "use": "卡片族 g4 v3",
+      "when": "需要「主问题与线索」这种结构时用。",
+      "slots": [
+        "title",
+        "hero",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "T01",
+      "name": "单句居中",
+      "cat": "text",
+      "sub": "statement",
+      "use": "标题与正文标准页，center",
+      "when": "需要「单句居中」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T02",
+      "name": "左侧立论",
+      "cat": "text",
+      "sub": "statement",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「左侧立论」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T03",
+      "name": "两行递进",
+      "cat": "text",
+      "sub": "statement",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「两行递进」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T04",
+      "name": "观点与边界",
+      "cat": "text",
+      "sub": "statement",
+      "use": "标题与正文标准页，side",
+      "when": "需要「观点与边界」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T05",
+      "name": "单段导读",
+      "cat": "text",
+      "sub": "title-body",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「单段导读」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T06",
+      "name": "提要与展开",
+      "cat": "text",
+      "sub": "title-body",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「提要与展开」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T07",
+      "name": "两节正文",
+      "cat": "text",
+      "sub": "title-body",
+      "use": "标题与正文标准页，steps",
+      "when": "需要「两节正文」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T08",
+      "name": "正文与旁注",
+      "cat": "text",
+      "sub": "title-body",
+      "use": "标题与正文标准页，side",
+      "when": "需要「正文与旁注」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T09",
+      "name": "单段引语",
+      "cat": "text",
+      "sub": "quote",
+      "use": "标题与正文标准页，center",
+      "when": "需要「单段引语」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T10",
+      "name": "上下文引语",
+      "cat": "text",
+      "sub": "quote",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「上下文引语」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T11",
+      "name": "双声对读",
+      "cat": "text",
+      "sub": "quote",
+      "use": "标题与正文标准页，two",
+      "when": "需要「双声对读」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T12",
+      "name": "引语与释义",
+      "cat": "text",
+      "sub": "quote",
+      "use": "标题与正文标准页，side",
+      "when": "需要「引语与释义」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T13",
+      "name": "顺序清单",
+      "cat": "text",
+      "sub": "numbered",
+      "use": "标题与正文标准页，steps",
+      "when": "需要「顺序清单」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T14",
+      "name": "主项与分项",
+      "cat": "text",
+      "sub": "numbered",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「主项与分项」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T15",
+      "name": "两组编号",
+      "cat": "text",
+      "sub": "numbered",
+      "use": "标题与正文标准页，two",
+      "when": "需要「两组编号」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T16",
+      "name": "优先次序",
+      "cat": "text",
+      "sub": "numbered",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「优先次序」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T17",
+      "name": "单问单答",
+      "cat": "text",
+      "sub": "qa",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「单问单答」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T18",
+      "name": "连续三问",
+      "cat": "text",
+      "sub": "qa",
+      "use": "标题与正文标准页，steps",
+      "when": "需要「连续三问」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T19",
+      "name": "主问与追问",
+      "cat": "text",
+      "sub": "qa",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「主问与追问」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T20",
+      "name": "左右对答",
+      "cat": "text",
+      "sub": "qa",
+      "use": "标题与正文标准页，two",
+      "when": "需要「左右对答」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T21",
+      "name": "双栏续读",
+      "cat": "text",
+      "sub": "columns",
+      "use": "标题与正文标准页，two",
+      "when": "需要「双栏续读」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T22",
+      "name": "三栏续读",
+      "cat": "text",
+      "sub": "columns",
+      "use": "标题与正文标准页，three",
+      "when": "需要「三栏续读」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T23",
+      "name": "导语与双栏",
+      "cat": "text",
+      "sub": "columns",
+      "use": "标题与正文标准页，two",
+      "when": "需要「导语与双栏」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T24",
+      "name": "正文与结语",
+      "cat": "text",
+      "sub": "columns",
+      "use": "标题与正文标准页，two",
+      "when": "需要「正文与结语」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T25",
+      "name": "原句与边注",
+      "cat": "text",
+      "sub": "note",
+      "use": "标题与正文标准页，side",
+      "when": "需要「原句与边注」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T26",
+      "name": "逐段批注",
+      "cat": "text",
+      "sub": "note",
+      "use": "标题与正文标准页，steps",
+      "when": "需要「逐段批注」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T27",
+      "name": "关键词释义",
+      "cat": "text",
+      "sub": "note",
+      "use": "标题与正文标准页，two",
+      "when": "需要「关键词释义」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "T28",
+      "name": "摘录与评议",
+      "cat": "text",
+      "sub": "note",
+      "use": "标题与正文标准页，通栏",
+      "when": "需要「摘录与评议」这种结构时用。",
+      "slots": [
+        "title",
+        "items[]",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          22
+        ]
+      }
+    },
+    {
+      "id": "X01",
+      "name": "维度逐行横比",
+      "cat": "table",
+      "sub": "cross",
+      "use": "同维度比较多个对象；可组合顶部公式与底部判断",
+      "when": "需要「维度逐行横比」这种表格结构时用。",
+      "slots": [
+        "title",
+        "columns/rows",
+        "caption? formula? example? effects[]?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ],
+        "rows": [
+          2,
+          10
+        ]
+      }
+    },
+    {
+      "id": "D01",
+      "name": "通栏纵表",
+      "cat": "table",
+      "sub": "detail",
+      "use": "通栏明细表，表头浅底，行间细线",
+      "when": "需要「通栏纵表」这种表格结构时用。",
+      "slots": [
+        "title",
+        "columns/rows 或 groups",
+        "note?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ],
+        "rows": [
+          2,
+          10
+        ]
+      }
+    },
+    {
+      "id": "D02",
+      "name": "双区续排",
+      "cat": "table",
+      "sub": "detail",
+      "use": "明细表对半分，两段续排",
+      "when": "需要「双区续排」这种表格结构时用。",
+      "slots": [
+        "title",
+        "columns/rows 或 groups",
+        "note?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ],
+        "rows": [
+          2,
+          10
+        ]
+      }
+    },
+    {
+      "id": "D03",
+      "name": "字段横展",
+      "cat": "table",
+      "sub": "detail",
+      "use": "多列表格，居中排布，适合字段横展",
+      "when": "需要「字段横展」这种表格结构时用。",
+      "slots": [
+        "title",
+        "columns/rows 或 groups",
+        "note?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ],
+        "rows": [
+          2,
+          10
+        ]
+      }
+    },
+    {
+      "id": "D04",
+      "name": "选行侧注",
+      "cat": "table",
+      "sub": "detail",
+      "use": "明细表加右侧注解，一行高亮",
+      "when": "需要「选行侧注」这种表格结构时用。",
+      "slots": [
+        "title",
+        "columns/rows 或 groups",
+        "note?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ],
+        "rows": [
+          2,
+          10
+        ]
+      }
+    },
+    {
+      "id": "G01",
+      "name": "组标题带与明细行",
+      "cat": "table",
+      "sub": "grouped",
+      "use": "表内用标题带把明细分成几段",
+      "when": "需要「组标题带与明细行」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "G02",
+      "name": "并排分组表",
+      "cat": "table",
+      "sub": "grouped",
+      "use": "两张分组表并排，各自带标题",
+      "when": "需要「并排分组表」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "G03",
+      "name": "加权评分总表",
+      "cat": "table",
+      "sub": "rating",
+      "use": "权重乘分数的评分表，末列总分",
+      "when": "需要「加权评分总表」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "G04",
+      "name": "排名与单项拆解",
+      "cat": "table",
+      "sub": "rating",
+      "use": "左侧条形排名，右侧单项明细",
+      "when": "需要「排名与单项拆解」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "H01",
+      "name": "单幅强度矩阵",
+      "cat": "table",
+      "sub": "heatmap",
+      "use": "单张热力矩阵，四级色阶",
+      "when": "需要「单幅强度矩阵」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "H02",
+      "name": "同期双幅热图",
+      "cat": "table",
+      "sub": "heatmap",
+      "use": "两张热力图并排对照",
+      "when": "需要「同期双幅热图」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "Q01",
+      "name": "四象限策略区",
+      "cat": "table",
+      "sub": "quadrant",
+      "use": "二乘二象限，每格一句策略",
+      "when": "需要「四象限策略区」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "Q02",
+      "name": "对象落点与坐标表",
+      "cat": "table",
+      "sub": "quadrant",
+      "use": "左侧象限带落点，右侧坐标表",
+      "when": "需要「对象落点与坐标表」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "R01",
+      "name": "任务与角色全表",
+      "cat": "table",
+      "sub": "raci",
+      "use": "任务乘角色的责任分配表",
+      "when": "需要「任务与角色全表」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "R02",
+      "name": "负责人清单与协作表",
+      "cat": "table",
+      "sub": "raci",
+      "use": "职责与协作两张表并排",
+      "when": "需要「负责人清单与协作表」这种表格结构时用。",
+      "slots": [
+        "title",
+        "cue?",
+        "columns/rows 或 blocks/cells",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K01",
+      "name": "单一指标",
+      "cat": "chart",
+      "sub": "metric",
+      "use": "一个数字加口径说明",
+      "when": "需要「单一指标」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K02",
+      "name": "指标与走势",
+      "cat": "chart",
+      "sub": "metric",
+      "use": "指标加一条走势旁证",
+      "when": "需要「指标与走势」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K03",
+      "name": "并列指标组",
+      "cat": "chart",
+      "sub": "metric",
+      "use": "三个并列指标",
+      "when": "需要「并列指标组」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K04",
+      "name": "目标进度清单",
+      "cat": "chart",
+      "sub": "metric",
+      "use": "多条进度条",
+      "when": "需要「目标进度清单」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K05",
+      "name": "横条排名",
+      "cat": "chart",
+      "sub": "bar",
+      "use": "横向条形排名",
+      "when": "需要「横条排名」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K06",
+      "name": "两期哑铃对比",
+      "cat": "chart",
+      "sub": "bar",
+      "use": "两期数值用哑铃对比",
+      "when": "需要「两期哑铃对比」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K07",
+      "name": "走势与目标线",
+      "cat": "chart",
+      "sub": "line",
+      "use": "折线加目标线",
+      "when": "需要「走势与目标线」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K08",
+      "name": "分面趋势",
+      "cat": "chart",
+      "sub": "line",
+      "use": "三张同尺度小图并排",
+      "when": "需要「分面趋势」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K09",
+      "name": "环形构成",
+      "cat": "chart",
+      "sub": "proportion",
+      "use": "环形占比",
+      "when": "需要「环形构成」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K10",
+      "name": "百分比堆叠条",
+      "cat": "chart",
+      "sub": "proportion",
+      "use": "百分比堆叠",
+      "when": "需要「百分比堆叠条」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K11",
+      "name": "区间频数分布",
+      "cat": "chart",
+      "sub": "distribution",
+      "use": "直方图",
+      "when": "需要「区间频数分布」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K12",
+      "name": "双变量散点",
+      "cat": "chart",
+      "sub": "distribution",
+      "use": "散点",
+      "when": "需要「双变量散点」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K13",
+      "name": "瀑布图",
+      "cat": "chart",
+      "sub": "delta",
+      "use": "起点到终点逐项分解",
+      "when": "需要「瀑布图」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K14",
+      "name": "正负贡献",
+      "cat": "chart",
+      "sub": "delta",
+      "use": "正负柱对比",
+      "when": "需要「正负贡献」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "K15",
+      "name": "指标与解释图",
+      "cat": "chart",
+      "sub": "metric",
+      "use": "一个大指标加两张小图",
+      "when": "需要「指标与解释图」这种图表页时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "metric/metrics/rows/series/items/points",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F01",
+      "name": "横向连续步骤",
+      "cat": "flow",
+      "sub": "linear",
+      "use": "四到五步横向串联，箭头推进",
+      "when": "需要「横向连续步骤」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F02",
+      "name": "条件分流",
+      "cat": "flow",
+      "sub": "branch",
+      "use": "一次判定分成两条路径",
+      "when": "需要「条件分流」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F03",
+      "name": "分流后汇合",
+      "cat": "flow",
+      "sub": "branch",
+      "use": "两条路径最后重新并入一条",
+      "when": "需要「分流后汇合」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F04",
+      "name": "等距事件轴",
+      "cat": "flow",
+      "sub": "timeline",
+      "use": "时间轴等距排列，上下交替标注",
+      "when": "需要「等距事件轴」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F05",
+      "name": "纵向大事记",
+      "cat": "flow",
+      "sub": "timeline",
+      "use": "竖线上的里程碑",
+      "when": "需要「纵向大事记」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F06",
+      "name": "阶梯式阶段路线",
+      "cat": "flow",
+      "sub": "roadmap",
+      "use": "阶段逐级抬升",
+      "when": "需要「阶梯式阶段路线」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F07",
+      "name": "多线阶段路线",
+      "cat": "flow",
+      "sub": "roadmap",
+      "use": "多条工作线在季度上并行",
+      "when": "需要「多线阶段路线」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F08",
+      "name": "任务区间甘特图",
+      "cat": "flow",
+      "sub": "gantt",
+      "use": "任务按周铺开",
+      "when": "需要「任务区间甘特图」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F09",
+      "name": "跨角色交接",
+      "cat": "flow",
+      "sub": "swimlane",
+      "use": "角色泳道上的交接",
+      "when": "需要「跨角色交接」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F10",
+      "name": "触点与动作旅程",
+      "cat": "flow",
+      "sub": "journey",
+      "use": "阶段、触点、动作、产出四列",
+      "when": "需要「触点与动作旅程」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F11",
+      "name": "体验起伏旅程",
+      "cat": "flow",
+      "sub": "journey",
+      "use": "体验高低起伏的折线",
+      "when": "需要「体验起伏旅程」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "F12",
+      "name": "闭环迭代",
+      "cat": "flow",
+      "sub": "loop",
+      "use": "四个节点首尾相接",
+      "when": "需要「闭环迭代」这种流程或时间结构时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "steps/points/items/lanes/series",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A01",
+      "name": "层级树",
+      "cat": "diagram",
+      "sub": "tree",
+      "use": "自上而下拆三层，每个子项只归一个上级",
+      "when": "需要「层级树」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A02",
+      "name": "横向分层与贯穿栏",
+      "cat": "diagram",
+      "sub": "layers",
+      "use": "分层行加右侧跨层栏",
+      "when": "需要「横向分层与贯穿栏」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A03",
+      "name": "左侧接入与共享底座",
+      "cat": "diagram",
+      "sub": "layers",
+      "use": "左侧入口、上方模块、底部共享底座",
+      "when": "需要「左侧接入与共享底座」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A04",
+      "name": "边界与接口",
+      "cat": "diagram",
+      "sub": "relation",
+      "use": "虚线边界内的处理模块，两侧进出接口",
+      "when": "需要「边界与接口」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A05",
+      "name": "共同目标与并列支柱",
+      "cat": "diagram",
+      "sub": "relation",
+      "use": "顶部共同目标，下面并列支柱，底部共同基础",
+      "when": "需要「共同目标与并列支柱」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A06",
+      "name": "单中心辐射",
+      "cat": "diagram",
+      "sub": "relation",
+      "use": "中心节点向四个方向辐射",
+      "when": "需要「单中心辐射」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A07",
+      "name": "多节点协作网络",
+      "cat": "diagram",
+      "sub": "relation",
+      "use": "多个节点带标签连线",
+      "when": "需要「多节点协作网络」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A08",
+      "name": "多因汇聚",
+      "cat": "diagram",
+      "sub": "relation",
+      "use": "两个输入汇到一个处理，再出结果",
+      "when": "需要「多因汇聚」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A09",
+      "name": "单因分化",
+      "cat": "diagram",
+      "sub": "relation",
+      "use": "一个输入经处理分到两个结果",
+      "when": "需要「单因分化」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A10",
+      "name": "双集合交集",
+      "cat": "diagram",
+      "sub": "set",
+      "use": "两个集合的交集",
+      "when": "需要「双集合交集」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "A11",
+      "name": "逐层包含",
+      "cat": "diagram",
+      "sub": "set",
+      "use": "三层嵌套集合",
+      "when": "需要「逐层包含」这种关系图时用。",
+      "slots": [
+        "title",
+        "caption?",
+        "结构字段",
+        "reading?",
+        "footnote?"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          20
+        ]
+      }
+    },
+    {
+      "id": "S01",
+      "name": "封面·左对齐",
+      "cat": "cover",
+      "sub": "cover",
+      "use": "标题左对齐，副标题和英文跟在下面，底部一条短脚线",
+      "when": "需要「封面·左对齐」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S02",
+      "name": "封面·居中",
+      "cat": "cover",
+      "sub": "cover",
+      "use": "标题居中，顶部一行元信息",
+      "when": "需要「封面·居中」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S03",
+      "name": "封面·色块",
+      "cat": "cover",
+      "sub": "cover",
+      "use": "浅底整版，标题在上，元信息在右下",
+      "when": "需要「封面·色块」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S04",
+      "name": "封面·左右分",
+      "cat": "cover",
+      "sub": "cover",
+      "use": "标题在左，副标题在右侧竖线旁",
+      "when": "需要「封面·左右分」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S05",
+      "name": "开篇引导",
+      "cat": "cover",
+      "sub": "opening",
+      "use": "一句开场判断加一行说明",
+      "when": "需要「开篇引导」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S06",
+      "name": "内容目录",
+      "cat": "cover",
+      "sub": "nav",
+      "use": "编号加标题加一句说明，逐行排列",
+      "when": "需要「内容目录」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S07",
+      "name": "全篇结构",
+      "cat": "cover",
+      "sub": "nav",
+      "use": "三列章节并列",
+      "when": "需要「全篇结构」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S08",
+      "name": "会议议程",
+      "cat": "cover",
+      "sub": "nav",
+      "use": "时间加议程条目",
+      "when": "需要「会议议程」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S09",
+      "name": "时间分配",
+      "cat": "cover",
+      "sub": "nav",
+      "use": "按分钟切分的色块带",
+      "when": "需要「时间分配」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S10",
+      "name": "章节封",
+      "cat": "cover",
+      "sub": "chapter",
+      "use": "深色整版，章节编号和标题",
+      "when": "需要「章节封」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S11",
+      "name": "章节过渡",
+      "cat": "cover",
+      "sub": "chapter",
+      "use": "章节序号加标题，底部章节列表",
+      "when": "需要「章节过渡」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S12",
+      "name": "本章导读",
+      "cat": "cover",
+      "sub": "chapter",
+      "use": "一个问题加右侧要点",
+      "when": "需要「本章导读」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S13",
+      "name": "谢谢",
+      "cat": "cover",
+      "sub": "closing",
+      "use": "居中大字",
+      "when": "需要「谢谢」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    },
+    {
+      "id": "S14",
+      "name": "交流与讨论",
+      "cat": "cover",
+      "sub": "closing",
+      "use": "标题加右侧问题框",
+      "when": "需要「交流与讨论」这种页面时用。",
+      "slots": [
+        "title",
+        "subtitle/en/meta/items 等按形态"
+      ],
+      "capacity": {
+        "title": [
+          4,
+          24
+        ]
+      }
+    }
+  ],
+  "themes": [
+    {
+      "id": "paper-ink",
+      "label": "纸白·墨黑",
+      "use": "通用，宋体配 Georgia",
+      "default": true
+    },
+    {
+      "id": "red-ink",
+      "label": "墨黑朱红",
+      "use": "商业分析、财报拆解、通用"
+    },
+    {
+      "id": "ink-blue",
+      "label": "墨黑靛蓝",
+      "use": "数据汇报、技术、研究"
+    }
+  ],
+  "icons": [
+    {
+      "id": "users",
+      "group": "people",
+      "sub": "person",
+      "use": "用户、人群"
+    },
+    {
+      "id": "building",
+      "group": "people",
+      "sub": "org",
+      "use": "平台、企业、机构"
+    },
+    {
+      "id": "file",
+      "group": "object",
+      "sub": "doc",
+      "use": "合同、文档、条款"
+    },
+    {
+      "id": "price",
+      "group": "object",
+      "sub": "money",
+      "use": "价格、单价、抽成"
+    },
+    {
+      "id": "clock",
+      "group": "object",
+      "sub": "device",
+      "use": "时间、周期、时长"
+    },
+    {
+      "id": "lock",
+      "group": "object",
+      "sub": "device",
+      "use": "锁定、准入、隐私"
+    },
+    {
+      "id": "grid",
+      "group": "geo",
+      "sub": "mesh",
+      "use": "密度、加载率、库存"
+    },
+    {
+      "id": "layers",
+      "group": "geo",
+      "sub": "stack",
+      "use": "层级、架构、分层"
+    },
+    {
+      "id": "swap",
+      "group": "dir",
+      "sub": "flow",
+      "use": "交易、流转、置换"
+    },
+    {
+      "id": "rise",
+      "group": "dir",
+      "sub": "trend",
+      "use": "上升、扩张、提速"
+    },
+    {
+      "id": "shield",
+      "group": "state",
+      "sub": "guard",
+      "use": "监管、风险、上限"
+    },
+    {
+      "id": "alert",
+      "group": "state",
+      "sub": "signal",
+      "use": "警告、失效、边界"
+    },
+    {
+      "id": "check",
+      "group": "state",
+      "sub": "signal",
+      "use": "完成、达标、结论"
+    },
+    {
+      "id": "chart",
+      "group": "data",
+      "sub": "chart",
+      "use": "增长、规模、数据"
+    }
+  ],
+  "tags": {
+    "用户": [
+      "users"
+    ],
+    "人群": [
+      "users"
+    ],
+    "时间": [
+      "users"
+    ],
+    "平台": [
+      "building"
+    ],
+    "企业": [
+      "building"
+    ],
+    "商家": [
+      "building"
+    ],
+    "密度": [
+      "grid"
+    ],
+    "加载率": [
+      "grid"
+    ],
+    "广告位": [
+      "grid"
+    ],
+    "价格": [
+      "price"
+    ],
+    "单价": [
+      "price"
+    ],
+    "定价": [
+      "price"
+    ],
+    "抽成": [
+      "price"
+    ],
+    "时长": [
+      "clock"
+    ],
+    "周期": [
+      "clock"
+    ],
+    "交易": [
+      "swap"
+    ],
+    "流转": [
+      "swap"
+    ],
+    "监管": [
+      "shield"
+    ],
+    "风险": [
+      "shield"
+    ],
+    "上限": [
+      "shield"
+    ],
+    "隐私": [
+      "lock"
+    ],
+    "准入": [
+      "lock"
+    ],
+    "增长": [
+      "chart"
+    ],
+    "数据": [
+      "chart"
+    ],
+    "规模": [
+      "chart"
+    ],
+    "合同": [
+      "file"
+    ],
+    "文档": [
+      "file"
+    ],
+    "条款": [
+      "file"
+    ],
+    "层级": [
+      "layers"
+    ],
+    "架构": [
+      "layers"
+    ],
+    "分层": [
+      "layers"
+    ],
+    "上升": [
+      "rise"
+    ],
+    "扩张": [
+      "rise"
+    ],
+    "警告": [
+      "alert"
+    ],
+    "失效": [
+      "alert"
+    ],
+    "完成": [
+      "check"
+    ],
+    "达标": [
+      "check"
+    ]
+  },
+  "iconGroups": [
+    {
+      "id": "people",
+      "name": "人形",
+      "subs": [
+        {
+          "id": "person",
+          "name": "个体"
+        },
+        {
+          "id": "org",
+          "name": "组织"
+        }
+      ]
+    },
+    {
+      "id": "object",
+      "name": "实物",
+      "subs": [
+        {
+          "id": "doc",
+          "name": "文档"
+        },
+        {
+          "id": "money",
+          "name": "货币"
+        },
+        {
+          "id": "device",
+          "name": "器物"
+        }
+      ]
+    },
+    {
+      "id": "geo",
+      "name": "几何",
+      "subs": [
+        {
+          "id": "mesh",
+          "name": "网格"
+        },
+        {
+          "id": "stack",
+          "name": "层级"
+        }
+      ]
+    },
+    {
+      "id": "dir",
+      "name": "方向",
+      "subs": [
+        {
+          "id": "flow",
+          "name": "流转"
+        },
+        {
+          "id": "trend",
+          "name": "趋势"
+        }
+      ]
+    },
+    {
+      "id": "state",
+      "name": "状态",
+      "subs": [
+        {
+          "id": "guard",
+          "name": "防护"
+        },
+        {
+          "id": "signal",
+          "name": "提示"
+        }
+      ]
+    },
+    {
+      "id": "data",
+      "name": "数据",
+      "subs": [
+        {
+          "id": "chart",
+          "name": "图表"
+        }
+      ]
+    }
+  ],
+  "layoutCategories": [
+    {
+      "id": "cover",
+      "name": "封面与导航",
+      "subs": [
+        {
+          "id": "main",
+          "name": "主封面"
+        },
+        {
+          "id": "sub",
+          "name": "扉页"
+        },
+        {
+          "id": "toc",
+          "name": "目录页"
+        },
+        {
+          "id": "agenda",
+          "name": "议程页"
+        },
+        {
+          "id": "chapter",
+          "name": "章节过渡"
+        },
+        {
+          "id": "chapter-lead",
+          "name": "章节导读"
+        },
+        {
+          "id": "end",
+          "name": "结束页"
+        }
+      ]
+    },
+    {
+      "id": "text",
+      "name": "标题与正文",
+      "subs": [
+        {
+          "id": "statement",
+          "name": "大字观点"
+        },
+        {
+          "id": "title-body",
+          "name": "标题＋正文"
+        },
+        {
+          "id": "quote",
+          "name": "引语"
+        },
+        {
+          "id": "numbered",
+          "name": "编号条目"
+        },
+        {
+          "id": "qa",
+          "name": "问答"
+        },
+        {
+          "id": "columns",
+          "name": "长文分栏"
+        },
+        {
+          "id": "note",
+          "name": "批注摘录"
+        }
+      ]
+    },
+    {
+      "id": "grid",
+      "name": "分栏与卡片",
+      "subs": [
+        {
+          "id": "two-sym",
+          "name": "对称双栏"
+        },
+        {
+          "id": "two-main",
+          "name": "主次双栏"
+        },
+        {
+          "id": "three",
+          "name": "三栏并列"
+        },
+        {
+          "id": "multi",
+          "name": "多栏并列"
+        },
+        {
+          "id": "four",
+          "name": "四宫格"
+        },
+        {
+          "id": "cards",
+          "name": "多卡网格"
+        },
+        {
+          "id": "main-plus",
+          "name": "主卡＋辅卡"
+        }
+      ]
+    },
+    {
+      "id": "table",
+      "name": "表格与矩阵",
+      "subs": [
+        {
+          "id": "detail",
+          "name": "明细表"
+        },
+        {
+          "id": "cross",
+          "name": "交叉比较表"
+        },
+        {
+          "id": "grouped",
+          "name": "分组表"
+        },
+        {
+          "id": "rating",
+          "name": "评分表"
+        },
+        {
+          "id": "heatmap",
+          "name": "热力矩阵"
+        },
+        {
+          "id": "quadrant",
+          "name": "定位象限"
+        },
+        {
+          "id": "raci",
+          "name": "责任分配矩阵"
+        }
+      ]
+    },
+    {
+      "id": "chart",
+      "name": "指标与图表",
+      "subs": [
+        {
+          "id": "big-number",
+          "name": "指标大字"
+        },
+        {
+          "id": "kpi-group",
+          "name": "指标组"
+        },
+        {
+          "id": "ranking",
+          "name": "排序与比较图"
+        },
+        {
+          "id": "trend",
+          "name": "趋势图"
+        },
+        {
+          "id": "share",
+          "name": "占比与构成图"
+        },
+        {
+          "id": "scatter",
+          "name": "分布与相关图"
+        },
+        {
+          "id": "waterfall",
+          "name": "差额分解图"
+        },
+        {
+          "id": "dashboard",
+          "name": "多图看板"
+        }
+      ]
+    },
+    {
+      "id": "flow",
+      "name": "流程与时间",
+      "subs": [
+        {
+          "id": "steps",
+          "name": "步骤条"
+        },
+        {
+          "id": "branch",
+          "name": "分支流程"
+        },
+        {
+          "id": "timeline",
+          "name": "时间线"
+        },
+        {
+          "id": "roadmap",
+          "name": "阶段路线图"
+        },
+        {
+          "id": "gantt",
+          "name": "甘特排期"
+        },
+        {
+          "id": "swimlane",
+          "name": "泳道图"
+        },
+        {
+          "id": "journey",
+          "name": "用户旅程"
+        },
+        {
+          "id": "loop",
+          "name": "循环流程"
+        }
+      ]
+    },
+    {
+      "id": "diagram",
+      "name": "架构与关系",
+      "subs": [
+        {
+          "id": "tree",
+          "name": "层级树"
+        },
+        {
+          "id": "layers",
+          "name": "分层架构"
+        },
+        {
+          "id": "modules",
+          "name": "模块架构"
+        },
+        {
+          "id": "pillars",
+          "name": "支柱模型"
+        },
+        {
+          "id": "hub",
+          "name": "中心辐射"
+        },
+        {
+          "id": "network",
+          "name": "网络关系"
+        },
+        {
+          "id": "causal",
+          "name": "因果关系"
+        },
+        {
+          "id": "venn",
+          "name": "交集与包含"
+        }
+      ]
+    },
+    {
+      "id": "media",
+      "name": "图片与媒体",
+      "subs": [
+        {
+          "id": "full",
+          "name": "全幅大图"
+        },
+        {
+          "id": "lr",
+          "name": "左右图文"
+        },
+        {
+          "id": "tb",
+          "name": "上下图文"
+        },
+        {
+          "id": "gallery",
+          "name": "多图画廊"
+        },
+        {
+          "id": "annotate",
+          "name": "图片标注"
+        },
+        {
+          "id": "storyboard",
+          "name": "连续分镜"
+        },
+        {
+          "id": "mockup",
+          "name": "设备样机"
+        },
+        {
+          "id": "video",
+          "name": "视频展示"
+        }
+      ]
+    },
+    {
+      "id": "map",
+      "name": "地图与空间",
+      "subs": [
+        {
+          "id": "region",
+          "name": "区域着色"
+        },
+        {
+          "id": "points",
+          "name": "点位分布"
+        },
+        {
+          "id": "route",
+          "name": "路线轨迹"
+        },
+        {
+          "id": "plan",
+          "name": "平面布局"
+        },
+        {
+          "id": "zones",
+          "name": "空间分区"
+        },
+        {
+          "id": "zoom",
+          "name": "局部放大"
+        }
+      ]
+    },
+    {
+      "id": "mixed",
+      "name": "综合排布",
+      "subs": [
+        {
+          "id": "overview",
+          "name": "总览＋局部详解"
+        },
+        {
+          "id": "main-side",
+          "name": "主图＋侧栏解读"
+        },
+        {
+          "id": "summary-detail",
+          "name": "上方摘要＋下方明细"
+        },
+        {
+          "id": "dashboard-zones",
+          "name": "多区仪表盘"
+        },
+        {
+          "id": "panorama",
+          "name": "单页全景"
+        },
+        {
+          "id": "collage",
+          "name": "海报式拼贴"
+        }
+      ]
+    }
+  ]
+}
