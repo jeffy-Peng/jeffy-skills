@@ -1,0 +1,29 @@
+{
+  "automated": {
+    "scope": "对象与连线完整性、判断出口、柱长和共同零点、长名称与原因不截断、消息端点与顺序、返回线型、标签遮线、文字碰撞及越界",
+    "command": "python scripts/test-cross-material-adaptation.py",
+    "geometryReport": "geometry-check.json",
+    "result": "pass"
+  },
+  "manualReview": [
+    {
+      "material": "FLOW-001",
+      "result": "通过本例",
+      "observation": "四个判断各有是/否出口，保留补件回路、资格拒绝、成功退款及自动流程转人工。重试条件明确未受理且未重试，不用次数剩余替代支付状态。",
+      "evidence": "flow.png"
+    },
+    {
+      "material": "BAR-001",
+      "result": "通过本例",
+      "observation": "六条数据共享零点和0—100分钟尺度，完整名称、两业务组与原因就近对应，76分钟重点不是最大值，注明任务聚焦且不计算总耗时。",
+      "evidence": "bar.png"
+    },
+    {
+      "material": "SEQ-001",
+      "result": "通过本例",
+      "observation": "超时作为结果未知的注释，不伪造失败消息。先查K，已受理禁止重复提交，未受理且未重试才同键重试一次；虚线仅表示返回，纵距非耗时。",
+      "evidence": "sequence.png"
+    }
+  ],
+  "scope": "同一执行模型三次适配的自动检查与人工自审；不是独立模型盲测，不推定全库或所有拓扑可靠。"
+}

@@ -1,6 +1,6 @@
 // Recompute transparent line cutouts from the final label geometry, in SVG coordinates.
 function updateLineLabelMasks(svg,padding=7){
- const ns='http://www.w3.org/2000/svg',labels=[...svg.querySelectorAll('text[data-line-label]')],edges=[...svg.querySelectorAll('[data-connector]')];
+ const ns='http://www.w3.org/2000/svg',labels=[...svg.querySelectorAll('text[data-line-label],text[data-node-description],text[data-description]')].filter(n=>n.textContent.trim()&&parseFloat(n.ownerDocument.defaultView.getComputedStyle(n).opacity)>0),edges=[...svg.querySelectorAll('[data-connector]')];
  if(!edges.length)return;
  let defs=svg.querySelector('defs');if(!defs){defs=document.createElementNS(ns,'defs');svg.prepend(defs)}
  if(!svg.dataset.lineMaskId)svg.dataset.lineMaskId='line-label-gaps-'+(++updateLineLabelMasks.sequence);

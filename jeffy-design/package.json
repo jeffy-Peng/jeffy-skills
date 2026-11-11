@@ -1,6 +1,6 @@
 {
   "name": "jeffy-design",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "Content-first presentation design with reusable materials, themes, composition and validation.",

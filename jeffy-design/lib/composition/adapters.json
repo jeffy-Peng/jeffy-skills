@@ -81,5 +81,26 @@
     "fn": "renderHierarchy",
     "defaults": {},
     "sheet": "原方案（root/children 接口）"
+  },
+  "FLOW-002": {
+    "file": "../drafts/机制表达审核/mechanisms.js",
+    "cut": "const samples=",
+    "fn": "renderSwimlaneReview",
+    "defaults": {},
+    "status": "draft-preview-only"
+  },
+  "REL-004": {
+    "file": "../drafts/机制表达审核/mechanisms.js",
+    "cut": "const samples=",
+    "fn": "renderLayersReview",
+    "defaults": {},
+    "status": "draft-preview-only"
+  },
+  "SEQ-001": {
+    "file": "../drafts/机制表达审核/mechanisms.js",
+    "cut": "const samples=",
+    "fn": "renderSequenceReview",
+    "defaults": {},
+    "status": "draft-preview-only"
   }
 }

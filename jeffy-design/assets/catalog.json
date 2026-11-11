@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "updated": "2026-11-11",
   "entries": [
     {
@@ -13,7 +13,13 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-001.html"
+          "path": "柱状图组件/BAR-001.html",
+          "rationale": "样张的规整柱列便于演示共同基线，不要求等字数或相同类别数量。"
+        },
+        {
+          "name": "跨素材结构适配案例",
+          "path": "../examples/cross-material-adaptation/index.html",
+          "rationale": "对应本项的结构变化案例保留语义规范，但按本次分支、分组或条件交互重新绘制；不是另一套固定模板。"
         }
       ],
       "sources": [
@@ -21,9 +27,13 @@
       ],
       "status": "已登记·旧验收待核对",
       "evidence": [
-        "柱状图组件/验证记录.json"
+        "柱状图组件/验证记录.json",
+        "../examples/cross-material-adaptation/validation.json"
       ],
-      "limits": "正负数据选BAR-005"
+      "limits": "正负数据选BAR-005",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/BAR-001.md"
     },
     {
       "id": "BAR-002",
@@ -36,7 +46,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-002.html"
+          "path": "柱状图组件/BAR-002.html",
+          "rationale": "样张把系列均匀并排是为了便于逐项比较，系列数量和间距并非固定。"
         }
       ],
       "sources": [
@@ -47,7 +58,10 @@
         "柱状图组件/验证记录.json",
         "../tests/composition/extended-validation.json"
       ],
-      "limits": "系列须使用可比单位"
+      "limits": "系列须使用可比单位",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/BAR-002.md"
     },
     {
       "id": "BAR-003",
@@ -60,7 +74,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-003.html"
+          "path": "柱状图组件/BAR-003.html",
+          "rationale": "样张分项规则一致便于理解构成，不要求每个对象都有相同非零分项。"
         }
       ],
       "sources": [
@@ -71,7 +86,10 @@
         "柱状图组件/验证记录.json",
         "../tests/composition/extended-validation.json"
       ],
-      "limits": "百分比总量为零时无占比"
+      "limits": "百分比总量为零时无占比",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/BAR-003.md"
     },
     {
       "id": "BAR-005",
@@ -86,7 +104,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-005.html"
+          "path": "柱状图组件/BAR-005.html",
+          "rationale": "样张把正负项并置便于看方向，正负项数无需相等。"
         }
       ],
       "sources": [
@@ -96,7 +115,10 @@
       "evidence": [
         "柱状图组件/进阶组件验证.json"
       ],
-      "limits": "不是累计金额过程"
+      "limits": "不是累计金额过程",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/BAR-005.md"
     },
     {
       "id": "BAR-006",
@@ -111,7 +133,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-006.html"
+          "path": "柱状图组件/BAR-006.html",
+          "rationale": "样张只有起点和最终合计是一个简单账目，非所有分析都只有这两种总计。"
         }
       ],
       "sources": [
@@ -122,7 +145,10 @@
         "柱状图组件/进阶组件验证.json",
         "../tests/composition/extended-validation.json"
       ],
-      "limits": "增减项顺序影响解释"
+      "limits": "增减项顺序影响解释",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/BAR-006.md"
     },
     {
       "id": "BAR-007",
@@ -137,7 +163,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-007.html"
+          "path": "柱状图组件/BAR-007.html",
+          "rationale": "样张统一目标标记便于对照，但不要求每项共用同一个目标值。"
         }
       ],
       "sources": [
@@ -147,7 +174,10 @@
       "evidence": [
         "柱状图组件/进阶组件验证.json"
       ],
-      "limits": "实际与目标须同单位"
+      "limits": "实际与目标须同单位",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/BAR-007.md"
     },
     {
       "id": "LINE-001",
@@ -160,7 +190,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "折线图组件/LINE-001.html"
+          "path": "折线图组件/LINE-001.html",
+          "rationale": "样张等距类别轴只适合其时间口径，不意味着任意日期都必须等距。"
         }
       ],
       "sources": [
@@ -171,7 +202,10 @@
         "折线图组件/验证记录.json",
         "折线图组件/模式验证.json"
       ],
-      "limits": "累计需可相加；指数基期非零"
+      "limits": "累计需可相加；指数基期非零",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/LINE-001.md"
     },
     {
       "id": "PIE-001",
@@ -184,7 +218,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "占比图组件/PIE-001.html"
+          "path": "占比图组件/PIE-001.html",
+          "rationale": "样张分项较少便于展示构成，不代表任意长尾都适合塞进一圈。"
         }
       ],
       "sources": [
@@ -194,7 +229,10 @@
       "evidence": [
         "占比图组件/验证记录.json"
       ],
-      "limits": "不直接比较多期变化；零总量无占比"
+      "limits": "不直接比较多期变化；零总量无占比",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/PIE-001.md"
     },
     {
       "id": "SCATTER-001",
@@ -207,7 +245,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "散点图组件/SCATTER-001.html"
+          "path": "散点图组件/SCATTER-001.html",
+          "rationale": "样张点较疏便于展示坐标，不规定密集数据也必须逐点贴字。"
         }
       ],
       "sources": [
@@ -217,7 +256,10 @@
       "evidence": [
         "散点图组件/验证记录.json"
       ],
-      "limits": "相关不代表因果；密集标注需成页检查"
+      "limits": "相关不代表因果；密集标注需成页检查",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/SCATTER-001.md"
     },
     {
       "id": "TABLE-001",
@@ -230,7 +272,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "表格组件/TABLE-001.html"
+          "path": "表格组件/TABLE-001.html",
+          "rationale": "样张字段短所以列宽接近，真实内容不必平均分列。"
         }
       ],
       "sources": [
@@ -240,7 +283,10 @@
       "evidence": [
         "表格组件/验证记录.json"
       ],
-      "limits": "长表需分页或增加区域，不能降字号"
+      "limits": "长表需分页或增加区域，不能降字号",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/TABLE-001.md"
     },
     {
       "id": "TABLE-002",
@@ -253,7 +299,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "表格组件/TABLE-002.html"
+          "path": "表格组件/TABLE-002.html",
+          "rationale": "样张的简单矩阵便于逐格查看，不要求所有维度有同等决策权。"
         }
       ],
       "sources": [
@@ -261,7 +308,10 @@
       ],
       "status": "已登记·旧验收待核对",
       "evidence": [],
-      "limits": "不能混淆缺失与不具备"
+      "limits": "不能混淆缺失与不具备",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/TABLE-002.md"
     },
     {
       "id": "MATRIX-001",
@@ -274,7 +324,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "矩阵组件/MATRIX-001.html"
+          "path": "矩阵组件/MATRIX-001.html",
+          "rationale": "样张四个区域均衡只为示范定位，真实点数和分界不必对称。"
         }
       ],
       "sources": [
@@ -282,7 +333,10 @@
       ],
       "status": "已登记·旧验收待核对",
       "evidence": [],
-      "limits": "默认中点不是业务判断"
+      "limits": "默认中点不是业务判断",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/MATRIX-001.md"
     },
     {
       "id": "REL-001",
@@ -297,11 +351,13 @@
       "sheets": [
         {
           "name": "原方案（旧状态待核对）",
-          "path": "架构关系组件/REL-001.html"
+          "path": "架构关系组件/REL-001.html",
+          "rationale": "样张树形整齐是分支较均衡的结果，不应删节点来保持对称。"
         },
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/TREE-001.html"
+          "path": "简洁线条组件/TREE-001.html",
+          "rationale": "样张树形整齐是分支较均衡的结果，不应删节点来保持对称。"
         }
       ],
       "sources": [
@@ -313,7 +369,10 @@
         "简洁线条组件/四类关系素材-验证.json",
         "../tests/composition/extended-validation.json"
       ],
-      "limits": "区域组装目前接入原方案root/children；简洁线条TREE方案未迁移。两款方案接口不同；TREE-001仅为方案文件名"
+      "limits": "区域组装目前接入原方案root/children；简洁线条TREE方案未迁移。两款方案接口不同；TREE-001仅为方案文件名",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/REL-001.md"
     },
     {
       "id": "FLOW-001",
@@ -326,15 +385,26 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "流程图组件/FLOW-001.html"
+          "path": "流程图组件/FLOW-001.html",
+          "rationale": "样张有限分支用于示范节点类型，不要求真实流程只有一个判断或一次返回。"
+        },
+        {
+          "name": "跨素材结构适配案例",
+          "path": "../examples/cross-material-adaptation/index.html",
+          "rationale": "对应本项的结构变化案例保留语义规范，但按本次分支、分组或条件交互重新绘制；不是另一套固定模板。"
         }
       ],
       "sources": [
         "流程图组件/flow.js"
       ],
       "status": "已入库",
-      "evidence": [],
-      "limits": "流程完整性由内容决定；条件文字共用遮线"
+      "evidence": [
+        "../examples/cross-material-adaptation/validation.json"
+      ],
+      "limits": "流程完整性由内容决定；条件文字共用遮线",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/FLOW-001.md"
     },
     {
       "id": "TIME-001",
@@ -347,7 +417,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "时间组件/TIME-001.html"
+          "path": "时间组件/TIME-001.html",
+          "rationale": "样张相隔较开的日期便于贴标签，不限制同一日期只能有一件事。"
         }
       ],
       "sources": [
@@ -357,7 +428,10 @@
       "evidence": [
         "../tests/composition/extended-validation.json"
       ],
-      "limits": "时间比例与等距模式含义不同"
+      "limits": "时间比例与等距模式含义不同",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/TIME-001.md"
     },
     {
       "id": "TIME-002",
@@ -370,7 +444,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "时间组件/TIME-002.html"
+          "path": "时间组件/TIME-002.html",
+          "rationale": "样张时段少所以可以宽松排布，不意味着复杂计划必须缩成同一行。"
         }
       ],
       "sources": [
@@ -378,7 +453,10 @@
       ],
       "status": "已入库",
       "evidence": [],
-      "limits": "各段使用同一时间口径"
+      "limits": "各段使用同一时间口径",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/TIME-002.md"
     },
     {
       "id": "REL-003",
@@ -391,7 +469,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "架构关系组件/REL-003.html"
+          "path": "架构关系组件/REL-003.html",
+          "rationale": "样张容器并列是为了展示各自归属，不限制真实范围必须同宽或无嵌套。"
         }
       ],
       "sources": [
@@ -399,7 +478,10 @@
       ],
       "status": "已入库",
       "evidence": [],
-      "limits": "与SET-001定性集合交集不同"
+      "limits": "与SET-001定性集合交集不同",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/REL-003.md"
     },
     {
       "id": "REL-006",
@@ -412,7 +494,8 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "架构关系组件/REL-006.html"
+          "path": "架构关系组件/REL-006.html",
+          "rationale": "样张环形排布适合无明显层次的关系，不代表所有网络都该围成一圈。"
         }
       ],
       "sources": [
@@ -420,7 +503,10 @@
       ],
       "status": "已入库",
       "evidence": [],
-      "limits": "复杂交叉可能需拆图；共用透明遮线"
+      "limits": "复杂交叉可能需拆图；共用透明遮线",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/REL-006.md"
     },
     {
       "id": "HEAT-001",
@@ -433,7 +519,8 @@
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/HEAT-001.html"
+          "path": "简洁线条组件/HEAT-001.html",
+          "rationale": "样张使用单向明度比较大小，不代表所有正负矩阵都适合单向灰度。"
         }
       ],
       "sources": [
@@ -443,7 +530,10 @@
       "evidence": [
         "简洁线条组件/新增三类素材-验证.json"
       ],
-      "limits": "颜色深浅需同口径；不作因果推断"
+      "limits": "颜色深浅需同口径；不作因果推断",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/HEAT-001.md"
     },
     {
       "id": "DIST-001",
@@ -456,7 +546,8 @@
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/DIST-001.html"
+          "path": "简洁线条组件/DIST-001.html",
+          "rationale": "样张等宽箱便于解释频数，不意味着每个分布都用同一组箱界。"
         }
       ],
       "sources": [
@@ -466,7 +557,10 @@
       "evidence": [
         "简洁线条组件/新增三类素材-验证.json"
       ],
-      "limits": "分箱影响观察，不是类别柱状图"
+      "limits": "分箱影响观察，不是类别柱状图",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/DIST-001.md"
     },
     {
       "id": "SANKEY-001",
@@ -474,12 +568,13 @@
       "purpose": "流量去向",
       "form": "两端桑基图",
       "question": "说明数量由哪些来源流向哪些去向",
-      "minimumInput": "两端节点及非负流量路径",
+      "minimumInput": "来源、去向或阶段节点及对应非负流量；需说明守恒与损耗口径",
       "parameters": "节点与流量、数值标注",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/SANKEY-001.html"
+          "path": "简洁线条组件/SANKEY-001.html",
+          "rationale": "现有样张与代码只有两端，是参考实现能力边界，不是流量表达只能有两端。"
         }
       ],
       "sources": [
@@ -489,7 +584,10 @@
       "evidence": [
         "简洁线条组件/新增三类素材-验证.json"
       ],
-      "limits": "当前仅两端，不支持多阶段或循环流"
+      "limits": "当前仅两端，不支持多阶段或循环流",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/SANKEY-001.md"
     },
     {
       "id": "FUNNEL-001",
@@ -502,7 +600,8 @@
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/FUNNEL-001.html"
+          "path": "简洁线条组件/FUNNEL-001.html",
+          "rationale": "样张单漏斗表达单一路径，不限制真实分析必须没有分支。"
         }
       ],
       "sources": [
@@ -512,7 +611,10 @@
       "evidence": [
         "简洁线条组件/四类关系素材-验证.json"
       ],
-      "limits": "首阶段非零；不可混用不同人群"
+      "limits": "首阶段非零；不可混用不同人群",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/FUNNEL-001.md"
     },
     {
       "id": "LOOP-001",
@@ -520,12 +622,13 @@
       "purpose": "循环关系",
       "form": "循环图",
       "question": "表达循环顺序与方向",
-      "minimumInput": "2—10个环节名称",
+      "minimumInput": "至少两个环节及有意义的有向反馈关系",
       "parameters": "节点数量、顺逆方向",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/LOOP-001.html"
+          "path": "简洁线条组件/LOOP-001.html",
+          "rationale": "样张均匀圆周便于示范循环，不要求现实反馈速度或节点重要性相等。"
         }
       ],
       "sources": [
@@ -535,7 +638,10 @@
       "evidence": [
         "简洁线条组件/四类关系素材-验证.json"
       ],
-      "limits": "不表示各环节耗时或贡献大小"
+      "limits": "不表示各环节耗时或贡献大小",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/LOOP-001.md"
     },
     {
       "id": "SET-001",
@@ -548,7 +654,8 @@
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/SET-001.html"
+          "path": "简洁线条组件/SET-001.html",
+          "rationale": "样张两个集合仅为关系示范，不限制内容只有两个集合。"
         }
       ],
       "sources": [
@@ -558,7 +665,10 @@
       "evidence": [
         "简洁线条组件/四类关系素材-验证.json"
       ],
-      "limits": "面积不表示数量；不能代替定量Venn图"
+      "limits": "面积不表示数量；不能代替定量Venn图",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/SET-001.md"
     },
     {
       "id": "BOX-001",
@@ -571,7 +681,8 @@
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "分布与轮廓组件/BOX-001.html"
+          "path": "分布与轮廓组件/BOX-001.html",
+          "rationale": "样张仅用箱体概括分布，不要求隐藏样本量或所有原始点。"
         }
       ],
       "sources": [
@@ -581,7 +692,10 @@
       "evidence": [
         "分布与轮廓组件/validation.json"
       ],
-      "limits": "线性插值分位数，须为1.5×IQR范围内观测"
+      "limits": "线性插值分位数，须为1.5×IQR范围内观测",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/BOX-001.md"
     },
     {
       "id": "RADAR-001",
@@ -589,12 +703,13 @@
       "purpose": "多维比较",
       "form": "雷达图",
       "question": "比较对象的多维评分轮廓",
-      "minimumInput": "3—8个同方向、同尺度0—100评分",
+      "minimumInput": "至少三个同方向、可解释且可比的维度评分；需明确标准化口径",
       "parameters": "维度数量、对象对照、数值标注",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "分布与轮廓组件/RADAR-001.html"
+          "path": "分布与轮廓组件/RADAR-001.html",
+          "rationale": "样张归一到0—100是其评分口径，并不是原始指标不经处理就可输入。"
         }
       ],
       "sources": [
@@ -604,7 +719,10 @@
       "evidence": [
         "分布与轮廓组件/validation.json"
       ],
-      "limits": "不直接混用单位；当前只验证有限系列"
+      "limits": "不直接混用单位；当前只验证有限系列",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/RADAR-001.md"
     },
     {
       "id": "FLOW-002",
@@ -617,15 +735,27 @@
       "sheets": [
         {
           "name": "草稿预览",
-          "path": "../drafts/泳道图/FLOW-002.html"
+          "path": "../drafts/泳道图/FLOW-002.html",
+          "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。"
+        },
+        {
+          "name": "机制表达审核方案",
+          "path": "../drafts/机制表达审核/FLOW-002.html",
+          "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。"
         }
       ],
       "sources": [
-        "../drafts/泳道图/swimlane.js"
+        "../drafts/泳道图/swimlane.js",
+        "../drafts/机制表达审核/mechanisms.js"
       ],
       "status": "草稿·未入库",
-      "evidence": [],
-      "limits": "尚未作为正式素材登记；组合能力未接入"
+      "evidence": [
+        "../drafts/机制表达审核/validation.json"
+      ],
+      "limits": "尚未作为正式素材登记；组合能力未接入",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/FLOW-002.md"
     },
     {
       "id": "REL-002",
@@ -638,7 +768,8 @@
       "sheets": [
         {
           "name": "草稿预览",
-          "path": "../drafts/交换关系/REL-002.html"
+          "path": "../drafts/交换关系/REL-002.html",
+          "rationale": "样张对称排布便于看两端，不代表交换内容或价值相等。"
         }
       ],
       "sources": [
@@ -646,7 +777,10 @@
       ],
       "status": "草稿·未入库",
       "evidence": [],
-      "limits": "尚未作为正式素材登记；组合能力未接入"
+      "limits": "尚未作为正式素材登记；组合能力未接入",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/REL-002.md"
     },
     {
       "id": "REL-004",
@@ -659,15 +793,41 @@
       "sheets": [
         {
           "name": "草稿预览",
-          "path": "../drafts/分层架构/REL-004.html"
+          "path": "../drafts/分层架构/REL-004.html",
+          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
+        },
+        {
+          "name": "机制表达审核方案",
+          "path": "../drafts/机制表达审核/REL-004.html",
+          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
+        },
+        {
+          "name": "样张与设计理由",
+          "path": "分层架构表达标准/参考样张.html",
+          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
+        },
+        {
+          "name": "依规范重绘案例（非模板）",
+          "path": "../examples/layer-adaptation/index.html",
+          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
         }
       ],
       "sources": [
-        "../drafts/分层架构/layers.js"
+        "../drafts/分层架构/layers.js",
+        "../drafts/机制表达审核/mechanisms.js",
+        "分层架构表达标准/参考实现.js"
       ],
       "status": "草稿·未入库",
-      "evidence": [],
-      "limits": "尚未作为正式素材登记；组合能力未接入"
+      "evidence": [
+        "../drafts/机制表达审核/validation.json",
+        "../examples/layer-adaptation/validation.json"
+      ],
+      "limits": "表达规范试点；生成器并非结构边界。常规分格可复用，跨层、分组、不等宽结构允许依规范重绘。仍处审核状态。",
+      "standard": "分层架构表达标准/规范.md",
+      "referenceImplementation": "分层架构表达标准/参考实现.js",
+      "adaptationCase": "../examples/layer-adaptation/index.html",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证"
     },
     {
       "id": "REL-005",
@@ -680,7 +840,8 @@
       "sheets": [
         {
           "name": "草稿预览",
-          "path": "../drafts/中心辐射/REL-005.html"
+          "path": "../drafts/中心辐射/REL-005.html",
+          "rationale": "样张周边均匀是视觉安排，不表示所有关系强度或权力相等。"
         }
       ],
       "sources": [
@@ -688,8 +849,44 @@
       ],
       "status": "草稿·未入库",
       "evidence": [],
-      "limits": "尚未作为正式素材登记；组合能力未接入"
+      "limits": "尚未作为正式素材登记；组合能力未接入",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/REL-005.md"
+    },
+    {
+      "id": "SEQ-001",
+      "aliases": [],
+      "purpose": "架构与关系",
+      "form": "时序图",
+      "question": "谁先请求谁，谁在什么时候返回？",
+      "minimumInput": "参与者唯一ID与有序消息，消息包含发送方、接收方和标签",
+      "parameters": "消息数量、返回线型",
+      "sheets": [
+        {
+          "name": "机制表达审核方案",
+          "path": "../drafts/机制表达审核/SEQ-001.html",
+          "rationale": "样张只展示简单请求和返回，参考实现尚不支持的片段不构成语义禁令。"
+        },
+        {
+          "name": "跨素材结构适配案例",
+          "path": "../examples/cross-material-adaptation/index.html",
+          "rationale": "对应本项的结构变化案例保留语义规范，但按本次分支、分组或条件交互重新绘制；不是另一套固定模板。"
+        }
+      ],
+      "sources": [
+        "../drafts/机制表达审核/mechanisms.js"
+      ],
+      "status": "草稿·未入库",
+      "evidence": [
+        "../drafts/机制表达审核/validation.json",
+        "../examples/cross-material-adaptation/validation.json"
+      ],
+      "limits": "暂不支持自消息、激活条、并行与条件组合片段",
+      "implementationRole": "reference",
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standard": "表达规范/SEQ-001.md"
     }
   ],
-  "policy": "目录状态不等于全量验收；组合范围由适配器登记派生。旧文件和草稿仅保留引用，不重复计数。"
+  "policy": "每项为表达规范、带理由的样张与参考实现；规范覆盖不等于行为验收，生成器能力不等于结构边界。"
 }

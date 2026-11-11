@@ -1,0 +1,30 @@
+[
+  {
+    "id": "FLOW-002",
+    "initialAndControls": "pass"
+  },
+  {
+    "id": "REL-004",
+    "initialAndControls": "pass"
+  },
+  {
+    "id": "SEQ-001",
+    "initialAndControls": "pass"
+  },
+  {
+    "name": "empty layers",
+    "pass": true
+  },
+  {
+    "name": "unknown participant",
+    "pass": true
+  },
+  {
+    "name": "duplicate participants",
+    "pass": true
+  },
+  {
+    "name": "bad lane",
+    "pass": true
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "page": "flow",
+    "collisions": [],
+    "outside": []
+  },
+  {
+    "page": "bar",
+    "collisions": [],
+    "outside": []
+  },
+  {
+    "page": "sequence",
+    "collisions": [],
+    "outside": []
+  }
+]

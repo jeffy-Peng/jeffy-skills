@@ -1,107 +1,23 @@
 {
+  "standardContract": {
+    "entries": 31,
+    "standards": 31,
+    "sampleRationales": 39
+  },
   "updated": "2026-11-11",
   "counts": {
-    "entries": 30,
-    "drafts": 4,
+    "entries": 31,
+    "drafts": 5,
     "composition": 12,
+    "draftComposition": 3,
     "samePlot": 2
   },
-  "referencesChecked": 87,
+  "referencesChecked": 137,
   "missing": [],
   "dependencies": [
     {
-      "preview": "assets\\简洁线条组件\\TREE-001.html",
-      "script": "components.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\散点图组件\\SCATTER-001.html",
-      "script": "scatter.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\矩阵组件\\MATRIX-001.html",
-      "script": "matrix.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\时间组件\\TIME-001.html",
-      "script": "timeline.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\柱状图组件\\BAR-003.html",
-      "script": "../共用/legend.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\柱状图组件\\BAR-003.html",
-      "script": "bar.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\柱状图组件\\BAR-003.html",
-      "script": "../共用/motion.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\简洁线条组件\\SANKEY-001.html",
-      "script": "charts.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\表格组件\\TABLE-001.html",
-      "script": "table.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\简洁线条组件\\HEAT-001.html",
-      "script": "charts.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\柱状图组件\\BAR-001.html",
-      "script": "../共用/legend.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\柱状图组件\\BAR-001.html",
-      "script": "bar.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\柱状图组件\\BAR-001.html",
-      "script": "../共用/motion.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\简洁线条组件\\DIST-001.html",
-      "script": "charts.js",
-      "exists": true
-    },
-    {
       "preview": "assets\\简洁线条组件\\SET-001.html",
       "script": "components.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\简洁线条组件\\LOOP-001.html",
-      "script": "components.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\架构关系组件\\REL-003.html",
-      "script": "containment.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\占比图组件\\PIE-001.html",
-      "script": "pie.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\占比图组件\\PIE-001.html",
-      "script": "../共用/motion.js",
       "exists": true
     },
     {
@@ -120,37 +36,17 @@
       "exists": true
     },
     {
+      "preview": "assets\\散点图组件\\SCATTER-001.html",
+      "script": "scatter.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\架构关系组件\\REL-001.html",
+      "script": "hierarchy.js",
+      "exists": true
+    },
+    {
       "preview": "assets\\简洁线条组件\\FUNNEL-001.html",
-      "script": "components.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\柱状图组件\\BAR-006.html",
-      "script": "advanced-bar.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\柱状图组件\\BAR-007.html",
-      "script": "advanced-bar.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\分布与轮廓组件\\RADAR-001.html",
-      "script": "../共用/legend.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\分布与轮廓组件\\RADAR-001.html",
-      "script": "components.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\分布与轮廓组件\\BOX-001.html",
-      "script": "../共用/legend.js",
-      "exists": true
-    },
-    {
-      "preview": "assets\\分布与轮廓组件\\BOX-001.html",
       "script": "components.js",
       "exists": true
     },
@@ -165,8 +61,68 @@
       "exists": true
     },
     {
-      "preview": "assets\\柱状图组件\\BAR-005.html",
+      "preview": "assets\\流程图组件\\FLOW-001.html",
+      "script": "../共用/line-labels.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\流程图组件\\FLOW-001.html",
+      "script": "flow.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\DIST-001.html",
+      "script": "charts.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\TREE-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-003.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-003.html",
+      "script": "bar.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-003.html",
+      "script": "../共用/motion.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\时间组件\\TIME-002.html",
+      "script": "duration.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-006.html",
       "script": "advanced-bar.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\交换关系\\REL-002.html",
+      "script": "exchange.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\LOOP-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\机制表达审核\\REL-004.html",
+      "script": "../../assets/共用/line-labels.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\机制表达审核\\REL-004.html",
+      "script": "mechanisms.js",
       "exists": true
     },
     {
@@ -185,8 +141,68 @@
       "exists": true
     },
     {
-      "preview": "drafts\\交换关系\\REL-002.html",
-      "script": "exchange.js",
+      "preview": "drafts\\泳道图\\FLOW-002.html",
+      "script": "swimlane.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\表格组件\\TABLE-001.html",
+      "script": "table.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\简洁线条组件\\SANKEY-001.html",
+      "script": "charts.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-007.html",
+      "script": "advanced-bar.js",
+      "exists": true
+    },
+    {
+      "preview": "examples\\layer-adaptation\\index.html",
+      "script": "../../assets/共用/line-labels.js",
+      "exists": true
+    },
+    {
+      "preview": "examples\\layer-adaptation\\index.html",
+      "script": "../../assets/分层架构表达标准/参考实现.js",
+      "exists": true
+    },
+    {
+      "preview": "examples\\layer-adaptation\\index.html",
+      "script": "draw.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\时间组件\\TIME-001.html",
+      "script": "timeline.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分布与轮廓组件\\BOX-001.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分布与轮廓组件\\BOX-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-001.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-001.html",
+      "script": "bar.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-001.html",
+      "script": "../共用/motion.js",
       "exists": true
     },
     {
@@ -195,23 +211,38 @@
       "exists": true
     },
     {
-      "preview": "assets\\时间组件\\TIME-002.html",
-      "script": "duration.js",
+      "preview": "assets\\矩阵组件\\MATRIX-001.html",
+      "script": "matrix.js",
       "exists": true
     },
     {
-      "preview": "assets\\架构关系组件\\REL-001.html",
-      "script": "hierarchy.js",
+      "preview": "assets\\简洁线条组件\\HEAT-001.html",
+      "script": "charts.js",
       "exists": true
     },
     {
-      "preview": "assets\\流程图组件\\FLOW-001.html",
-      "script": "../共用/line-labels.js",
+      "preview": "assets\\占比图组件\\PIE-001.html",
+      "script": "pie.js",
       "exists": true
     },
     {
-      "preview": "assets\\流程图组件\\FLOW-001.html",
-      "script": "flow.js",
+      "preview": "assets\\占比图组件\\PIE-001.html",
+      "script": "../共用/motion.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\机制表达审核\\FLOW-002.html",
+      "script": "../../assets/共用/line-labels.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\机制表达审核\\FLOW-002.html",
+      "script": "mechanisms.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\柱状图组件\\BAR-005.html",
+      "script": "advanced-bar.js",
       "exists": true
     },
     {
@@ -225,8 +256,43 @@
       "exists": true
     },
     {
-      "preview": "drafts\\泳道图\\FLOW-002.html",
-      "script": "swimlane.js",
+      "preview": "assets\\架构关系组件\\REL-003.html",
+      "script": "containment.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分布与轮廓组件\\RADAR-001.html",
+      "script": "../共用/legend.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分布与轮廓组件\\RADAR-001.html",
+      "script": "components.js",
+      "exists": true
+    },
+    {
+      "preview": "examples\\cross-material-adaptation\\index.html",
+      "script": "../../assets/共用/line-labels.js",
+      "exists": true
+    },
+    {
+      "preview": "examples\\cross-material-adaptation\\index.html",
+      "script": "../../assets/分层架构表达标准/参考实现.js",
+      "exists": true
+    },
+    {
+      "preview": "examples\\cross-material-adaptation\\index.html",
+      "script": "draw.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\机制表达审核\\SEQ-001.html",
+      "script": "../../assets/共用/line-labels.js",
+      "exists": true
+    },
+    {
+      "preview": "drafts\\机制表达审核\\SEQ-001.html",
+      "script": "mechanisms.js",
       "exists": true
     }
   ],

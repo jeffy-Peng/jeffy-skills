@@ -1,0 +1,277 @@
+{
+  "theme": "mono",
+  "pages": [
+    {
+      "id": "FLOW-002",
+      "title": "泳道：明确角色与交接",
+      "question": "该素材能否按目标区域保留文字与关系？",
+      "claim": "泳道：明确角色与交接",
+      "readingOrder": [
+        "diagram",
+        "boundary"
+      ],
+      "components": [
+        {
+          "id": "diagram",
+          "material": "FLOW-002",
+          "purpose": "验证机制表达与主题字号",
+          "data": {
+            "kind": "swimlane",
+            "lanes": [
+              {
+                "id": "a",
+                "title": "角色 A"
+              },
+              {
+                "id": "b",
+                "title": "角色 B"
+              },
+              {
+                "id": "c",
+                "title": "角色 C"
+              }
+            ],
+            "nodes": [
+              {
+                "id": "1",
+                "lane": "a",
+                "step": 0,
+                "title": "提出需求",
+                "body": "说明输入"
+              },
+              {
+                "id": "2",
+                "lane": "b",
+                "step": 1,
+                "title": "处理请求",
+                "body": "说明处理"
+              },
+              {
+                "id": "3",
+                "lane": "a",
+                "step": 2,
+                "title": "确认结果",
+                "body": "说明判断"
+              },
+              {
+                "id": "4",
+                "lane": "c",
+                "step": 3,
+                "title": "完成执行",
+                "body": "说明输出"
+              }
+            ],
+            "edges": [
+              {
+                "from": "1",
+                "to": "2",
+                "label": "提交"
+              },
+              {
+                "from": "2",
+                "to": "3",
+                "label": "待确认"
+              },
+              {
+                "from": "3",
+                "to": "4",
+                "label": "通过"
+              }
+            ]
+          },
+          "options": {
+            "direction": "horizontal",
+            "details": false
+          },
+          "box": {
+            "x": 64,
+            "y": 150,
+            "width": 1152,
+            "height": 430
+          }
+        }
+      ],
+      "text": [
+        {
+          "id": "boundary",
+          "text": "审核用合成结构，非真实业务结论。角色、消息或层级由具体内容决定；本页仅验证组装，不代表所有复杂拓扑均可放入。",
+          "box": {
+            "x": 64,
+            "y": 610,
+            "width": 1152,
+            "height": 44
+          }
+        }
+      ],
+      "source": "来源：本次合成素材测试。",
+      "speakerNotes": "先根据标题区分角色交接、结构归属与时间交互。图中关系对应输入数据，不能把层级关系误读为时间顺序，也不能把时序图当作承担职责的泳道。"
+    },
+    {
+      "id": "REL-004",
+      "title": "分层：表达能力归属",
+      "question": "该素材能否按目标区域保留文字与关系？",
+      "claim": "分层：表达能力归属",
+      "readingOrder": [
+        "diagram",
+        "boundary"
+      ],
+      "components": [
+        {
+          "id": "diagram",
+          "material": "REL-004",
+          "purpose": "验证机制表达与主题字号",
+          "data": {
+            "kind": "layers",
+            "layers": [
+              {
+                "title": "层级 A",
+                "modules": [
+                  {
+                    "title": "模块 A1",
+                    "body": "模块说明"
+                  },
+                  {
+                    "title": "模块 A2",
+                    "body": "模块说明"
+                  }
+                ]
+              },
+              {
+                "title": "层级 B",
+                "modules": [
+                  {
+                    "title": "模块 B1",
+                    "body": "模块说明"
+                  },
+                  {
+                    "title": "模块 B2",
+                    "body": "模块说明"
+                  },
+                  {
+                    "title": "模块 B3",
+                    "body": "模块说明"
+                  }
+                ]
+              },
+              {
+                "title": "层级 C",
+                "modules": [
+                  {
+                    "title": "模块 C1",
+                    "body": "模块说明"
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "direction": "horizontal",
+            "details": false
+          },
+          "box": {
+            "x": 64,
+            "y": 150,
+            "width": 1152,
+            "height": 430
+          }
+        }
+      ],
+      "text": [
+        {
+          "id": "boundary",
+          "text": "审核用合成结构，非真实业务结论。角色、消息或层级由具体内容决定；本页仅验证组装，不代表所有复杂拓扑均可放入。",
+          "box": {
+            "x": 64,
+            "y": 610,
+            "width": 1152,
+            "height": 44
+          }
+        }
+      ],
+      "source": "来源：本次合成素材测试。",
+      "speakerNotes": "先根据标题区分角色交接、结构归属与时间交互。图中关系对应输入数据，不能把层级关系误读为时间顺序，也不能把时序图当作承担职责的泳道。"
+    },
+    {
+      "id": "SEQ-001",
+      "title": "时序：追踪请求与响应",
+      "question": "该素材能否按目标区域保留文字与关系？",
+      "claim": "时序：追踪请求与响应",
+      "readingOrder": [
+        "diagram",
+        "boundary"
+      ],
+      "components": [
+        {
+          "id": "diagram",
+          "material": "SEQ-001",
+          "purpose": "验证机制表达与主题字号",
+          "data": {
+            "kind": "sequence",
+            "participants": [
+              {
+                "id": "a",
+                "title": "主体 A"
+              },
+              {
+                "id": "b",
+                "title": "主体 B"
+              },
+              {
+                "id": "c",
+                "title": "主体 C"
+              }
+            ],
+            "messages": [
+              {
+                "from": "a",
+                "to": "b",
+                "label": "请求"
+              },
+              {
+                "from": "b",
+                "to": "c",
+                "label": "查询"
+              },
+              {
+                "from": "c",
+                "to": "b",
+                "label": "返回结果",
+                "return": true
+              },
+              {
+                "from": "b",
+                "to": "a",
+                "label": "响应",
+                "return": true
+              }
+            ]
+          },
+          "options": {
+            "direction": "horizontal",
+            "details": false
+          },
+          "box": {
+            "x": 64,
+            "y": 150,
+            "width": 1152,
+            "height": 430
+          }
+        }
+      ],
+      "text": [
+        {
+          "id": "boundary",
+          "text": "审核用合成结构，非真实业务结论。角色、消息或层级由具体内容决定；本页仅验证组装，不代表所有复杂拓扑均可放入。",
+          "box": {
+            "x": 64,
+            "y": 610,
+            "width": 1152,
+            "height": 44
+          }
+        }
+      ],
+      "source": "来源：本次合成素材测试。",
+      "speakerNotes": "先根据标题区分角色交接、结构归属与时间交互。图中关系对应输入数据，不能把层级关系误读为时间顺序，也不能把时序图当作承担职责的泳道。"
+    }
+  ]
+}

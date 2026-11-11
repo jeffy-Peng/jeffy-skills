@@ -1,0 +1,391 @@
+{
+  "flow": {
+    "id": "flow",
+    "title": "售后流程保留补件、拒绝、重试和转人工",
+    "nodes": [
+      {
+        "id": "start",
+        "type": "start",
+        "title": "申请售后",
+        "x": 64,
+        "y": 176,
+        "w": 120,
+        "h": 48
+      },
+      {
+        "id": "complete",
+        "type": "decision",
+        "title": "材料完整？",
+        "x": 270,
+        "y": 165,
+        "w": 150,
+        "h": 70
+      },
+      {
+        "id": "audit",
+        "type": "process",
+        "title": "审核申请",
+        "x": 510,
+        "y": 176,
+        "w": 150,
+        "h": 48
+      },
+      {
+        "id": "eligible",
+        "type": "decision",
+        "title": "符合退款？",
+        "x": 740,
+        "y": 165,
+        "w": 150,
+        "h": 70
+      },
+      {
+        "id": "refund",
+        "type": "process",
+        "title": "执行退款",
+        "x": 1010,
+        "y": 176,
+        "w": 160,
+        "h": 48
+      },
+      {
+        "id": "supplement",
+        "type": "process",
+        "title": "补充材料",
+        "x": 270,
+        "y": 315,
+        "w": 150,
+        "h": 55
+      },
+      {
+        "id": "success",
+        "type": "decision",
+        "title": "退款成功？",
+        "x": 1015,
+        "y": 302,
+        "w": 150,
+        "h": 70
+      },
+      {
+        "id": "review",
+        "type": "process",
+        "title": "核对支付结果",
+        "x": 740,
+        "y": 307,
+        "w": 160,
+        "h": 60
+      },
+      {
+        "id": "retry",
+        "type": "decision",
+        "title": "未受理且未重试？",
+        "x": 740,
+        "y": 455,
+        "w": 160,
+        "h": 100,
+        "lines": [
+          "未受理且",
+          "未重试？"
+        ]
+      },
+      {
+        "id": "paid",
+        "type": "end",
+        "title": "已退款，结束",
+        "x": 1010,
+        "y": 483,
+        "w": 160,
+        "h": 48
+      },
+      {
+        "id": "manual",
+        "type": "end",
+        "title": "转人工队列",
+        "x": 480,
+        "y": 480,
+        "w": 160,
+        "h": 48
+      },
+      {
+        "id": "reject",
+        "type": "end",
+        "title": "不予退款，结束",
+        "x": 740,
+        "y": 585,
+        "w": 160,
+        "h": 44
+      }
+    ],
+    "edges": [
+      {
+        "id": "f1",
+        "source": "start",
+        "target": "complete",
+        "path": "M184 200H270",
+        "label": "",
+        "labelX": 0,
+        "labelY": 0,
+        "feedback": false
+      },
+      {
+        "id": "f2",
+        "source": "complete",
+        "target": "audit",
+        "path": "M420 200H510",
+        "label": "是",
+        "labelX": 465,
+        "labelY": 200,
+        "feedback": false
+      },
+      {
+        "id": "f3",
+        "source": "complete",
+        "target": "supplement",
+        "path": "M345 235V315",
+        "label": "否",
+        "labelX": 345,
+        "labelY": 275,
+        "feedback": false
+      },
+      {
+        "id": "f4",
+        "source": "supplement",
+        "target": "complete",
+        "path": "M270 342H220V200H270",
+        "label": "补齐后重审",
+        "labelX": 220,
+        "labelY": 272,
+        "feedback": true
+      },
+      {
+        "id": "f5",
+        "source": "audit",
+        "target": "eligible",
+        "path": "M660 200H740",
+        "label": "",
+        "labelX": 0,
+        "labelY": 0,
+        "feedback": false
+      },
+      {
+        "id": "f6",
+        "source": "eligible",
+        "target": "refund",
+        "path": "M890 200H1010",
+        "label": "是",
+        "labelX": 950,
+        "labelY": 200,
+        "feedback": false
+      },
+      {
+        "id": "f7",
+        "source": "eligible",
+        "target": "reject",
+        "path": "M815 165V140H1208V607H900",
+        "label": "否：审核拒绝",
+        "labelX": 1020,
+        "labelY": 140,
+        "feedback": false
+      },
+      {
+        "id": "f8",
+        "source": "refund",
+        "target": "success",
+        "path": "M1090 224V302",
+        "label": "",
+        "labelX": 0,
+        "labelY": 0,
+        "feedback": false
+      },
+      {
+        "id": "f9",
+        "source": "success",
+        "target": "paid",
+        "path": "M1090 372V483",
+        "label": "是",
+        "labelX": 1090,
+        "labelY": 425,
+        "feedback": false
+      },
+      {
+        "id": "f10",
+        "source": "success",
+        "target": "review",
+        "path": "M1015 337H900",
+        "label": "否",
+        "labelX": 955,
+        "labelY": 337,
+        "feedback": false
+      },
+      {
+        "id": "f11",
+        "source": "review",
+        "target": "retry",
+        "path": "M820 367V455",
+        "label": "已核对",
+        "labelX": 820,
+        "labelY": 417,
+        "feedback": false
+      },
+      {
+        "id": "f12",
+        "source": "retry",
+        "target": "refund",
+        "path": "M900 505H930V565H1185V200H1170",
+        "label": "是：同键重试一次",
+        "labelX": 1065,
+        "labelY": 565,
+        "feedback": true
+      },
+      {
+        "id": "f13",
+        "source": "retry",
+        "target": "manual",
+        "path": "M740 505H640",
+        "label": "否",
+        "labelX": 690,
+        "labelY": 505,
+        "feedback": false
+      }
+    ]
+  },
+  "bar": {
+    "id": "bar",
+    "title": "退款核对耗时76分钟，重点排查外部回执",
+    "unit": "分钟",
+    "max": 100,
+    "rows": [
+      {
+        "id": "B1",
+        "group": "申请审核",
+        "label": "用户资料与申请信息完整性核验",
+        "value": 82,
+        "reason": "多来源资料需逐项对照",
+        "focus": false,
+        "y": 225
+      },
+      {
+        "id": "B2",
+        "group": "申请审核",
+        "label": "业务规则与权益资格一致性审核",
+        "value": 64,
+        "reason": "规则较多，需确认适用范围",
+        "focus": false,
+        "y": 285
+      },
+      {
+        "id": "B3",
+        "group": "申请审核",
+        "label": "审核意见通知与补充信息回收",
+        "value": 47,
+        "reason": "等待申请人补充材料",
+        "focus": false,
+        "y": 345
+      },
+      {
+        "id": "B4",
+        "group": "退款执行",
+        "label": "跨系统退款结果核对与异常恢复",
+        "value": 76,
+        "reason": "外部回执延迟，先核对再处理",
+        "focus": true,
+        "y": 445
+      },
+      {
+        "id": "B5",
+        "group": "退款执行",
+        "label": "退款申请提交与支付状态同步",
+        "value": 53,
+        "reason": "支付状态同步存在等待",
+        "focus": false,
+        "y": 505
+      },
+      {
+        "id": "B6",
+        "group": "退款执行",
+        "label": "人工争议登记与后续结果通知",
+        "value": 31,
+        "reason": "登记后进入后续处理队列",
+        "focus": false,
+        "y": 565
+      }
+    ]
+  },
+  "sequence": {
+    "id": "sequence",
+    "title": "支付超时不等于失败，先查询再同键重试",
+    "participants": [
+      {
+        "id": "user",
+        "title": "用户",
+        "x": 160
+      },
+      {
+        "id": "service",
+        "title": "交易服务",
+        "x": 610
+      },
+      {
+        "id": "pay",
+        "title": "支付接口",
+        "x": 1100
+      }
+    ],
+    "messages": [
+      {
+        "id": "s1",
+        "source": "user",
+        "target": "service",
+        "label": "申请退款：请求键 K",
+        "y": 220
+      },
+      {
+        "id": "s2",
+        "source": "service",
+        "target": "pay",
+        "label": "提交退款：请求键 K",
+        "y": 275
+      },
+      {
+        "id": "s3",
+        "source": "service",
+        "target": "pay",
+        "label": "查询 K 的处理结果",
+        "y": 400
+      },
+      {
+        "id": "s4",
+        "source": "pay",
+        "target": "service",
+        "label": "已受理 / 未受理",
+        "y": 445,
+        "return": true
+      },
+      {
+        "id": "s5",
+        "source": "service",
+        "target": "pay",
+        "label": "仅未受理时：同键重试一次",
+        "y": 525,
+        "guard": "未受理且尚未重试"
+      },
+      {
+        "id": "s6",
+        "source": "pay",
+        "target": "service",
+        "label": "重试结果",
+        "y": 570,
+        "return": true,
+        "guard": "发生重试后"
+      },
+      {
+        "id": "s7",
+        "source": "service",
+        "target": "user",
+        "label": "通知结果；仍无法确认则转人工",
+        "y": 625,
+        "return": true
+      }
+    ]
+  }
+}

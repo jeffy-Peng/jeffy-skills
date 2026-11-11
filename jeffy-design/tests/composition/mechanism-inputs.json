@@ -1,0 +1,151 @@
+{
+  "swimlane": {
+    "kind": "swimlane",
+    "lanes": [
+      {
+        "id": "a",
+        "title": "角色 A"
+      },
+      {
+        "id": "b",
+        "title": "角色 B"
+      },
+      {
+        "id": "c",
+        "title": "角色 C"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "1",
+        "lane": "a",
+        "step": 0,
+        "title": "提出需求",
+        "body": "说明输入"
+      },
+      {
+        "id": "2",
+        "lane": "b",
+        "step": 1,
+        "title": "处理请求",
+        "body": "说明处理"
+      },
+      {
+        "id": "3",
+        "lane": "a",
+        "step": 2,
+        "title": "确认结果",
+        "body": "说明判断"
+      },
+      {
+        "id": "4",
+        "lane": "c",
+        "step": 3,
+        "title": "完成执行",
+        "body": "说明输出"
+      }
+    ],
+    "edges": [
+      {
+        "from": "1",
+        "to": "2",
+        "label": "提交"
+      },
+      {
+        "from": "2",
+        "to": "3",
+        "label": "待确认"
+      },
+      {
+        "from": "3",
+        "to": "4",
+        "label": "通过"
+      }
+    ]
+  },
+  "layers": {
+    "kind": "layers",
+    "layers": [
+      {
+        "title": "层级 A",
+        "modules": [
+          {
+            "title": "模块 A1",
+            "body": "模块说明"
+          },
+          {
+            "title": "模块 A2",
+            "body": "模块说明"
+          }
+        ]
+      },
+      {
+        "title": "层级 B",
+        "modules": [
+          {
+            "title": "模块 B1",
+            "body": "模块说明"
+          },
+          {
+            "title": "模块 B2",
+            "body": "模块说明"
+          },
+          {
+            "title": "模块 B3",
+            "body": "模块说明"
+          }
+        ]
+      },
+      {
+        "title": "层级 C",
+        "modules": [
+          {
+            "title": "模块 C1",
+            "body": "模块说明"
+          }
+        ]
+      }
+    ]
+  },
+  "sequence": {
+    "kind": "sequence",
+    "participants": [
+      {
+        "id": "a",
+        "title": "主体 A"
+      },
+      {
+        "id": "b",
+        "title": "主体 B"
+      },
+      {
+        "id": "c",
+        "title": "主体 C"
+      }
+    ],
+    "messages": [
+      {
+        "from": "a",
+        "to": "b",
+        "label": "请求"
+      },
+      {
+        "from": "b",
+        "to": "c",
+        "label": "查询"
+      },
+      {
+        "from": "c",
+        "to": "b",
+        "label": "返回结果",
+        "return": true
+      },
+      {
+        "from": "b",
+        "to": "a",
+        "label": "响应",
+        "return": true
+      }
+    ]
+  }
+}

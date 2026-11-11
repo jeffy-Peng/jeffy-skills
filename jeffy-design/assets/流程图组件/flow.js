@@ -57,7 +57,7 @@ function renderFlow(svg,input,opt={}){
  const title=text(hasBody?x+16:n.cx,n.cy+(hasBody?-11:0),n.title,16);
  title.setAttribute('text-anchor','start');if(!hasBody)title.setAttribute('x',n.cx-title.getComputedTextLength()/2);title.setAttribute('dominant-baseline','central');
  if(n.body&&n.type==='process'){
- const body=text(x+16,n.cy+17,n.body,13);body.setAttribute('text-anchor','start');body.setAttribute('fill','#777777');body.style.opacity=hasBody?'1':'0';
+ const body=text(x+16,n.cy+17,n.body,13);body.dataset.nodeDescription='true';body.setAttribute('text-anchor','start');body.setAttribute('fill','#777777');body.style.opacity=hasBody?'1':'0';
  }
  });
  if(old.length&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
