@@ -1,18 +1,19 @@
 (async()=>{
-const {deck,theme,adapters,legend,lineLabels}=window.compositionInput,roles=Object.fromEntries(theme.scale.map(x=>[x.role,x])),reports=[];
+const {deck,theme,adapters,legend,lineLabels,themeDrawing,themeRenderers}=window.compositionInput,roles=Object.fromEntries(theme.scale.map(x=>[x.role,x])),reports=[];
 const issue=(code,message,extra={})=>({code,message,...extra});
 const overlap=(a,b,g=0)=>a.x<b.x+b.width-g&&a.x+a.width>b.x+g&&a.y<b.y+b.height-g&&a.y+a.height>b.y+g;
 function textBlock(parent,id,text,box,role='body'){
- const r=roles[role];if(!r)throw Error('未知主题角色 '+role);let n=document.createElement('div');n.className='block';n.dataset.block=id;n.textContent=text;n.style.cssText=`left:${box.x}px;top:${box.y}px;width:${box.width}px;height:${box.height}px;font-size:${r.size}px;line-height:${r.lineHeight};font-weight:${r.weight};letter-spacing:${r.tracking};color:#${theme.colors[r.color]}`;parent.append(n);return n;
+ const r=roles[role];if(!r)throw Error('未知主题角色 '+role);let n=document.createElement('div');n.className='block';n.dataset.block=id;n.dataset.themeRole=role;n.textContent=text;n.style.cssText=`left:${box.x}px;top:${box.y}px;width:${box.width}px;height:${box.height}px;font-size:${r.size}px;line-height:${r.lineHeight};font-weight:${r.weight};letter-spacing:${r.tracking};color:#${theme.colors[r.color]}`;parent.append(n);return n;
 }
 async function mount(host,spec){
  const a=adapters[spec.material],r=roles[spec.labelRole||'pill'];
  if(!r)return {ok:false,issues:[issue('THEME','标签角色不存在')]};
  const frame=document.createElement('iframe');frame.title=spec.purpose;host.append(frame);
  const font=`"${theme.fonts.latin}","${theme.fonts.ea}",serif`;
- await new Promise(resolve=>{frame.onload=resolve;frame.srcdoc=`<!doctype html><meta charset="utf-8"><style>*{box-sizing:border-box}body{margin:0;font: ${roles.body.size}px ${font};color:#${theme.colors.body}}svg{display:block;font-family:${font}}table{border-collapse:collapse;width:100%;table-layout:fixed}caption{text-align:left;font-weight:600;padding-bottom:8px}th,td{font-weight:400;text-align:center;vertical-align:middle;padding:9px 10px;border-bottom:1px solid #ddd;overflow-wrap:anywhere}thead{background:#f3f3f3}.number{text-align:center}.focus{background:#eee}.table-note{font-size:${roles.source.size}px}</style><svg></svg><div id="table"></div>`});
+ await new Promise(resolve=>{frame.onload=resolve;frame.srcdoc=`<!doctype html><meta charset="utf-8"><style>*{box-sizing:border-box}body{background:#${theme.colors.paper};margin:0;font: ${roles.body.size}px ${font};color:#${theme.colors.body}}svg{display:block;font-family:${font}}table{border-collapse:collapse;width:100%;table-layout:fixed}caption{text-align:left;font-weight:600;padding-bottom:8px}th,td{font-weight:400;text-align:center;vertical-align:middle;padding:9px 10px;border-bottom:1px solid #ddd;overflow-wrap:anywhere}thead{background:#${theme.colors.soft}}.number{text-align:center}.focus{background:#eee}.table-note{font-size:${roles.source.size}px}</style><svg></svg><div id="table"></div>`});
  const win=frame.contentWindow,doc=frame.contentDocument;await doc.fonts.ready;
- const script=doc.createElement('script');script.textContent=legend+'\n'+lineLabels+'\n'+a.code;doc.body.append(script);
+ const script=doc.createElement('script');script.textContent=legend+'\n'+lineLabels+'\n'+themeDrawing+'\n'+themeRenderers+'\n'+a.code;doc.body.append(script);
+ if(a.renderer==='theme-v1')return await mountNative(frame,spec);
  let result;try{result=win[a.fn](spec.material.startsWith('TABLE')?doc.querySelector('#table'):doc.querySelector('svg'),spec.data,{...a.defaults,...spec.options,...(a.defaults.kind?{kind:a.defaults.kind}:{})})}catch(e){return{ok:false,issues:[issue('DATA',e.message)],material:spec.material}}
  // Initial render is complete; cancel native preview motion before measuring/exporting.
  const svg=doc.querySelector('svg');for(const key of ['_frame','_transitionFrame'])if(svg[key])win.cancelAnimationFrame(svg[key]);
@@ -42,10 +43,21 @@ async function mount(host,spec){
  const factor=issues.length?1.25:1;
  return{ok:!issues.length,issues,material:spec.material,required:{width:Math.ceil(spec.box.width*factor),height:Math.ceil(spec.box.height*factor),estimate:!!issues.length},actual:{width:spec.box.width,height:spec.box.height},plot:natural,regions,result,capability:'fixed-text-fit; no label reflow or topology solver'};
 }
-await document.fonts.ready;
+async function mountNative(frame,spec){
+ const win=frame.contentWindow,doc=frame.contentDocument,issues=[];let result;
+ try{if(spec.labelRole&&spec.labelRole!=='pill')throw Object.assign(Error('theme-v1按元素语义选择角色，不支持labelRole覆盖'),{code:'UNSUPPORTED'});if(spec.data.title?.trim())throw Object.assign(Error('组件标题需分配独立主题文字区域，不得静默丢弃'),{code:'UNSUPPORTED'});await win.ThemeDrawing.fonts(doc,theme);result=win.ThemeRenderers.render(spec.material.startsWith('TABLE')?doc.querySelector('#table'):doc.querySelector('svg'),spec.data,spec.options||{},theme,spec.box,spec.material)}catch(e){return{ok:false,material:spec.material,issues:[issue(e.code||'DATA',e.message)],capability:'theme-v1'}}
+ if(spec.material.startsWith('TABLE')){doc.querySelector('svg').remove();const height=doc.body.scrollHeight;if(height>spec.box.height||result.minWidth>spec.box.width)issues.push(issue('CAPACITY','表格主题字号下区域不足',{required:{width:result.minWidth,height}}));return{ok:!issues.length,issues,material:spec.material,required:{width:result.minWidth,height},actual:spec.box,regions:[],result,capability:'theme-v1'}}
+ doc.querySelector('#table').remove();const svg=doc.querySelector('svg');svg.setAttribute('aria-label',spec.purpose);svg.setAttribute('role','img');win.updateLineLabelMasks(svg,theme.materials.labelGap);
+ const bounds=svg.getBoundingClientRect(),regions=[...svg.querySelectorAll('text')].filter(t=>t.textContent.trim()).map(t=>{let b=t.getBoundingClientRect(),css=win.getComputedStyle(t),role=t.dataset.themeRole;return{text:t.textContent,role,x:b.x-bounds.x,y:b.y-bounds.y,width:b.width,height:b.height,fontSize:parseFloat(css.fontSize),expectedSize:roles[role]?.size,fontFamily:css.fontFamily}});
+ for(const b of regions){if(!Number.isFinite(b.expectedSize)||Math.abs(b.fontSize-b.expectedSize)>.2)issues.push(issue('THEME','角色字号不符',{text:b.text}));if(b.x<-.5||b.y<-.5||b.x+b.width>spec.box.width+.5||b.y+b.height>spec.box.height+.5)issues.push(issue('CAPACITY','主题文字超出目标区域',{text:b.text}));}
+ for(let i=0;i<regions.length;i++)for(let j=i+1;j<regions.length;j++)if(overlap(regions[i],regions[j],1))issues.push(issue('LAYOUT','主题文字碰撞',{texts:[regions[i].text,regions[j].text]}));
+ const colors=new Set(Object.values(theme.colors).map(v=>'#'+v.toLowerCase()));for(const node of [...svg.querySelectorAll('[fill],[stroke]')].filter(n=>!n.closest('mask')))for(const key of ['fill','stroke']){const value=node.getAttribute(key);if(value&&!['none','transparent'].includes(value)&&!colors.has(value.toLowerCase()))issues.push(issue('THEME','存在绕过主题的颜色',{value}));}
+ return{ok:!issues.length,issues,material:spec.material,required:{width:spec.box.width,height:spec.box.height},actual:spec.box,regions,result,capability:'theme-v1'};
+}
+await ThemeDrawing.fonts(document,theme);
 for(const [i,page]of deck.pages.entries()){
  const report={id:page.id,ok:false,issues:[],components:[],reviews:page.review||{},manualReview:'pending'};reports.push(report);
- const sheet=document.createElement('section');sheet.className='sheet';sheet.dataset.page=page.id;sheet.style.fontFamily=`"${theme.fonts.latin}","${theme.fonts.ea}",serif`;document.querySelector('main').append(sheet);
+ const sheet=document.createElement('section');sheet.className='sheet';sheet.dataset.page=page.id;sheet.style.background='#'+theme.colors.paper;sheet.style.fontFamily=`"${theme.fonts.latin}","${theme.fonts.ea}",serif`;document.querySelector('main').append(sheet);
  if(!page.question||!page.claim||!page.readingOrder?.length||!page.speakerNotes||!page.source)report.issues.push(issue('CONTENT','缺少问题、观点、阅读顺序、讲稿或来源'));
  textBlock(sheet,'title',page.title,{x:64,y:34,width:1152,height:70},'title');
  const line=document.createElement('div');line.className='block';line.style.cssText=`left:64px;top:118px;width:1152px;border-top:${theme.rules.headerWidthPx}px solid #${theme.colors.ink}`;sheet.append(line);
@@ -63,4 +75,4 @@ for(const [i,page]of deck.pages.entries()){
  const note=document.createElement('details');note.innerHTML='<summary>逐字稿与验收状态</summary>';const content=document.createElement('p');content.textContent=page.speakerNotes;note.append(content);const status=document.createElement('pre');status.className='report';status.textContent=JSON.stringify({automatic:report.ok?'pass':'fail',issues:report.issues,expressionReview:'需要人工核对观点、证据及关系完整性'},null,2);note.append(status);document.querySelector('main').append(note);
 }
 window.validationReport=reports;window.renderComplete=true;
-})().catch(e=>{window.validationReport=[{ok:false,issues:[{code:'RUNTIME',message:e.message}]}];window.renderComplete=true;document.querySelector('main').textContent=e.message});
+})().catch(e=>{window.validationReport=[{ok:false,issues:[{code:e.code||'RUNTIME',message:e.message}]}];window.renderComplete=true;document.querySelector('main').textContent=e.message});

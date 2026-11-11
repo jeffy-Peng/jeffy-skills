@@ -1,0 +1,8 @@
+{
+  "gap": 16,
+  "padding": 12,
+  "labelGap": 7,
+  "radius": 0,
+  "barMode": "solid",
+  "nodeFill": "paper"
+}

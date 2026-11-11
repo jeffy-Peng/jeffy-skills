@@ -1,0 +1,1635 @@
+{
+  "reports": [
+    {
+      "id": "BAR-001",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "比较评分，说明高分不能抵消准入失败",
+          "ok": true,
+          "issues": [],
+          "material": "BAR-001",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "0",
+              "role": "pill",
+              "x": 82.6937484741211,
+              "y": 371.5,
+              "width": 9.203125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "25",
+              "role": "pill",
+              "x": 332.01837158203125,
+              "y": 371.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "50",
+              "role": "pill",
+              "x": 585.9445190429688,
+              "y": 371.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "75",
+              "role": "pill",
+              "x": 839.8707275390625,
+              "y": 371.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "100",
+              "role": "pill",
+              "x": 1089.1953125,
+              "y": 371.5,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "加权评分 / 分",
+              "role": "pill",
+              "x": 1006.25,
+              "y": 397.1000061035156,
+              "width": 97.435791015625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "方案 A",
+              "role": "pill",
+              "x": 23.967185974121094,
+              "y": 77.16666412353516,
+              "width": 49.34527587890625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "87.5",
+              "role": "pill",
+              "x": 984.0369262695312,
+              "y": 77.16666412353516,
+              "width": 32.34375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "方案 B",
+              "role": "pill",
+              "x": 23.967185974121094,
+              "y": 188.5,
+              "width": 49.328125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "80",
+              "role": "pill",
+              "x": 907.8590698242188,
+              "y": 188.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "方案 C",
+              "role": "pill",
+              "x": 23.092185974121094,
+              "y": 299.8333435058594,
+              "width": 50.34527587890625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "75.5",
+              "role": "pill",
+              "x": 862.15234375,
+              "y": 299.8333435058594,
+              "width": 32.34375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "min": 0,
+            "max": 100,
+            "step": 25,
+            "rows": 3
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "LINE-001",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "用同基期指数对比订单、成交额和净成交额的分化",
+          "ok": true,
+          "issues": [],
+          "material": "LINE-001",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "80",
+              "role": "pill",
+              "x": 50.889060974121094,
+              "y": 305.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "100",
+              "role": "pill",
+              "x": 41.685935974121094,
+              "y": 234.5,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "120",
+              "role": "pill",
+              "x": 41.685935974121094,
+              "y": 163.5,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "140",
+              "role": "pill",
+              "x": 41.685935974121094,
+              "y": 92.5,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "160",
+              "role": "pill",
+              "x": 41.685935974121094,
+              "y": 21.5,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "基期指数 / 1月=100",
+              "role": "pill",
+              "x": 13.5,
+              "y": 100.90625,
+              "width": 17,
+              "height": 143.1875,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "订单",
+              "role": "pill",
+              "x": 427.1000061035156,
+              "y": 405.5,
+              "width": 33.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "成交额",
+              "role": "pill",
+              "x": 543.4000244140625,
+              "y": 405.5,
+              "width": 50.5999755859375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "净成交额",
+              "role": "pill",
+              "x": 677,
+              "y": 405.5,
+              "width": 65.89996337890625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "1月",
+              "role": "pill",
+              "x": 328.47149658203125,
+              "y": 321.5,
+              "width": 25.5,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "6月",
+              "role": "pill",
+              "x": 836.3238525390625,
+              "y": 321.5,
+              "width": 25.5,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "min": 80,
+            "max": 160,
+            "step": 20
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "PIE-001",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "解释6月成交额退款与留存的构成",
+          "ok": true,
+          "issues": [],
+          "material": "PIE-001",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "退款 24%",
+              "role": "pill",
+              "x": 676.9974975585938,
+              "y": 77.88367462158203,
+              "width": 71.28125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "留存 76%",
+              "role": "pill",
+              "x": 403.72125244140625,
+              "y": 295.1163330078125,
+              "width": 70.28125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "成交额 / 万元",
+              "role": "pill",
+              "x": 527.125,
+              "y": 174.5,
+              "width": 97.43585205078125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "22.5",
+              "role": "cardTitle",
+              "x": 555.15625,
+              "y": 198.5,
+              "width": 41.7928466796875,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "退款",
+              "role": "pill",
+              "x": 509.70001220703125,
+              "y": 405.5,
+              "width": 34.29998779296875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "留存",
+              "role": "pill",
+              "x": 627,
+              "y": 405.5,
+              "width": 33.29998779296875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "total": 22.5
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "REL-006",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "单独追踪付款和结算",
+          "ok": true,
+          "issues": [],
+          "material": "REL-006",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "付款",
+              "role": "pill",
+              "x": 786.8497314453125,
+              "y": 161.41250610351562,
+              "width": 34.29998779296875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "结算",
+              "role": "pill",
+              "x": 330.5409240722656,
+              "y": 161.41250610351562,
+              "width": 34.29998779296875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "支付",
+              "role": "cardTitle",
+              "x": 554.796875,
+              "y": 23.150001525878906,
+              "width": 42.40625,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "买家",
+              "role": "cardTitle",
+              "x": 1011.105712890625,
+              "y": 293.67498779296875,
+              "width": 42.40625,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "商家",
+              "role": "cardTitle",
+              "x": 98.48808288574219,
+              "y": 293.67498779296875,
+              "width": 42.40625,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "nodes": 3,
+            "edges": 2,
+            "nodeWidth": 70.2,
+            "nodeHeight": 41.3
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "FLOW-001",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "展示售后复核回路；不把争议当作正常结算",
+          "ok": true,
+          "issues": [],
+          "material": "FLOW-001",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "否",
+              "role": "pill",
+              "x": 848.84375,
+              "y": 144.25,
+              "width": 17,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "是",
+              "role": "pill",
+              "x": 847.84375,
+              "y": 236.75,
+              "width": 18,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "重处理",
+              "role": "pill",
+              "x": 692.046875,
+              "y": 413.5,
+              "width": 49.5999755859375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "订单",
+              "role": "cardTitle",
+              "x": 133.296875,
+              "y": 187.5,
+              "width": 42.40625,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "履约",
+              "role": "cardTitle",
+              "x": 414.296875,
+              "y": 187.5,
+              "width": 42.40625,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "争议？",
+              "role": "cardTitle",
+              "x": 684.6953125,
+              "y": 187.5,
+              "width": 63.609375,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "结算",
+              "role": "cardTitle",
+              "x": 975.296875,
+              "y": 95,
+              "width": 43.40625,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "复核",
+              "role": "cardTitle",
+              "x": 975.296875,
+              "y": 280,
+              "width": 43.40625,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "nodes": 5,
+            "edges": 5,
+            "nodeWidth": 154.8,
+            "nodeHeight": 41.3
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "TABLE-001",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "逐项核对两个月的金额口径",
+          "ok": true,
+          "issues": [],
+          "material": "TABLE-001",
+          "required": {
+            "width": 773,
+            "height": 148
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [],
+          "result": {
+            "minWidth": 773,
+            "rows": 2,
+            "columns": 6
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "TABLE-002",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "以可核对数据检查准入门槛",
+          "ok": true,
+          "issues": [],
+          "material": "TABLE-002",
+          "required": {
+            "width": 558.91796875,
+            "height": 197
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [],
+          "result": {
+            "minWidth": 558.91796875,
+            "rows": 3,
+            "columns": 5
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "BAR-002",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "比较同类别下两系列的绝对数量",
+          "ok": true,
+          "issues": [],
+          "material": "BAR-002",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "0",
+              "role": "pill",
+              "x": 50.89374542236328,
+              "y": 305.5,
+              "width": 9.203125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "5",
+              "role": "pill",
+              "x": 50.89374542236328,
+              "y": 210.8333282470703,
+              "width": 9.203125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "10",
+              "role": "pill",
+              "x": 41.69062042236328,
+              "y": 116.16666412353516,
+              "width": 18.40625,
+              "height": 16.99999237060547,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "15",
+              "role": "pill",
+              "x": 41.69062042236328,
+              "y": 21.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "数量 / 单位",
+              "role": "pill",
+              "x": 13.5,
+              "y": 131.5828857421875,
+              "width": 17,
+              "height": 81.1358642578125,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "项目 X",
+              "role": "pill",
+              "x": 493.9828186035156,
+              "y": 405.5,
+              "width": 49.345306396484375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "项目 Y",
+              "role": "pill",
+              "x": 626,
+              "y": 405.5,
+              "width": 49.34527587890625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "A",
+              "role": "pill",
+              "x": 199.7175750732422,
+              "y": 321.5,
+              "width": 12,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "12",
+              "role": "pill",
+              "x": 176.0066375732422,
+              "y": 62.30000305175781,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "9",
+              "role": "pill",
+              "x": 222.6082000732422,
+              "y": 119.0999984741211,
+              "width": 9.203125,
+              "height": 17.00000762939453,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "B",
+              "role": "pill",
+              "x": 456.943359375,
+              "y": 321.5,
+              "width": 10.984375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "9",
+              "role": "pill",
+              "x": 436.833984375,
+              "y": 119.0999984741211,
+              "width": 9.203125,
+              "height": 17.00000762939453,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "11",
+              "role": "pill",
+              "x": 474.826171875,
+              "y": 81.23332977294922,
+              "width": 17.21875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "C",
+              "role": "pill",
+              "x": 712.7316284179688,
+              "y": 321.5,
+              "width": 12,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "6",
+              "role": "pill",
+              "x": 693.0597534179688,
+              "y": 175.89999389648438,
+              "width": 9.203125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "8",
+              "role": "pill",
+              "x": 735.0597534179688,
+              "y": 138.03334045410156,
+              "width": 9.203125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "D",
+              "role": "pill",
+              "x": 968.9573974609375,
+              "y": 321.5,
+              "width": 11.859375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "15",
+              "role": "pill",
+              "x": 944.6839599609375,
+              "y": 5.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "10",
+              "role": "pill",
+              "x": 986.6839599609375,
+              "y": 100.16666412353516,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "min": 0,
+            "max": 15,
+            "step": 5,
+            "rows": 4
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "BAR-003",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "比较各类别中两分项的构成比例",
+          "ok": true,
+          "issues": [],
+          "material": "BAR-003",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "0",
+              "role": "pill",
+              "x": 60.092185974121094,
+              "y": 305.5,
+              "width": 9.203125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "25",
+              "role": "pill",
+              "x": 50.889060974121094,
+              "y": 234.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "50",
+              "role": "pill",
+              "x": 50.889060974121094,
+              "y": 163.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "75",
+              "role": "pill",
+              "x": 50.889060974121094,
+              "y": 92.5,
+              "width": 18.40625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "100",
+              "role": "pill",
+              "x": 41.685935974121094,
+              "y": 21.5,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "数量 / %",
+              "role": "pill",
+              "x": 13.5,
+              "y": 141.3125,
+              "width": 17,
+              "height": 62.375,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "项目 X",
+              "role": "pill",
+              "x": 493.9828186035156,
+              "y": 405.5,
+              "width": 49.345306396484375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "项目 Y",
+              "role": "pill",
+              "x": 626,
+              "y": 405.5,
+              "width": 49.34527587890625,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "A",
+              "role": "pill",
+              "x": 207.76620483398438,
+              "y": 321.5,
+              "width": 12,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "57.1%",
+              "role": "pill",
+              "x": 190.82089233398438,
+              "y": 224.35714721679688,
+              "width": 46.875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "42.9%",
+              "role": "pill",
+              "x": 190.82089233398438,
+              "y": 82.35713958740234,
+              "width": 46.875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "B",
+              "role": "pill",
+              "x": 462.6923828125,
+              "y": 321.5,
+              "width": 10.984375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "45%",
+              "role": "pill",
+              "x": 451.7158203125,
+              "y": 241.60000610351562,
+              "width": 32.9375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "55%",
+              "role": "pill",
+              "x": 451.7158203125,
+              "y": 99.5999984741211,
+              "width": 32.9375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "C",
+              "role": "pill",
+              "x": 716.1810302734375,
+              "y": 321.5,
+              "width": 12,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "42.9%",
+              "role": "pill",
+              "x": 698.6732177734375,
+              "y": 244.64285278320312,
+              "width": 46.875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "57.1%",
+              "role": "pill",
+              "x": 698.6732177734375,
+              "y": 102.64286041259766,
+              "width": 46.875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "D",
+              "role": "pill",
+              "x": 970.1072387695312,
+              "y": 321.5,
+              "width": 11.859375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "60%",
+              "role": "pill",
+              "x": 959.5681762695312,
+              "y": 220.3000030517578,
+              "width": 32.9375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "40%",
+              "role": "pill",
+              "x": 959.5681762695312,
+              "y": 78.30000305175781,
+              "width": 32.9375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "min": 0,
+            "max": 100,
+            "step": 25,
+            "rows": 4
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "BAR-006",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "核对正负变化与累计终点",
+          "ok": true,
+          "issues": [],
+          "material": "BAR-006",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "0",
+              "role": "pill",
+              "x": 60.092185974121094,
+              "y": 355.5,
+              "width": 9.203125,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "50",
+              "role": "pill",
+              "x": 50.889060974121094,
+              "y": 244.1666717529297,
+              "width": 18.40625,
+              "height": 17.000015258789062,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "100",
+              "role": "pill",
+              "x": 41.685935974121094,
+              "y": 132.8333282470703,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "150",
+              "role": "pill",
+              "x": 41.685935974121094,
+              "y": 21.5,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "金额 / 万元",
+              "role": "pill",
+              "x": 13.5,
+              "y": 156.5828857421875,
+              "width": 17,
+              "height": 81.1358642578125,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "起点",
+              "role": "pill",
+              "x": 172.56109619140625,
+              "y": 371.5,
+              "width": 32.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "100",
+              "role": "pill",
+              "x": 175.06109619140625,
+              "y": 116.83333587646484,
+              "width": 27.609375,
+              "height": 17.00000762939453,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "新增",
+              "role": "pill",
+              "x": 374.7020263671875,
+              "y": 371.5,
+              "width": 33.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "+45",
+              "role": "pill",
+              "x": 377.9832763671875,
+              "y": 16.633333206176758,
+              "width": 28.046875,
+              "height": 16.999998092651367,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "流失",
+              "role": "pill",
+              "x": 577.8429565429688,
+              "y": 371.5,
+              "width": 34.29998779296875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "-25",
+              "role": "pill",
+              "x": 583.1320190429688,
+              "y": 16.633333206176758,
+              "width": 24.03125,
+              "height": 16.999998092651367,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "调整",
+              "role": "pill",
+              "x": 780.98388671875,
+              "y": 371.5,
+              "width": 34.29998779296875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "+10",
+              "role": "pill",
+              "x": 784.26513671875,
+              "y": 50.03333282470703,
+              "width": 28.046875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "合计",
+              "role": "pill",
+              "x": 984.1248779296875,
+              "y": 371.5,
+              "width": 34.29998779296875,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "130",
+              "role": "pill",
+              "x": 987.6248779296875,
+              "y": 50.03333282470703,
+              "width": 27.609375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "min": 0,
+            "max": 150,
+            "step": 50,
+            "rows": 5
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "TIME-001",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "按时间比例放置四个事件",
+          "ok": true,
+          "issues": [],
+          "material": "TIME-001",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "2026-01-01",
+              "role": "pill",
+              "x": 13.849990844726562,
+              "y": 129.89999389648438,
+              "width": 84.84375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "节点 A",
+              "role": "cardTitle",
+              "x": 24.365623474121094,
+              "y": 181.89999389648438,
+              "width": 64.43446350097656,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "2026-04-01",
+              "role": "pill",
+              "x": 356.52789306640625,
+              "y": 129.89999389648438,
+              "width": 84.84375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "节点 B",
+              "role": "cardTitle",
+              "x": 367.04351806640625,
+              "y": 181.89999389648438,
+              "width": 63.8125,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "2026-07-01",
+              "role": "pill",
+              "x": 703.0133056640625,
+              "y": 129.89999389648438,
+              "width": 84.84375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "节点 C",
+              "role": "cardTitle",
+              "x": 713.5289306640625,
+              "y": 181.89999389648438,
+              "width": 63.8125,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "2026-10-01",
+              "role": "pill",
+              "x": 1053.3062744140625,
+              "y": 129.89999389648438,
+              "width": 84.84375,
+              "height": 17,
+              "fontSize": 16,
+              "expectedSize": 16,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "节点 D",
+              "role": "cardTitle",
+              "x": 1063.8218994140625,
+              "y": 181.89999389648438,
+              "width": 63.8125,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "events": 4
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    },
+    {
+      "id": "REL-001",
+      "ok": true,
+      "issues": [],
+      "components": [
+        {
+          "id": "subject",
+          "purpose": "展示一根两支四叶的归属结构",
+          "ok": true,
+          "issues": [],
+          "material": "REL-001",
+          "required": {
+            "width": 1152,
+            "height": 430
+          },
+          "actual": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "regions": [
+            {
+              "text": "模块 A",
+              "role": "cardTitle",
+              "x": 543.09375,
+              "y": 69.5,
+              "width": 65.4344482421875,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "模块 B",
+              "role": "cardTitle",
+              "x": 262.09375,
+              "y": 203.5,
+              "width": 64.8125,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "B1",
+              "role": "cardTitle",
+              "x": 140.875,
+              "y": 337.5,
+              "width": 27.25,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "B2",
+              "role": "cardTitle",
+              "x": 421.875,
+              "y": 337.5,
+              "width": 27.25,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "模块 C",
+              "role": "cardTitle",
+              "x": 824.09375,
+              "y": 203.5,
+              "width": 64.8125,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "C1",
+              "role": "cardTitle",
+              "x": 702.875,
+              "y": 337.5,
+              "width": 27.25,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            },
+            {
+              "text": "C2",
+              "role": "cardTitle",
+              "x": 983.875,
+              "y": 337.5,
+              "width": 27.25,
+              "height": 23,
+              "fontSize": 21,
+              "expectedSize": 21,
+              "fontFamily": "Arial, \"Microsoft YaHei\""
+            }
+          ],
+          "result": {
+            "nodes": 7,
+            "edges": 6,
+            "nodeWidth": 91.6,
+            "nodeHeight": 41.3
+          },
+          "capability": "theme-v1"
+        }
+      ],
+      "reviews": {},
+      "manualReview": "pending"
+    }
+  ],
+  "errors": []
+}

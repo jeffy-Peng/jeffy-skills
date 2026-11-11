@@ -14,7 +14,8 @@
     "verify:pressure": "node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation.json",
     "verify:extended": "node scripts/verify-page.mjs build/extended/index.html build/extended/validation.json",
     "test:composition": "node scripts/test-composition.mjs build/reports/composition.json",
-    "test:adapters": "node scripts/test-composition-extended.mjs build/reports/adapters.json"
+    "test:adapters": "node scripts/test-composition-extended.mjs build/reports/adapters.json",
+    "test:themes": "node scripts/test-themes.mjs build/theming"
   },
   "devDependencies": {
     "playwright": "^1.49.0"

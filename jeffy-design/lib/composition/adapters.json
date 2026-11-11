@@ -5,43 +5,50 @@
     "fn": "renderChart",
     "defaults": {
       "kind": "single"
-    }
+    },
+    "renderer": "theme-v1"
   },
   "LINE-001": {
     "file": "折线图组件/line.js",
     "cut": "const sample=",
     "fn": "renderLine",
-    "defaults": {}
+    "defaults": {},
+    "renderer": "theme-v1"
   },
   "PIE-001": {
     "file": "占比图组件/pie.js",
     "cut": "const sample=",
     "fn": "renderPie",
-    "defaults": {}
+    "defaults": {},
+    "renderer": "theme-v1"
   },
   "REL-006": {
     "file": "架构关系组件/network.js",
     "cut": "function refresh()",
     "fn": "renderNetwork",
-    "defaults": {}
+    "defaults": {},
+    "renderer": "theme-v1"
   },
   "FLOW-001": {
     "file": "流程图组件/flow.js",
     "cut": "const sample=",
     "fn": "renderFlow",
-    "defaults": {}
+    "defaults": {},
+    "renderer": "theme-v1"
   },
   "TABLE-001": {
     "file": "表格组件/table.js",
     "cut": "const detailSample=",
     "fn": "renderTable",
-    "defaults": {}
+    "defaults": {},
+    "renderer": "theme-v1"
   },
   "TABLE-002": {
     "file": "表格组件/table.js",
     "cut": "const detailSample=",
     "fn": "renderTable",
-    "defaults": {}
+    "defaults": {},
+    "renderer": "theme-v1"
   },
   "BAR-002": {
     "file": "柱状图组件/bar.js",
@@ -49,7 +56,8 @@
     "fn": "renderChart",
     "defaults": {
       "kind": "grouped"
-    }
+    },
+    "renderer": "theme-v1"
   },
   "BAR-003": {
     "file": "柱状图组件/bar.js",
@@ -57,7 +65,8 @@
     "fn": "renderChart",
     "defaults": {
       "kind": "stacked"
-    }
+    },
+    "renderer": "theme-v1"
   },
   "BAR-006": {
     "file": "柱状图组件/advanced-bar.js",
@@ -65,7 +74,8 @@
     "fn": "renderChart",
     "defaults": {
       "kind": "waterfall"
-    }
+    },
+    "renderer": "theme-v1"
   },
   "TIME-001": {
     "file": "时间组件/timeline.js",
@@ -73,14 +83,16 @@
     "fn": "renderTimeline",
     "defaults": {
       "details": false
-    }
+    },
+    "renderer": "theme-v1"
   },
   "REL-001": {
     "file": "架构关系组件/hierarchy.js",
     "cut": "function refresh()",
     "fn": "renderHierarchy",
     "defaults": {},
-    "sheet": "原方案（root/children 接口）"
+    "sheet": "原方案（root/children 接口）",
+    "renderer": "theme-v1"
   },
   "FLOW-002": {
     "file": "../drafts/机制表达审核/mechanisms.js",

@@ -1,0 +1,720 @@
+{
+  "theme": "mono",
+  "pages": [
+    {
+      "id": "BAR-001",
+      "title": "BAR-001 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "BAR-001",
+          "purpose": "比较评分，说明高分不能抵消准入失败",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "metric": "加权评分",
+            "unit": "分",
+            "series": [
+              "加权评分"
+            ],
+            "data": [
+              {
+                "label": "方案 A",
+                "values": [
+                  87.5
+                ]
+              },
+              {
+                "label": "方案 B",
+                "values": [
+                  80
+                ]
+              },
+              {
+                "label": "方案 C",
+                "values": [
+                  75.5
+                ]
+              }
+            ]
+          },
+          "options": {
+            "kind": "single",
+            "direction": "horizontal"
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "LINE-001",
+      "title": "LINE-001 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "LINE-001",
+          "purpose": "用同基期指数对比订单、成交额和净成交额的分化",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "metric": "基期指数",
+            "unit": "1月=100",
+            "labels": [
+              "1月",
+              "6月"
+            ],
+            "series": [
+              {
+                "name": "订单",
+                "values": [
+                  100,
+                  150
+                ]
+              },
+              {
+                "name": "成交额",
+                "values": [
+                  100,
+                  112.5
+                ]
+              },
+              {
+                "name": "净成交额",
+                "values": [
+                  100,
+                  90
+                ]
+              }
+            ]
+          },
+          "options": {
+            "points": true,
+            "zero": false,
+            "mode": "raw"
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "PIE-001",
+      "title": "PIE-001 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "PIE-001",
+          "purpose": "解释6月成交额退款与留存的构成",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "data": [
+              {
+                "label": "退款",
+                "value": 5.4
+              },
+              {
+                "label": "留存",
+                "value": 17.1
+              }
+            ],
+            "centerLabel": "成交额 / 万元"
+          },
+          "options": {
+            "donut": true,
+            "percent": true
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "REL-006",
+      "title": "REL-006 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "REL-006",
+          "purpose": "单独追踪付款和结算",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "nodes": [
+              {
+                "id": "b",
+                "title": "支付"
+              },
+              {
+                "id": "u",
+                "title": "买家"
+              },
+              {
+                "id": "s",
+                "title": "商家"
+              }
+            ],
+            "edges": [
+              {
+                "from": "u",
+                "to": "b",
+                "label": "付款"
+              },
+              {
+                "from": "b",
+                "to": "s",
+                "label": "结算"
+              }
+            ]
+          },
+          "options": {
+            "arrows": true,
+            "labels": true
+          },
+          "entities": {
+            "buyer": "买家"
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "FLOW-001",
+      "title": "FLOW-001 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "FLOW-001",
+          "purpose": "展示售后复核回路；不把争议当作正常结算",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "nodes": [
+              {
+                "id": "a",
+                "title": "订单",
+                "type": "start"
+              },
+              {
+                "id": "b",
+                "title": "履约",
+                "type": "process"
+              },
+              {
+                "id": "c",
+                "title": "争议？",
+                "type": "decision"
+              },
+              {
+                "id": "d",
+                "title": "结算",
+                "type": "end"
+              },
+              {
+                "id": "e",
+                "title": "复核",
+                "type": "process"
+              }
+            ],
+            "edges": [
+              {
+                "from": "a",
+                "to": "b"
+              },
+              {
+                "from": "b",
+                "to": "c"
+              },
+              {
+                "from": "c",
+                "to": "d",
+                "label": "否"
+              },
+              {
+                "from": "c",
+                "to": "e",
+                "label": "是"
+              },
+              {
+                "from": "e",
+                "to": "b",
+                "label": "重处理",
+                "feedback": true
+              }
+            ]
+          },
+          "options": {
+            "direction": "horizontal",
+            "details": false
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "TABLE-001",
+      "title": "TABLE-001 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "TABLE-001",
+          "purpose": "逐项核对两个月的金额口径",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "columns": [
+              "时期",
+              "订单数（单）",
+              "客单价（元）",
+              "成交额（万元）",
+              "退款比例",
+              "净成交额（万元）"
+            ],
+            "rows": [
+              [
+                "1月",
+                1000,
+                200,
+                20,
+                "5%",
+                19
+              ],
+              [
+                "6月",
+                1500,
+                150,
+                22.5,
+                "24%",
+                17.1
+              ]
+            ],
+            "note": ""
+          },
+          "options": {}
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "TABLE-002",
+      "title": "TABLE-002 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "TABLE-002",
+          "purpose": "以可核对数据检查准入门槛",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "columns": [
+              "方案",
+              "境内存储",
+              "年成本≤80万",
+              "恢复时间≤30分",
+              "准入结果"
+            ],
+            "rows": [
+              [
+                "A",
+                "不满足",
+                "90万 · 不满足",
+                "15分 · 满足",
+                "淘汰"
+              ],
+              [
+                "B",
+                "满足",
+                "78万 · 满足",
+                "25分 · 满足",
+                "唯一可行"
+              ],
+              [
+                "C",
+                "满足",
+                "60万 · 满足",
+                "40分 · 不满足",
+                "淘汰"
+              ]
+            ],
+            "note": ""
+          },
+          "options": {
+            "focus": 4
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "BAR-002",
+      "title": "BAR-002 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "BAR-002",
+          "purpose": "比较同类别下两系列的绝对数量",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "metric": "数量",
+            "unit": "单位",
+            "series": [
+              "项目 X",
+              "项目 Y"
+            ],
+            "data": [
+              {
+                "label": "A",
+                "values": [
+                  12,
+                  9
+                ]
+              },
+              {
+                "label": "B",
+                "values": [
+                  9,
+                  11
+                ]
+              },
+              {
+                "label": "C",
+                "values": [
+                  6,
+                  8
+                ]
+              },
+              {
+                "label": "D",
+                "values": [
+                  15,
+                  10
+                ]
+              }
+            ]
+          },
+          "options": {
+            "direction": "vertical"
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "BAR-003",
+      "title": "BAR-003 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "BAR-003",
+          "purpose": "比较各类别中两分项的构成比例",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "metric": "数量",
+            "unit": "单位",
+            "series": [
+              "项目 X",
+              "项目 Y"
+            ],
+            "data": [
+              {
+                "label": "A",
+                "values": [
+                  12,
+                  9
+                ]
+              },
+              {
+                "label": "B",
+                "values": [
+                  9,
+                  11
+                ]
+              },
+              {
+                "label": "C",
+                "values": [
+                  6,
+                  8
+                ]
+              },
+              {
+                "label": "D",
+                "values": [
+                  15,
+                  10
+                ]
+              }
+            ]
+          },
+          "options": {
+            "direction": "vertical",
+            "mode": "percent"
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "BAR-006",
+      "title": "BAR-006 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "BAR-006",
+          "purpose": "核对正负变化与累计终点",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "metric": "金额",
+            "unit": "万元",
+            "data": [
+              {
+                "label": "起点",
+                "value": 100
+              },
+              {
+                "label": "新增",
+                "value": 45
+              },
+              {
+                "label": "流失",
+                "value": -25
+              },
+              {
+                "label": "调整",
+                "value": 10
+              }
+            ]
+          },
+          "options": {
+            "direction": "vertical"
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "TIME-001",
+      "title": "TIME-001 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "TIME-001",
+          "purpose": "按时间比例放置四个事件",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "events": [
+              {
+                "id": "A",
+                "date": "2026-01-01",
+                "title": "节点 A",
+                "body": "标准说明"
+              },
+              {
+                "id": "B",
+                "date": "2026-04-01",
+                "title": "节点 B",
+                "body": "标准说明"
+              },
+              {
+                "id": "C",
+                "date": "2026-07-01",
+                "title": "节点 C",
+                "body": "标准说明"
+              },
+              {
+                "id": "D",
+                "date": "2026-10-01",
+                "title": "节点 D",
+                "body": "标准说明"
+              }
+            ]
+          },
+          "options": {
+            "direction": "horizontal",
+            "spacing": "time",
+            "details": false
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    },
+    {
+      "id": "REL-001",
+      "title": "REL-001 · 主题自适应",
+      "question": "同一内容能否按主题重算？",
+      "claim": "数据不变，主题决定样式与实际测量。",
+      "readingOrder": [
+        "subject"
+      ],
+      "components": [
+        {
+          "id": "subject",
+          "material": "REL-001",
+          "purpose": "展示一根两支四叶的归属结构",
+          "box": {
+            "x": 64,
+            "y": 170,
+            "width": 1152,
+            "height": 430
+          },
+          "data": {
+            "title": "",
+            "root": {
+              "title": "模块 A",
+              "children": [
+                {
+                  "title": "模块 B",
+                  "children": [
+                    {
+                      "title": "B1"
+                    },
+                    {
+                      "title": "B2"
+                    }
+                  ]
+                },
+                {
+                  "title": "模块 C",
+                  "children": [
+                    {
+                      "title": "C1"
+                    },
+                    {
+                      "title": "C2"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "options": {
+            "direction": "vertical"
+          }
+        }
+      ],
+      "source": "来源：合成测试数据，仅验证样式与绘制。",
+      "speakerNotes": "本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。"
+    }
+  ]
+}

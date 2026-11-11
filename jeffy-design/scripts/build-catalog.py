@@ -45,7 +45,7 @@ def build():
    references.append(path)
    if not (ASSETS/path).is_file():missing.append(path)
   combo=[]
-  if e['id'] in adapters:combo.append(('区域组装：草稿试接（未入库）' if adapters[e['id']].get('status')=='draft-preview-only' else '区域组装：已接入（黑白灰、静态）')+('；'+adapters[e['id']]['sheet'] if adapters[e['id']].get('sheet') else ''))
+  if e['id'] in adapters:combo.append(('区域组装：草稿试接（未入库）' if adapters[e['id']].get('status')=='draft-preview-only' else ('区域组装：theme-v1（跨主题、静态）' if adapters[e['id']].get('renderer')=='theme-v1' else '区域组装：历史静态路径'))+('；'+adapters[e['id']]['sheet'] if adapters[e['id']].get('sheet') else ''))
   if e['id'] in engine_ids:combo.append('同绘图区：已接入')
   if not combo:combo=['尚未接入统一组装；可用独立源件']
   preview='<b>'+link(e['standard'],'先读表达规范')+'</b><br>'+'<br>'.join(link(x['path'],x['name'])+'<details><summary>设计理由</summary>'+escape(x['rationale'])+'</details>' for x in e['sheets'])
@@ -65,7 +65,7 @@ def build():
 唯一维护源为 [catalog.json](catalog.json)，HTML 由 `python scripts/build-catalog.py` 生成。登记状态与组合能力分别记录，组合范围从两个引擎的登记文件派生，不能因独立素材入库而推定已支持组装。
 
 - 素材共同规则与新增登记要求见 [素材使用与维护](../references/素材使用与维护.md)。
-- 区域组装：lib/composition/adapters.json；目前黑白灰静态分支。
+- 区域组装：lib/composition/adapters.json；常规12项为theme-v1，草稿仍为黑白灰旧路径。
 - 同绘图区：lib/page-engine/catalog.json；柱线共同坐标体系。
 - 旧编号保留为别名，历史重定向与草稿文件保留，不重复登记。
 - 草稿明确未入库；旧状态不统一者待核对，不自动升级。
@@ -75,7 +75,7 @@ def build():
 ''',encoding='utf-8')
  registered={str((ASSETS/s['path']).resolve()) for e in data['entries'] for s in e['sheets']}
  legacy=[]
- for file in ASSETS.rglob('*.html'):
+ for file in sorted(ASSETS.rglob('*.html')):
   if file.name=='index.html' or str(file.resolve()) in registered:continue
   content=file.read_text(encoding='utf-8');m=re.search(r'http-equiv="refresh"[^>]*content="[^"]*url=([^";]+)',content)
   legacy.append({'path':str(file.relative_to(ASSETS)).replace('\\','/'),'classification':'历史跳转入口' if m else '未登记独立预览，需核对','target':m[1] if m else None})
@@ -85,7 +85,7 @@ def build():
   def handle_starttag(self,t,a):
    if t=='script' and dict(a).get('src'):self.sources.append(dict(a)['src'])
  dependencies=[]
- for file in registered:
+ for file in sorted(registered):
   file=Path(file);p=Scripts();p.feed(file.read_text(encoding='utf-8'))
   for src in p.sources:
    if urlsplit(src).scheme:continue

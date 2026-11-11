@@ -50,7 +50,7 @@ node scripts/verify-page.mjs build/custom/index.html build/custom/validation.jso
 
 | 实现入口 | 用途 |
 | --- | --- |
-| `build-composition.mjs` | 多组件分区，当前验证黑白灰静态组装 |
+| `build-composition.mjs` | 多组件分区，12项常规适配器支持主题驱动的静态组装 |
 | `build-page.mjs` | 柱线同绘图区，共同坐标、单位与图例 |
 | `build.mjs` | 保留的早期模块入口，不是新页面的固定模板 |
 | 依规范自定义绘制 | 原生成器不适合时保留语义与样式，重新设计结构 |
@@ -60,10 +60,12 @@ node scripts/verify-page.mjs build/custom/index.html build/custom/validation.jso
 Catalog 有31项表达规范，其中5项保留草稿状态。区域组装有12项常规适配和3项草稿试接；同绘图区支持柱图与折线。具体范围从目录和适配器登记读取，不以独立素材入库推定任意组合已通过。
 
 - 内置主要交付 HTML，尚无统一的原生可编辑 PPTX 导出保证。
-- 新区域组装只验证 `mono` 黑白灰主题；其他主题配置不等于已通过该引擎验收。
+- 区域组装12项已迁移统一主题绘制层，验证 `mono`、`klein-blue`、`rounded-mono`；全库31项独立源件、同绘图区和动效尚未全部迁移。
 - 生成器不负责任意拓扑重排或自动分页，也不自动继承原素材全部交互与动效。
-- 中文字体未打包。黑白灰主题使用 Noto Serif SC 与 Georgia；缺字体会回退，正式交付前需安装并复查。
+- 中文字体未打包。黑白灰主题使用 Noto Serif SC 与 Georgia；新主题路径缺字体会明确返回 FONT，需安装后重新生成。
 - 自动检查不能判断所有语义与解释效果，仍需实际读图。已完成案例属于同一执行模型的适配和自审，不是独立盲测。
+
+主题配置 → 实际字体加载 → 角色测量 → 布局计算 → 绘制与遮线 → 验收。新增主题维护一个 JSON，不复制素材；新素材使用同一绘制接口。见[主题自适应](references/主题自适应.md)和[三主题对照](examples/theme-adaptation/index.md)。
 
 ## 案例
 
@@ -83,6 +85,7 @@ Catalog 有31项表达规范，其中5项保留草稿状态。区域组装有12�
 npm test
 npm run test:composition
 npm run test:adapters
+npm run test:themes
 python scripts/test-catalog-contract.py
 npm run catalog
 ```
