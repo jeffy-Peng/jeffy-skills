@@ -1,4 +1,4 @@
-// 浏览器依赖的解析。给 shot / ingest / 导入用。
+// 供构建验收与回归测试解析浏览器依赖。
 // 顺序：环境变量 → 本仓库 node_modules → DSH profile。都找不到就给出安装命令。
 import { createRequire } from 'node:module'
 import { existsSync, readdirSync } from 'node:fs'
@@ -42,10 +42,9 @@ export function loadChromium() {
   }
 
   throw new Error(
-    '找不到 playwright。三条路任选一条：\n' +
+    '找不到 playwright。两种安装方式任选一种：\n' +
       '  1. 在项目里装：npm i -D playwright && npx playwright install chromium\n' +
-      '  2. 已经装在别处：设 PLAYWRIGHT_PKG=那个目录的 package.json 路径\n' +
-      '  3. 不想装：跳过截图，只跑 node scripts/build.mjs，用浏览器自己看 HTML'
+      '  2. 已经装在别处：设 PLAYWRIGHT_PKG=那个目录的 package.json 路径；修复依赖后重新渲染验收。'
   )
 }
 

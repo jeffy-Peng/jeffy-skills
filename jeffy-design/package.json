@@ -5,9 +5,7 @@
   "type": "module",
   "description": "Content-first presentation design with reusable materials, themes, composition and validation.",
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "shot": "node scripts/shot.mjs",
-    "test": "node scripts/test-compose.mjs",
+    "test": "node scripts/test-theme-contract.mjs",
     "catalog": "python scripts/build-catalog.py",
     "example:pressure": "node scripts/build-composition.mjs tests/composition/pressure.json build/pressure/index.html",
     "example:extended": "node scripts/build-composition.mjs tests/composition/extended.json build/extended/index.html",

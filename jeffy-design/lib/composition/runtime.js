@@ -59,17 +59,18 @@ for(const [i,page]of deck.pages.entries()){
  const report={id:page.id,ok:false,issues:[],components:[],reviews:page.review||{},manualReview:'pending'};reports.push(report);
  const sheet=document.createElement('section');sheet.className='sheet';sheet.dataset.page=page.id;sheet.style.background='#'+theme.colors.paper;sheet.style.fontFamily=`"${theme.fonts.latin}","${theme.fonts.ea}",serif`;document.querySelector('main').append(sheet);
  if(!page.question||!page.claim||!page.readingOrder?.length||!page.speakerNotes||!page.source)report.issues.push(issue('CONTENT','缺少问题、观点、阅读顺序、讲稿或来源'));
- textBlock(sheet,'title',page.title,{x:64,y:34,width:1152,height:70},'title');
- const line=document.createElement('div');line.className='block';line.style.cssText=`left:64px;top:118px;width:1152px;border-top:${theme.rules.headerWidthPx}px solid #${theme.colors.ink}`;sheet.append(line);
+ sheet.style.width=theme.page.canvas.width+'px';sheet.style.height=theme.page.canvas.height+'px';
+ textBlock(sheet,'title',page.title,theme.page.title,'title');
+ const line=document.createElement('div');line.className='block';line.style.cssText=`left:${theme.page.headerRule.x}px;top:${theme.page.headerRule.y}px;width:${theme.page.headerRule.width}px;border-top:${theme.rules.headerWidthPx}px solid #${theme.colors.ink}`;sheet.append(line);
  const occupied=[];for(const c of page.components){if(!c.id||!c.purpose||!c.box||!adapters[c.material]){report.issues.push(issue('CONTRACT','组件缺少 ID、任务、目标区域或适配器'));continue}
- if(c.box.x<64||c.box.y<136||c.box.x+c.box.width>1216||c.box.y+c.box.height>654)report.issues.push(issue('CAPACITY','组件侵入页眉页脚或越界',{component:c.id}));
+ if(c.box.x<theme.page.content.x||c.box.y<theme.page.content.y||c.box.x+c.box.width>theme.page.content.x+theme.page.content.width||c.box.y+c.box.height>theme.page.content.y+theme.page.content.height)report.issues.push(issue('CAPACITY','组件侵入页眉页脚或越界',{component:c.id}));
  occupied.push({id:c.id,...c.box});const host=document.createElement('div');host.className='block component';host.dataset.block=c.id;host.style.cssText=`left:${c.box.x}px;top:${c.box.y}px;width:${c.box.width}px;height:${c.box.height}px`;sheet.append(host);
  const response=await mount(host,c);report.components.push({id:c.id,purpose:c.purpose,...response});report.issues.push(...response.issues.map(v=>({...v,component:c.id})));}
- for(const t of page.text||[]){occupied.push({id:t.id,...t.box});textBlock(sheet,t.id,t.text,t.box,t.role||'body')}
+ for(const t of page.text||[]){if(t.box.x<theme.page.content.x||t.box.y<theme.page.content.y||t.box.x+t.box.width>theme.page.content.x+theme.page.content.width||t.box.y+t.box.height>theme.page.content.y+theme.page.content.height)report.issues.push(issue('CAPACITY','文字侵入页眉页脚或越界',{block:t.id}));occupied.push({id:t.id,...t.box});textBlock(sheet,t.id,t.text,t.box,t.role||'body')}
  for(let a=0;a<occupied.length;a++)for(let b=a+1;b<occupied.length;b++)if(overlap(occupied[a],occupied[b]))report.issues.push(issue('LAYOUT','页面区域相交',{blocks:[occupied[a].id,occupied[b].id]}));
  const known=new Set(occupied.map(x=>x.id));if(page.readingOrder.some(x=>!known.has(x)))report.issues.push(issue('CONTENT','阅读顺序引用不存在的组件'));
  for(const shared of page.bindings||[]){let names=shared.members.map(m=>{let c=page.components.find(c=>c.id===m.component);return m.field?m.field.split('.').reduce((v,k)=>v?.[k],c?.data):undefined});if(names.some(n=>!n)||new Set(names).size!==1)report.issues.push(issue('BINDING','跨组件名称不一致',{binding:shared.id,names}));}
- textBlock(sheet,'source',page.source,{x:64,y:675,width:1110,height:25},'source');textBlock(sheet,'pageNo',String(i+1).padStart(2,'0'),{x:1180,y:675,width:36,height:25},'pageNo');
+ textBlock(sheet,'source',page.source,theme.page.source,'source');textBlock(sheet,'pageNo',String(i+1).padStart(2,'0'),theme.page.pageNo,'pageNo');
  for(const n of sheet.querySelectorAll('.block:not(.component)'))if(n.scrollHeight>n.clientHeight+1||n.scrollWidth>n.clientWidth+1)report.issues.push(issue('CAPACITY','文字区域装不下',{block:n.dataset.block}));
  report.ok=report.issues.length===0;
  const note=document.createElement('details');note.innerHTML='<summary>逐字稿与验收状态</summary>';const content=document.createElement('p');content.textContent=page.speakerNotes;note.append(content);const status=document.createElement('pre');status.className='report';status.textContent=JSON.stringify({automatic:report.ok?'pass':'fail',issues:report.issues,expressionReview:'需要人工核对观点、证据及关系完整性'},null,2);note.append(status);document.querySelector('main').append(note);
