@@ -1,0 +1,24 @@
+{
+  "asOf": "2026-11-12",
+  "cityCountsAsOf": "2025-01",
+  "cityCounts": {
+    "上海": 103,
+    "北京": 48,
+    "深圳": 35,
+    "桂林": 32,
+    "杭州": 28
+  },
+  "commercialVenues2025End": 1000,
+  "cities2025Jan": 159,
+  "prefectureCoverage": 54.2,
+  "climbingIndustryRevenue2024CNYbn": 4,
+  "weeklyAtLeastOnce": 66.1,
+  "irregular": 26.9,
+  "monthlyOrNever": 7.0,
+  "newWithinYearApprox": 33,
+  "businessCoverageMultiSelect": {
+    "常规攀爬": 92.6,
+    "私教": 86.2,
+    "团体培训": 79.8
+  }
+}
