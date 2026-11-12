@@ -45,7 +45,7 @@ def build():
    references.append(path)
    if not (ASSETS/path).is_file():missing.append(path)
   combo=[]
-  if e['id'] in adapters:combo.append(('区域组装：草稿试接（未入库）' if adapters[e['id']].get('status')=='draft-preview-only' else ('区域组装：theme-v1（跨主题、静态）' if adapters[e['id']].get('renderer')=='theme-v1' else '区域组装：历史静态路径'))+('；'+adapters[e['id']]['sheet'] if adapters[e['id']].get('sheet') else ''))
+  if e['id'] in adapters:combo.append(('历史试接：未适配克莱因蓝，当前仅独立草稿预览' if adapters[e['id']].get('status')=='draft-preview-only' else ('区域组装：theme-v1（跨主题、静态）' if adapters[e['id']].get('renderer')=='theme-v1' else '区域组装：历史静态路径'))+('；'+adapters[e['id']]['sheet'] if adapters[e['id']].get('sheet') else ''))
   if e['id'] in engine_ids:combo.append('同绘图区：已接入')
   if not combo:combo=['尚未接入统一组装；可用独立源件']
   preview='<b>'+link(e['standard'],'先读表达规范')+'</b><br>'+'<br>'.join(link(x['path'],x['name'])+'<details><summary>设计理由</summary>'+escape(x['rationale'])+'</details>' for x in e['sheets'])

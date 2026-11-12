@@ -14,7 +14,7 @@ const theme=resolveTheme(JSON.parse(readFileSync(resolve(root,'themes',deck.them
 const registry=JSON.parse(readFileSync(resolve(root,'lib/composition/adapters.json'),'utf8'));
 const used=new Set(deck.pages?.flatMap(p=>p.components.map(c=>c.material)));
 const adapters={};
-for(const id of used){const a=registry[id];if(!a)throw Error('UNSUPPORTED: '+id);const full=readFileSync(resolve(root,'assets',a.file),'utf8');const boundary=full.indexOf(a.cut);if(boundary<0)throw Error('适配器边界失效: '+id);if(a.renderer!=='theme-v1'&&deck.theme!=='mono')throw Error('UNSUPPORTED: '+id+' 尚未迁移跨主题绘制');adapters[id]={...a,code:a.renderer==='theme-v1'?'':full.slice(0,boundary)}}
+for(const id of used){const a=registry[id];if(!a)throw Error('UNSUPPORTED: '+id);const full=readFileSync(resolve(root,'assets',a.file),'utf8');const boundary=full.indexOf(a.cut);if(boundary<0)throw Error('适配器边界失效: '+id);if(a.renderer!=='theme-v1')throw Error('UNSUPPORTED: '+id+' 尚未迁移跨主题绘制');adapters[id]={...a,code:a.renderer==='theme-v1'?'':full.slice(0,boundary)}}
 const lineLabels=readFileSync(resolve(root,'assets/共用/line-labels.js'),'utf8');
 const legend=readFileSync(resolve(root,'assets/共用/legend.js'),'utf8');
 const themeDrawing=readFileSync(resolve(root,'lib/theming/drawing.js'),'utf8');

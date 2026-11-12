@@ -1,66 +1,6 @@
 {
   "results": [
     {
-      "name": "mono/BAR-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/LINE-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/PIE-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/REL-006",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/FLOW-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/TABLE-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/TABLE-002",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/BAR-002",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/BAR-003",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/BAR-006",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/TIME-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "mono/REL-001",
-      "pass": true,
-      "issues": []
-    },
-    {
       "name": "klein-blue/BAR-001",
       "pass": true,
       "issues": []
@@ -121,70 +61,6 @@
       "issues": []
     },
     {
-      "name": "rounded-mono/BAR-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/LINE-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/PIE-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/REL-006",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/FLOW-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/TABLE-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/TABLE-002",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/BAR-002",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/BAR-003",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/BAR-006",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/TIME-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "rounded-mono/REL-001",
-      "pass": true,
-      "issues": []
-    },
-    {
-      "name": "actual-theme-reflow",
-      "pass": true
-    },
-    {
       "name": "missing-font-explicit",
       "pass": true
     },
@@ -199,7 +75,11 @@
     {
       "name": "no-silent-shrinking",
       "pass": true
+    },
+    {
+      "name": "configured-page-regions-enforced",
+      "pass": true
     }
   ],
-  "scope": "12个静态区域适配器 × 3主题；字体角色、线宽、轮廓、圆角、居中、容量及缺失配置；不验证动效或任意布局。"
+  "scope": "12个静态区域适配器 × 克莱因蓝主题；字体角色、线宽、轮廓、圆角、居中、容量及缺失配置；不验证动效或任意布局。"
 }

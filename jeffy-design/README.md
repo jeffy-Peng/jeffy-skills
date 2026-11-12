@@ -8,7 +8,7 @@
 
 需要用户判断时最多一次在聊天中提供整稿方案；不逐页确认、不弹确认HTML。已有决定直接沿用。
 
-- [主题目录](themes/索引.md)：用户指定优先，无指定默认klein-blue。每份JSON维护适用场景、正文与讲稿提示词、可用区域和视觉参数。
+- [主题目录](themes/索引.md)：目前仅保留klein-blue。每份JSON维护适用场景、正文与讲稿提示词、可用区域和视觉参数。
 - [Catalog](assets/index.html)：按用途和形态找到表达规范，再看参考样张与实现。素材不限制本次对象数量与结构。
 - [主题自适应](references/主题自适应.md)：统一测量、布局与绘制接口。
 - [页面组装](references/页面组装.md)：工具调用、绘制规则、失败反馈与验收。
@@ -37,7 +37,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 
 Catalog唯一维护源为[assets/catalog.json](assets/catalog.json)，运行 `npm run catalog` 更新目录及资源记录。31项素材有规范入口，其中5项仍为草稿；规范齐全不代表代码覆盖所有合法表达。未入库草稿与现用证据保留，已被正式素材替代的未引用试稿删除。
 
-12项静态区域适配器使用theme-v1，验证mono、klein-blue、rounded-mono。其他独立源件、共享坐标引擎和动效尚未全部迁移。主题page在静态区域引擎中实际生效；新增配置仍需实际渲染验收。默认仅保证HTML路径，暂无统一原生可编辑PPTX导出。
+12项静态区域适配器使用theme-v1，当前验证klein-blue。其他独立源件、共享坐标引擎和动效尚未全部迁移。主题page在静态区域引擎中实际生效；新增配置仍需实际渲染验收。默认仅保证HTML路径，暂无统一原生可编辑PPTX导出。
 
 ## 验证
 
@@ -50,14 +50,14 @@ python scripts/test-catalog-contract.py
 npm run catalog
 ```
 
-分别验证主题字段与保留区域、12项组装回归、23项参数回归、42项跨主题及区域检查、31项Catalog契约与9项登记用例。失败返回非零；自动检查不能代替内容核验和实际读图。
+分别验证主题字段与保留区域、12项组装回归、23项参数回归、17项主题及区域检查、31项Catalog契约与9项登记用例。失败返回非零；自动检查不能代替内容核验和实际读图。
 
 结构案例还可运行 `python scripts/test-layer-adaptation.py`、`python scripts/test-cross-material-adaptation.py`、`python scripts/test-mechanism-drafts.py`。这些脚本需要Python Playwright与本机Edge，目前按Windows验证。
 
 ## 案例与目录
 
 - [室内攀岩市场三页](examples/climbing-market/index.html)：区域任务、图文组合、来源与逐字稿，用户认可整体方向。
-- [三主题对照](examples/theme-adaptation/index.md)：同一数据与素材的主题适配快照。
+- [主题适配样例](examples/theme-adaptation/index.md)：克莱因蓝素材检查页。
 - [结构重绘](examples/layer-adaptation/index.html)、[跨素材适配](examples/cross-material-adaptation/index.html)：依规范重构而非套样张。
 - [机制审核稿](drafts/机制表达审核/index.html)：仍为草稿，不自动提升状态。
 
