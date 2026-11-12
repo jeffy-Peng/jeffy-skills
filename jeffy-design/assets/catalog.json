@@ -734,28 +734,36 @@
       "parameters": "角色、步骤、方向",
       "sheets": [
         {
-          "name": "草稿预览",
-          "path": "../drafts/泳道图/FLOW-002.html",
-          "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。"
+          "name": "已确认原版",
+          "path": "泳道图组件/FLOW-002.html",
+          "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。",
+          "status": "已确认"
         },
         {
-          "name": "机制表达审核方案",
+          "name": "后续试验版（不继承原版确认）",
           "path": "../drafts/机制表达审核/FLOW-002.html",
-          "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。"
+          "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。",
+          "status": "试验版·未单独确认"
         }
       ],
       "sources": [
-        "../drafts/泳道图/swimlane.js",
+        "泳道图组件/swimlane.js",
         "../drafts/机制表达审核/mechanisms.js"
       ],
-      "status": "草稿·未入库",
+      "status": "已入库·原版已确认",
       "evidence": [
-        "../drafts/机制表达审核/validation.json"
+        "../drafts/机制表达审核/validation.json",
+        "已确认原版复核.json"
       ],
-      "limits": "尚未作为正式素材登记；组合能力未接入",
+      "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/FLOW-002.md"
+      "standard": "表达规范/FLOW-002.md",
+      "approval": {
+        "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
+        "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
+        "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
+      }
     },
     {
       "id": "REL-002",
@@ -767,20 +775,28 @@
       "parameters": "主体、关系、说明",
       "sheets": [
         {
-          "name": "草稿预览",
-          "path": "../drafts/交换关系/REL-002.html",
-          "rationale": "样张对称排布便于看两端，不代表交换内容或价值相等。"
+          "name": "已确认原版",
+          "path": "交换关系组件/REL-002.html",
+          "rationale": "样张对称排布便于看两端，不代表交换内容或价值相等。",
+          "status": "已确认"
         }
       ],
       "sources": [
-        "../drafts/交换关系/exchange.js"
+        "交换关系组件/exchange.js"
       ],
-      "status": "草稿·未入库",
-      "evidence": [],
-      "limits": "尚未作为正式素材登记；组合能力未接入",
+      "status": "已入库·原版已确认",
+      "evidence": [
+        "已确认原版复核.json"
+      ],
+      "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/REL-002.md"
+      "standard": "表达规范/REL-002.md",
+      "approval": {
+        "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
+        "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
+        "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
+      }
     },
     {
       "id": "REL-004",
@@ -792,14 +808,16 @@
       "parameters": "层数、模块、说明",
       "sheets": [
         {
-          "name": "草稿预览",
-          "path": "../drafts/分层架构/REL-004.html",
-          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
+          "name": "已确认原版",
+          "path": "分层架构组件/REL-004.html",
+          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。",
+          "status": "已确认"
         },
         {
-          "name": "机制表达审核方案",
+          "name": "后续试验版（不继承原版确认）",
           "path": "../drafts/机制表达审核/REL-004.html",
-          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
+          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。",
+          "status": "试验版·未单独确认"
         },
         {
           "name": "样张与设计理由",
@@ -813,21 +831,27 @@
         }
       ],
       "sources": [
-        "../drafts/分层架构/layers.js",
+        "分层架构组件/layers.js",
         "../drafts/机制表达审核/mechanisms.js",
         "分层架构表达标准/参考实现.js"
       ],
-      "status": "草稿·未入库",
+      "status": "已入库·原版已确认",
       "evidence": [
         "../drafts/机制表达审核/validation.json",
-        "../examples/layer-adaptation/validation.json"
+        "../examples/layer-adaptation/validation.json",
+        "已确认原版复核.json"
       ],
-      "limits": "表达规范试点；生成器并非结构边界。常规分格可复用，跨层、分组、不等宽结构允许依规范重绘。仍处审核状态。",
+      "limits": "表达规范试点；生成器并非结构边界。常规分格可复用，跨层、分组、不等宽结构允许依规范重绘。原版已确认；后续机制重写版独立保留试验状态。",
       "standard": "分层架构表达标准/规范.md",
       "referenceImplementation": "分层架构表达标准/参考实现.js",
       "adaptationCase": "../examples/layer-adaptation/index.html",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证"
+      "standardCoverage": "规则已整理；非全库重绘验证",
+      "approval": {
+        "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
+        "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
+        "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
+      }
     },
     {
       "id": "REL-005",
@@ -839,20 +863,28 @@
       "parameters": "主体、方向、标注",
       "sheets": [
         {
-          "name": "草稿预览",
-          "path": "../drafts/中心辐射/REL-005.html",
-          "rationale": "样张周边均匀是视觉安排，不表示所有关系强度或权力相等。"
+          "name": "已确认原版",
+          "path": "中心辐射组件/REL-005.html",
+          "rationale": "样张周边均匀是视觉安排，不表示所有关系强度或权力相等。",
+          "status": "已确认"
         }
       ],
       "sources": [
-        "../drafts/中心辐射/hub.js"
+        "中心辐射组件/hub.js"
       ],
-      "status": "草稿·未入库",
-      "evidence": [],
-      "limits": "尚未作为正式素材登记；组合能力未接入",
+      "status": "已入库·原版已确认",
+      "evidence": [
+        "已确认原版复核.json"
+      ],
+      "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/REL-005.md"
+      "standard": "表达规范/REL-005.md",
+      "approval": {
+        "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
+        "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
+        "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
+      }
     },
     {
       "id": "SEQ-001",
@@ -864,28 +896,34 @@
       "parameters": "消息数量、返回线型",
       "sheets": [
         {
-          "name": "机制表达审核方案",
+          "name": "独立组件试验版",
           "path": "../drafts/机制表达审核/SEQ-001.html",
-          "rationale": "样张只展示简单请求和返回，参考实现尚不支持的片段不构成语义禁令。"
+          "rationale": "样张只展示简单请求和返回，参考实现尚不支持的片段不构成语义禁令。",
+          "status": "未单独确认"
         },
         {
-          "name": "跨素材结构适配案例",
+          "name": "已认可的结构适配案例",
           "path": "../examples/cross-material-adaptation/index.html",
-          "rationale": "对应本项的结构变化案例保留语义规范，但按本次分支、分组或条件交互重新绘制；不是另一套固定模板。"
+          "rationale": "对应本项的结构变化案例保留语义规范，但按本次分支、分组或条件交互重新绘制；不是另一套固定模板。",
+          "status": "案例已认可"
         }
       ],
       "sources": [
         "../drafts/机制表达审核/mechanisms.js"
       ],
-      "status": "草稿·未入库",
+      "status": "草稿·独立组件版本待核对",
       "evidence": [
         "../drafts/机制表达审核/validation.json",
         "../examples/cross-material-adaptation/validation.json"
       ],
-      "limits": "暂不支持自消息、激活条、并行与条件组合片段",
+      "limits": "暂不支持自消息、激活条、并行与条件组合片段；结构适配案例与独立试验实现分开记录，当前未接入克莱因蓝区域引擎。",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/SEQ-001.md"
+      "standard": "表达规范/SEQ-001.md",
+      "approval": {
+        "scope": "跨素材结构适配案例已获整体认可；独立机制审核稿不等同该案例",
+        "basis": "沿用前序案例反馈，不要求用户重复审核已认可案例。"
+      }
     }
   ],
   "policy": "每项为表达规范、带理由的样张与参考实现；规范覆盖不等于行为验收，生成器能力不等于结构边界。"

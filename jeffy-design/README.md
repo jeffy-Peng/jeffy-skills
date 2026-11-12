@@ -35,7 +35,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 
 主题JSON中的usage说明场景与受众，writing提供整体语气、标题、正文、逐字稿与自审提示，page定义画布及页眉页脚和可用内容区域。模型先读配置，再创作与构图；writing不是自动文案过滤器。
 
-Catalog唯一维护源为[assets/catalog.json](assets/catalog.json)，运行 `npm run catalog` 更新目录及资源记录。31项素材有规范入口，其中5项仍为草稿；规范齐全不代表代码覆盖所有合法表达。未入库草稿与现用证据保留，已被正式素材替代的未引用试稿删除。
+Catalog唯一维护源为[assets/catalog.json](assets/catalog.json)，运行 `npm run catalog` 更新目录及资源记录。31项素材有规范入口，4项原版的遗留草稿标记已纠正；独立时序组件仍为试验版；规范齐全不代表代码覆盖所有合法表达。后续机制重写版在drafts单独保留，不覆盖已确认原版；现用证据保留，已被正式素材替代的未引用试稿删除。
 
 12项静态区域适配器使用theme-v1，当前验证klein-blue。其他独立源件、共享坐标引擎和动效尚未全部迁移。主题page在静态区域引擎中实际生效；新增配置仍需实际渲染验收。默认仅保证HTML路径，暂无统一原生可编辑PPTX导出。
 

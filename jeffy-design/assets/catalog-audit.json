@@ -7,14 +7,29 @@
   "updated": "2026-11-11",
   "counts": {
     "entries": 31,
-    "drafts": 5,
+    "drafts": 1,
     "composition": 12,
     "draftComposition": 3,
     "samePlot": 2
   },
-  "referencesChecked": 137,
+  "referencesChecked": 141,
   "missing": [],
   "dependencies": [
+    {
+      "preview": "assets\\中心辐射组件\\REL-005.html",
+      "script": "hub.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\交换关系组件\\REL-002.html",
+      "script": "exchange.js",
+      "exists": true
+    },
+    {
+      "preview": "assets\\分层架构组件\\REL-004.html",
+      "script": "layers.js",
+      "exists": true
+    },
     {
       "preview": "assets\\分布与轮廓组件\\BOX-001.html",
       "script": "../共用/legend.js",
@@ -156,6 +171,11 @@
       "exists": true
     },
     {
+      "preview": "assets\\泳道图组件\\FLOW-002.html",
+      "script": "swimlane.js",
+      "exists": true
+    },
+    {
       "preview": "assets\\流程图组件\\FLOW-001.html",
       "script": "../共用/line-labels.js",
       "exists": true
@@ -216,21 +236,6 @@
       "exists": true
     },
     {
-      "preview": "drafts\\中心辐射\\REL-005.html",
-      "script": "hub.js",
-      "exists": true
-    },
-    {
-      "preview": "drafts\\交换关系\\REL-002.html",
-      "script": "exchange.js",
-      "exists": true
-    },
-    {
-      "preview": "drafts\\分层架构\\REL-004.html",
-      "script": "layers.js",
-      "exists": true
-    },
-    {
       "preview": "drafts\\机制表达审核\\FLOW-002.html",
       "script": "../../assets/共用/line-labels.js",
       "exists": true
@@ -258,11 +263,6 @@
     {
       "preview": "drafts\\机制表达审核\\SEQ-001.html",
       "script": "mechanisms.js",
-      "exists": true
-    },
-    {
-      "preview": "drafts\\泳道图\\FLOW-002.html",
-      "script": "swimlane.js",
       "exists": true
     },
     {
