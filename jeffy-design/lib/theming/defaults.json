@@ -16,5 +16,7 @@
   "legendSwatchW": 16,
   "legendSwatchH": 12,
   "nodeWidthPx": 18,
-  "labelGutterPx": 120
+  "labelGutterPx": 120,
+  "pieRadiusH": 0.34,
+  "pieRadiusW": 0.26
 }

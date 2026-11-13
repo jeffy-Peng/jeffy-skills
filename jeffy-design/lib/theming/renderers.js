@@ -573,7 +573,7 @@ window.ThemeRenderers = (() => {
     }
     let cx = box.width / 2,
       cy = box.height / 2 - 20,
-      R = Math.min(box.height * 0.34, box.width * 0.26),
+      R = Math.min(box.height * p.tokens.pieRadiusH, box.width * p.tokens.pieRadiusW),
       inner = opt.donut ? R * 0.6 : 0,
       angle = -Math.PI / 2,
       legend = input.data.map((d, i) => ({ name: `${d.label} ${num(d.value)}`, type: 'bar', paint: p.series(i) }));
