@@ -89,6 +89,7 @@ node scripts/validate-outline.mjs 提纲.json                 # 每页的问题�
 node scripts/verify-page.mjs 输出.html                      # 页面报告 + 整页检查
 node scripts/check-notes.mjs 输入.json 输出.html             # 讲稿与画面数字比对
 node scripts/embed-fonts.mjs 输出.html 输出.embedded.html    # 字体内嵌，交付自包含
+node scripts/export-pages.mjs 输出.html build/export --scale=2  # 每页导出 PNG，贴 PPT 用
 ```
 
 失败返回非零；自动检查不能代替内容核验和实际读图。维护与新增约定见 [docs/维护说明.md](docs/维护说明.md)。

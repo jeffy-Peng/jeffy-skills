@@ -30,7 +30,8 @@
     "specimen": "node scripts/build-specimen.mjs",
     "baseline": "node scripts/visual-baseline.mjs",
     "baseline:update": "node scripts/visual-baseline.mjs --update",
-    "gen:rules": "node scripts/gen-rules.mjs"
+    "gen:rules": "node scripts/gen-rules.mjs",
+    "export": "node scripts/export-pages.mjs"
   },
   "devDependencies": {
     "playwright": "^1.65.0",
