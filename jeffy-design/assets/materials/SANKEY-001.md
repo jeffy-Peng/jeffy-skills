@@ -1,14 +1,14 @@
 ---
 id: SANKEY-001
-name: 两端流向
-form: 桑基图
+name: 桑基图
+form: 两端流向
 archetype: flow
 shape: flow-matrix
 tier: backup
 implementation: model
 options: [unit, sort, nodeGap]
 defaults: { sort: given, nodeGap: 24 }
-question: 总量从哪里来、到哪里去
+question: 总量从哪里来、分到哪里去
 minimumInput: 两列节点与一张流量表，每行一个来源到一个去向及其数值
 status: 仅规范·模型绘制
 standard: materials/SANKEY-001.md
@@ -17,7 +17,7 @@ sheets: []
     rationale: 样张只画两端，中间转运不表达，避免读者把画布宽度当成时间。
 ---
 
-# SANKEY-001 两端流向
+# SANKEY-001 桑基图
 
 ## 数据形状与分级
 

@@ -1,7 +1,7 @@
 ---
 id: HEAT-001
-name: 两类维度交叉后的数值
-form: 两类维度交叉后的数值
+name: 热力矩阵
+form: 交叉强度
 archetype: table
 shape: heatmap
 tier: backup

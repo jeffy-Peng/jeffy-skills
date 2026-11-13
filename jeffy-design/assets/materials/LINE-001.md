@@ -1,7 +1,7 @@
 ---
 id: LINE-001
-name: 时间趋势
-form: 折线图
+name: 折线图
+form: 时间趋势
 archetype: trend
 shape: time-series
 tier: primary
@@ -15,7 +15,7 @@ sources: []
 sheets: []
 ---
 
-# LINE-001 时间趋势
+# LINE-001 折线图
 
 ## 数据形状与分级
 

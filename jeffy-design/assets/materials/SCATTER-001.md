@@ -1,14 +1,14 @@
 ---
 id: SCATTER-001
-name: 两项数值的关联
-form: 两项数值的关联
+name: 散点图
+form: 相关与分布
 archetype: relation
 shape: scatter
 tier: backup
 implementation: model
 options: [direction, sort]
 defaults: { direction: vertical, sort: given }
-question: 观察两项数值的关联和分布
+question: 观察两项数值的关联与分布
 minimumInput: 对象名称与 X、Y 两项有限数值
 status: 仅规范·模型绘制
 standard: materials/SCATTER-001.md

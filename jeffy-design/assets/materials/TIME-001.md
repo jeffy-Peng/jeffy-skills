@@ -1,7 +1,7 @@
 ---
 id: TIME-001
 name: 时间线
-form: 说明事件先后或时间位置
+form: 事件先后
 archetype: timeline
 shape: timeline
 tier: primary

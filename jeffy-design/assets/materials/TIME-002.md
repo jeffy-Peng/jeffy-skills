@@ -1,7 +1,7 @@
 ---
 id: TIME-002
-name: 一段工作的持续范围
-form: 一段工作的持续范围
+name: 甘特条
+form: 时间区间
 archetype: timeline
 shape: time-span
 tier: backup
@@ -16,7 +16,7 @@ sources: []
 sheets: []
 ---
 
-# TIME-002 时间段
+# TIME-002 甘特条
 
 ## 数据形状与分级
 

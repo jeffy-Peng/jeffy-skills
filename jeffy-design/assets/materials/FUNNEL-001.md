@@ -1,7 +1,7 @@
 ---
 id: FUNNEL-001
-name: 逐阶段筛选和转化
-form: 逐阶段筛选和转化
+name: 漏斗图
+form: 阶段转化
 archetype: flow
 shape: funnel
 tier: backup

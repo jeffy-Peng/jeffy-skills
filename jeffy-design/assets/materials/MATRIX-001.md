@@ -1,7 +1,7 @@
 ---
 id: MATRIX-001
-name: 两个维度上的定位
-form: 两个维度上的定位
+name: 四象限矩阵
+form: 二维定位
 archetype: relation
 shape: quadrant
 tier: backup

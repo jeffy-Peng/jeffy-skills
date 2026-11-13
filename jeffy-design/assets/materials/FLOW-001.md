@@ -1,7 +1,7 @@
 ---
 id: FLOW-001
 name: 流程图
-form: 表达处理步骤、判断与返回
+form: 有向步骤
 archetype: flow
 shape: process
 tier: primary

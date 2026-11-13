@@ -1,7 +1,7 @@
 ---
 id: DIST-001
-name: 原始样本的区间分布
-form: 原始样本的区间分布
+name: 直方图
+form: 分布形态
 archetype: compare
 shape: distribution
 tier: backup
@@ -16,7 +16,7 @@ sources: []
 sheets: []
 ---
 
-# DIST-001 基础分布
+# DIST-001 直方图
 
 ## 数据形状与分级
 

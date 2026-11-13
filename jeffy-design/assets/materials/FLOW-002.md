@@ -1,7 +1,7 @@
 ---
 id: FLOW-002
-name: 跨角色交接
-form: 跨角色交接
+name: 泳道图
+form: 跨角色流程
 archetype: flow
 shape: swimlane
 tier: backup

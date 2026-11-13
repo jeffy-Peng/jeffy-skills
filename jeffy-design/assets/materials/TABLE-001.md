@@ -1,7 +1,7 @@
 ---
 id: TABLE-001
 name: 明细表
-form: 查阅多对象的详细字段
+form: 对象与字段
 archetype: table
 shape: table-records
 tier: primary

@@ -1,7 +1,7 @@
 ---
 id: LOOP-001
-name: 循环顺序与方向
-form: 循环顺序与方向
+name: 循环图
+form: 循环关系
 archetype: relation
 shape: loop
 tier: backup

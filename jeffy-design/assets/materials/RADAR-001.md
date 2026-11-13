@@ -1,7 +1,7 @@
 ---
 id: RADAR-001
-name: 对象的多维评分轮廓
-form: 对象的多维评分轮廓
+name: 雷达图
+form: 多维轮廓
 archetype: compare
 shape: radar
 tier: backup

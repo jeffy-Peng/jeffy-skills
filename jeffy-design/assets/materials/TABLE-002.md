@@ -1,7 +1,7 @@
 ---
 id: TABLE-002
 name: 比较矩阵
-form: 按相同维度逐项比较对象
+form: 对象乘维度
 archetype: table
 shape: matrix
 tier: backup
