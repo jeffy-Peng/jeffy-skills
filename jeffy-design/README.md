@@ -9,7 +9,7 @@
 需要用户判断时最多一次在聊天中提供整稿方案；不逐页确认、不弹确认 HTML。已有决定直接沿用。
 
 - [主题目录](themes/索引.md)：两套设计语言，`simple-line` 与 `pixel-mono`。
-- [Catalog](assets/index.html)：按用途和形态找到表达规范，再看参考样张与实现。
+- [Catalog](assets/index.html)：按用途和形态找到素材规范。
 - [主题自适应](references/主题自适应.md)：统一测量、布局与绘制接口。
 - [页面组装](references/页面组装.md)：工具调用、绘制规则、失败反馈与验收。
 - [素材维护](references/素材使用与维护.md)：新增登记与验证边界。
@@ -99,7 +99,7 @@ node scripts/embed-fonts.mjs 输出.html 输出.embedded.html    # 字体内嵌�
 
 ```text
 SKILL.md       七步制作流程
-assets/        表达规范、素材、示意图、骨架、Catalog
+assets/        素材规范、示意图、页面骨架与样张、Catalog
 themes/        场景、空间、写作、视觉、页面类型配置
 references/    适配、工具和维护细则
 lib/           布局、绘制、组装、检查
