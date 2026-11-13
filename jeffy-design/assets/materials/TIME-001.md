@@ -11,11 +11,8 @@ question: 说明事件先后或时间位置
 minimumInput: 事件名称、日期或顺序
 status: 已入库·自动组装
 standard: materials/TIME-001.md
-sources: [archive/时间组件/timeline.js]
-sheets:
-  - name: 统一组件
-    path: archive/时间组件/TIME-001.html
-    rationale: 样张固定布局，不继承到本页，只作画法参照。
+sources: []
+sheets: []
 ---
 
 # TIME-001 时间线

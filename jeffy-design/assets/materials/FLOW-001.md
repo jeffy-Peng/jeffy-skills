@@ -11,11 +11,8 @@ question: 表达处理步骤、判断与返回
 minimumInput: 节点ID、类型、连线；返回边标feedback
 status: 已入库·自动组装
 standard: materials/FLOW-001.md
-sources: [archive/流程图组件/flow.js]
-sheets:
-  - name: 统一组件
-    path: archive/流程图组件/FLOW-001.html
-    rationale: 样张固定布局，不继承到本页，只作画法参照。
+sources: []
+sheets: []
 ---
 
 # FLOW-001 流程图

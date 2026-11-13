@@ -65,7 +65,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 - 加素材：写 `assets/materials/<ID>.md`，跑 `npm run sync`，登记表、能力表与目录一起生成。
 - 生成物是 `lib/composition/adapters.json`、`assets/capability.json` 与 `build/generated/`，不要手改。`npm run sync:check` 只检查不写。
 
-Catalog 唯一维护源为 [assets/catalog.json](assets/catalog.json)，运行 `npm run catalog` 更新目录及资源记录。31 项素材每条一个 md 文件：12 条有代码实现，进基线；19 条只写规范，由模型按规范绘制，不进像素基线。旧样张与源件在 `assets/archive/`。
+Catalog 唯一维护源为 [assets/catalog.json](assets/catalog.json)，运行 `npm run catalog` 更新目录及资源记录。31 项素材每条一个 md 文件：12 条有代码实现，进基线；19 条只写规范，由模型按规范绘制，不进像素基线。素材库只保留规范与示意图。
 
 默认仅保证 HTML 路径，没有原生可编辑 PPTX 导出。
 
@@ -94,9 +94,6 @@ node scripts/embed-fonts.mjs 输出.html 输出.embedded.html    # 字体内嵌�
 
 ## 案例与目录
 
-- [室内攀岩市场三页](examples/climbing-market/index.html)：区域任务、图文组合、来源与逐字稿。
-- [主题适配样例](examples/theme-adaptation/index.md)：克莱因蓝素材检查页。
-- [结构重绘](examples/layer-adaptation/index.html)、[跨素材适配](examples/cross-material-adaptation/index.html)：依规范重构而非套样张。
 
 案例是历史输出与验证证据，不因主题或 Skill 更新自动重写。
 
@@ -108,7 +105,6 @@ references/    适配、工具和维护细则
 lib/           布局、绘制、组装、检查
 scripts/       构建与验收
 tests/         可复现输入与测试题
-examples/      参考案例与证据
 ```
 
 随父仓库采用 [MIT License](../LICENSE)。

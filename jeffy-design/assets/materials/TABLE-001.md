@@ -11,11 +11,8 @@ question: 查阅多对象的详细字段
 minimumInput: 表头及等列数记录
 status: 已入库·自动组装
 standard: materials/TABLE-001.md
-sources: [archive/表格组件/table.js]
-sheets:
-  - name: 统一组件
-    path: archive/表格组件/TABLE-001.html
-    rationale: 样张固定布局，不继承到本页，只作画法参照。
+sources: []
+sheets: []
 ---
 
 # TABLE-001 明细表

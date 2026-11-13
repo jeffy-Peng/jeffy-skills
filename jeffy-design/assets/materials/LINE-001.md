@@ -11,11 +11,8 @@ question: 比较同一指标随时间的变化
 minimumInput: 有序时期与等长数值系列，缺失用 null
 status: 已入库·自动组装
 standard: materials/LINE-001.md
-sources: [archive/折线图组件/line.js]
-sheets:
-  - name: 统一组件
-    path: archive/折线图组件/LINE-001.html
-    rationale: 样张等距类别轴只适合其时间口径，不意味着任意日期都必须等距。
+sources: []
+sheets: []
 ---
 
 # LINE-001 时间趋势
@@ -53,9 +50,3 @@ sheets:
 ![时间趋势示意](./specimens/LINE-001.png)
 
 `npm run specimen LINE-001` 重新生成，中间稿放在 build 目录，只留 PNG 在这里。示意图只画素材本身，不含标题、页码、来源。
-
-## 样张与参考
-
-[统一组件](../archive/折线图组件/LINE-001.html)。样张里的数量、间距、宽高不是继承要求，布局由本次内容决定。
-
-参考实现 [line.js](../archive/折线图组件/line.js)，只代表已实现能力，不代表这条素材的全部合法结构。

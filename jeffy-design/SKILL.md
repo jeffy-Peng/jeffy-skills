@@ -96,7 +96,7 @@ metadata:
 
 新增素材：写 md → `npm run sync` → `npm run test:materials`（按契约自动生成用例）→ `npm run specimen <ID>` 生成 `assets/materials/specimens/<ID>.png` 示意图 → `npm run baseline` 与基线比对。新增主题：改 JSON → `npm run sync` → `npm test`；只换配色就加一个色板，不动字号与版面。
 
-素材分两轨：`implementation: engine` 的 12 条进代码、进像素基线；`implementation: model` 的 19 条只写规范，由模型按规范绘制，不进基线，验收只查数据、越界与文字碰撞。旧样张与源件在 `assets/archive/`，只作证据。
+素材分两轨：`implementation: engine` 的 12 条进代码、进像素基线；`implementation: model` 的 19 条只写规范，由模型按规范绘制，不进基线，验收只查数据、越界与文字碰撞。素材库只保留规范与示意图，旧样张已清理。
 
 素材的标准化呈现就是示意图，只有图表本身，占位类别 A 到 D，没有标题、页码、来源。页面骨架图在 `assets/skeletons/`，每种页面一张，同样只有骨架没有内容。两者都不是规范，是回归基线：几何、笔触或骨架改动后重跑 `npm run baseline`，像素差超过千分之三算漂移，确认是有意改动再 `npm run baseline:update`。
 

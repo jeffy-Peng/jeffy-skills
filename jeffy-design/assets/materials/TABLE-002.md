@@ -11,11 +11,8 @@ question: 按相同维度逐项比较对象
 minimumInput: 对象×维度的状态或数值
 status: 已入库·自动组装
 standard: materials/TABLE-002.md
-sources: [archive/表格组件/table.js]
-sheets:
-  - name: 统一组件
-    path: archive/表格组件/TABLE-002.html
-    rationale: 样张固定布局，不继承到本页，只作画法参照。
+sources: []
+sheets: []
 ---
 
 # TABLE-002 比较矩阵

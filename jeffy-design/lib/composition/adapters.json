@@ -3,72 +3,72 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/柱状图组件/bar.js"
+    "sampleSource": null
   },
   "BAR-002": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/柱状图组件/bar.js"
+    "sampleSource": null
   },
   "BAR-003": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/柱状图组件/bar.js"
+    "sampleSource": null
   },
   "BAR-006": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/柱状图组件/advanced-bar.js"
+    "sampleSource": null
   },
   "LINE-001": {
     "archetype": "trend",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/折线图组件/line.js"
+    "sampleSource": null
   },
   "PIE-001": {
     "archetype": "share",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/占比图组件/pie.js"
+    "sampleSource": null
   },
   "TABLE-001": {
     "archetype": "table",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/表格组件/table.js"
+    "sampleSource": null
   },
   "TABLE-002": {
     "archetype": "table",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/表格组件/table.js"
+    "sampleSource": null
   },
   "REL-001": {
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/架构关系组件/hierarchy.js"
+    "sampleSource": null
   },
   "FLOW-001": {
     "archetype": "flow",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/流程图组件/flow.js"
+    "sampleSource": null
   },
   "TIME-001": {
     "archetype": "timeline",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/时间组件/timeline.js"
+    "sampleSource": null
   },
   "REL-006": {
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": "archive/架构关系组件/network.js"
+    "sampleSource": null
   }
 }

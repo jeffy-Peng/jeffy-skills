@@ -20,8 +20,7 @@ def validate_catalog(data,assets=ASSETS):
   for terms in [('语义',),('绘制',),('可调整','可重新设计'),('验收',)]:
    if not any(any(term in h for term in terms) for h in headings):raise ValueError(f'{ident}: standard missing rule section {terms}')
   if e.get('implementationRole')!='reference':raise ValueError(f'{ident}: implementationRole must be reference')
-  # 模型绘制的素材没有代码实现，允许不挂样张与源件。
-  if e.get('implementation')!='model' and (not e.get('sheets') or not e.get('sources')):raise ValueError(f'{ident}: samples and reference sources required')
+  # 样张只是历史证据，规范本身在 materials/<ID>.md，不强制挂样张与源件。
   if not isinstance(e.get('evidence'),list):raise ValueError(f'{ident}: evidence scope required; empty allowed for unverified draft')
   paths=[e['standard']]+e['sources']+e['evidence']
   for sample in e['sheets']:

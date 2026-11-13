@@ -10,20 +10,10 @@
       "question": "比较各对象的单项数量",
       "minimumInput": "类别名称与一组非负数值",
       "parameters": "横纵方向、类别数量",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/柱状图组件/BAR-001.html",
-          "rationale": "规整柱列便于演示共同基线，不要求等字数或相同类别数量。"
-        }
-      ],
-      "sources": [
-        "archive/柱状图组件/bar.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [
-        "archive/柱状图组件/验证记录.json"
-      ],
+      "evidence": [],
       "limits": "正负数据选BAR-005",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
@@ -47,20 +37,10 @@
       "question": "同一类别下比较多组数值",
       "minimumInput": "类别、系列名与等长非负数值",
       "parameters": "横纵方向、类别数量、系列数量",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/柱状图组件/BAR-002.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/柱状图组件/bar.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [
-        "archive/柱状图组件/验证记录.json"
-      ],
+      "evidence": [],
       "limits": "系列须使用可比单位",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
@@ -84,20 +64,10 @@
       "question": "比较整体及各部分构成",
       "minimumInput": "类别、分项与可相加的非负数值",
       "parameters": "横纵方向、类别数量、系列数量、数值 / 百分比",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/柱状图组件/BAR-003.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/柱状图组件/bar.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [
-        "archive/柱状图组件/验证记录.json"
-      ],
+      "evidence": [],
       "limits": "百分比总量为零时无占比",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
@@ -123,18 +93,10 @@
       "question": "比较各对象的正向或负向变化",
       "minimumInput": "类别与一组有限数值，可含负数",
       "parameters": "横纵方向、数据驱动范围与布局",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/柱状图组件/BAR-005.html",
-          "rationale": "样张把正负项并置便于看方向，正负项数无需相等。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/柱状图组件/进阶组件验证.json"
-      ],
+      "evidence": [],
       "limits": "不是累计金额过程",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -160,20 +122,10 @@
       "question": "解释起点如何逐项变化至终点",
       "minimumInput": "有序增减项、起点或总计标记",
       "parameters": "横纵方向、数据驱动范围与布局",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/柱状图组件/BAR-006.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/柱状图组件/advanced-bar.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [
-        "archive/柱状图组件/进阶组件验证.json"
-      ],
+      "evidence": [],
       "limits": "增减项顺序影响解释",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
@@ -198,18 +150,10 @@
       "question": "比较实际值与目标值",
       "minimumInput": "类别、实际值与对应目标值",
       "parameters": "横纵方向、数据驱动范围与布局",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/柱状图组件/BAR-007.html",
-          "rationale": "样张统一目标标记便于对照，但不要求每项共用同一个目标值。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/柱状图组件/进阶组件验证.json"
-      ],
+      "evidence": [],
       "limits": "实际与目标须同单位",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -233,21 +177,10 @@
       "question": "比较同一指标随时间的变化",
       "minimumInput": "有序时期与等长数值系列，缺失用 null",
       "parameters": "单/多系列、普通/阶梯、面积、累计/指数、重点与终点标注",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/折线图组件/LINE-001.html",
-          "rationale": "样张等距类别轴只适合其时间口径，不意味着任意日期都必须等距。"
-        }
-      ],
-      "sources": [
-        "archive/折线图组件/line.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [
-        "archive/折线图组件/验证记录.json",
-        "archive/折线图组件/模式验证.json"
-      ],
+      "evidence": [],
       "limits": "累计需可相加；指数基期非零",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
@@ -272,20 +205,10 @@
       "question": "总量由哪几部分组成，各占多少",
       "minimumInput": "三到八个互斥类别及其非负数值，总和大于零",
       "parameters": "饼图/环形图、数值/百分比",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/占比图组件/PIE-001.html",
-          "rationale": "扇区按数值切分，读者看的是相对大小；类目多于六个时改用条形更可靠。"
-        }
-      ],
-      "sources": [
-        "archive/占比图组件/pie.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [
-        "archive/占比图组件/验证记录.json"
-      ],
+      "evidence": [],
       "limits": "不直接比较多期变化；零总量无占比",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
@@ -311,18 +234,10 @@
       "question": "观察两项数值的关联和分布",
       "minimumInput": "对象名称与 X、Y 两项有限数值",
       "parameters": "名称标注、包含零、重点对象",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/散点图组件/SCATTER-001.html",
-          "rationale": "样张点较疏便于展示坐标，不规定密集数据也必须逐点贴字。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/散点图组件/验证记录.json"
-      ],
+      "evidence": [],
       "limits": "相关不代表因果；密集标注需成页检查",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -346,20 +261,10 @@
       "question": "查阅多对象的详细字段",
       "minimumInput": "表头及等列数记录",
       "parameters": "行列自适应、重点列、隔行底色",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/表格组件/TABLE-001.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/表格组件/table.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [
-        "archive/表格组件/验证记录.json"
-      ],
+      "evidence": [],
       "limits": "长表需分页或增加区域，不能降字号",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
@@ -381,16 +286,8 @@
       "question": "按相同维度逐项比较对象",
       "minimumInput": "对象×维度的状态或数值",
       "parameters": "具备状态/数值、重点列",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/表格组件/TABLE-002.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/表格组件/table.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
       "evidence": [],
       "limits": "不能混淆缺失与不具备",
@@ -414,13 +311,7 @@
       "question": "在两个维度上定位对象",
       "minimumInput": "对象坐标、维度名称、分界依据",
       "parameters": "分界值、象限名称、名称标注、重点对象",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/矩阵组件/MATRIX-001.html",
-          "rationale": "样张四个区域均衡只为示范定位，真实点数和分界不必对称。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [],
@@ -449,20 +340,10 @@
       "question": "表达父子层级与分类拆解",
       "minimumInput": "唯一ID、节点名称及父子关系",
       "parameters": "方向、节点和分支数量、重点",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/架构关系组件/REL-001.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/架构关系组件/hierarchy.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [
-        "archive/简洁线条组件/四类关系素材-验证.json"
-      ],
+      "evidence": [],
       "limits": "区域组装目前接入原方案root/children；简洁线条TREE方案未迁移。两款方案接口不同；TREE-001仅为方案文件名",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
@@ -486,16 +367,8 @@
       "question": "表达处理步骤、判断与返回",
       "minimumInput": "节点ID、类型、连线；返回边标feedback",
       "parameters": "节点类型、关系、方向、反馈",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/流程图组件/FLOW-001.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/流程图组件/flow.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
       "evidence": [],
       "limits": "流程完整性由内容决定；条件文字共用遮线",
@@ -523,16 +396,8 @@
       "question": "说明事件先后或时间位置",
       "minimumInput": "事件名称、日期或顺序",
       "parameters": "方向、间隔、节点说明",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/时间组件/TIME-001.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/时间组件/timeline.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
       "evidence": [],
       "limits": "时间比例与等距模式含义不同",
@@ -559,13 +424,7 @@
       "question": "表示一段工作的持续范围",
       "minimumInput": "段名称、开始与结束位置、可选说明",
       "parameters": "日期、数量、节点说明",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/时间组件/TIME-002.html",
-          "rationale": "样张时段少所以可以宽松排布，不意味着复杂计划必须缩成同一行。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [],
@@ -592,13 +451,7 @@
       "question": "说明范围包含与内部组成",
       "minimumInput": "范围、内部模块及归属",
       "parameters": "层级、同级等高、说明",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/架构关系组件/REL-003.html",
-          "rationale": "样张容器并列是为了展示各自归属，不限制真实范围必须同宽或无嵌套。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [],
@@ -625,16 +478,8 @@
       "question": "说明多方主体及有向动作",
       "minimumInput": "唯一节点ID、关系两端与动作",
       "parameters": "主体、关系、方向、标注",
-      "sheets": [
-        {
-          "name": "统一组件",
-          "path": "archive/架构关系组件/REL-006.html",
-          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
-        }
-      ],
-      "sources": [
-        "archive/架构关系组件/network.js"
-      ],
+      "sheets": [],
+      "sources": [],
       "status": "已入库·自动组装",
       "evidence": [],
       "limits": "复杂交叉可能需拆图；共用透明遮线",
@@ -662,18 +507,10 @@
       "question": "比较两类维度交叉后的数值",
       "minimumInput": "行列标签与对应数值矩阵，缺失 null",
       "parameters": "数值标注、包含零",
-      "sheets": [
-        {
-          "name": "简洁线条",
-          "path": "archive/简洁线条组件/HEAT-001.html",
-          "rationale": "样张使用单向明度比较大小，不代表所有正负矩阵都适合单向灰度。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/简洁线条组件/新增三类素材-验证.json"
-      ],
+      "evidence": [],
       "limits": "颜色深浅需同口径；不作因果推断",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -697,18 +534,10 @@
       "question": "查看原始样本的区间分布",
       "minimumInput": "有限数值的原始样本数组",
       "parameters": "分箱数量、数值标注",
-      "sheets": [
-        {
-          "name": "简洁线条",
-          "path": "archive/简洁线条组件/DIST-001.html",
-          "rationale": "样张等宽箱便于解释频数，不意味着每个分布都用同一组箱界。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/简洁线条组件/新增三类素材-验证.json"
-      ],
+      "evidence": [],
       "limits": "分箱影响观察，不是类别柱状图",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -735,9 +564,7 @@
       "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/简洁线条组件/新增三类素材-验证.json"
-      ],
+      "evidence": [],
       "limits": "当前仅两端，不支持多阶段或循环流",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -762,18 +589,10 @@
       "question": "说明逐阶段筛选和转化",
       "minimumInput": "同一批对象各阶段非递增数量",
       "parameters": "阶段数量、转化率标注",
-      "sheets": [
-        {
-          "name": "简洁线条",
-          "path": "archive/简洁线条组件/FUNNEL-001.html",
-          "rationale": "样张单漏斗表达单一路径，不限制真实分析必须没有分支。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/简洁线条组件/四类关系素材-验证.json"
-      ],
+      "evidence": [],
       "limits": "首阶段非零；不可混用不同人群",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -797,18 +616,10 @@
       "question": "表达循环顺序与方向",
       "minimumInput": "至少两个环节及有意义的有向反馈关系",
       "parameters": "节点数量、顺逆方向",
-      "sheets": [
-        {
-          "name": "简洁线条",
-          "path": "archive/简洁线条组件/LOOP-001.html",
-          "rationale": "样张均匀圆周便于示范循环，不要求现实反馈速度或节点重要性相等。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/简洁线条组件/四类关系素材-验证.json"
-      ],
+      "evidence": [],
       "limits": "不表示各环节耗时或贡献大小",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -832,18 +643,10 @@
       "question": "表达交集、包含或互斥",
       "minimumInput": "集合名称与定性关系",
       "parameters": "交集、包含、互斥；定性",
-      "sheets": [
-        {
-          "name": "简洁线条",
-          "path": "archive/简洁线条组件/SET-001.html",
-          "rationale": "样张两个集合仅为关系示范，不限制内容只有两个集合。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/简洁线条组件/四类关系素材-验证.json"
-      ],
+      "evidence": [],
       "limits": "面积不表示数量；不能代替定量Venn图",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -867,18 +670,10 @@
       "question": "比较多组样本分布及离群值",
       "minimumInput": "每组有限数值原始样本",
       "parameters": "横纵方向、组数、中位数标注",
-      "sheets": [
-        {
-          "name": "简洁线条",
-          "path": "archive/分布与轮廓组件/BOX-001.html",
-          "rationale": "样张仅用箱体概括分布，不要求隐藏样本量或所有原始点。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/分布与轮廓组件/validation.json"
-      ],
+      "evidence": [],
       "limits": "线性插值分位数，须为1.5×IQR范围内观测",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -902,18 +697,10 @@
       "question": "比较对象的多维评分轮廓",
       "minimumInput": "至少三个同方向、可解释且可比的维度评分；需明确标准化口径",
       "parameters": "维度数量、对象对照、数值标注",
-      "sheets": [
-        {
-          "name": "简洁线条",
-          "path": "archive/分布与轮廓组件/RADAR-001.html",
-          "rationale": "样张归一到0—100是其评分口径，并不是原始指标不经处理就可输入。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "archive/分布与轮廓组件/validation.json"
-      ],
+      "evidence": [],
       "limits": "不直接混用单位；当前只验证有限系列",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -937,19 +724,10 @@
       "question": "解释跨角色交接",
       "minimumInput": "角色、步骤与所属泳道",
       "parameters": "角色、步骤、方向",
-      "sheets": [
-        {
-          "name": "已确认原版",
-          "path": "archive/泳道图组件/FLOW-002.html",
-          "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。",
-          "status": "已确认"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "已确认原版复核.json"
-      ],
+      "evidence": [],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -978,19 +756,10 @@
       "question": "说明主体间双向交换",
       "minimumInput": "主体与交换内容、方向",
       "parameters": "主体、关系、说明",
-      "sheets": [
-        {
-          "name": "已确认原版",
-          "path": "archive/交换关系组件/REL-002.html",
-          "rationale": "样张对称排布便于看两端，不代表交换内容或价值相等。",
-          "status": "已确认"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "已确认原版复核.json"
-      ],
+      "evidence": [],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
@@ -1019,24 +788,10 @@
       "question": "说明层级与内部模块",
       "minimumInput": "层级、模块及可选说明",
       "parameters": "层数、模块、说明",
-      "sheets": [
-        {
-          "name": "已确认原版",
-          "path": "archive/分层架构组件/REL-004.html",
-          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。",
-          "status": "已确认"
-        },
-        {
-          "name": "样张与设计理由",
-          "path": "archive/分层架构表达标准/参考样张.html",
-          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "已确认原版复核.json"
-      ],
+      "evidence": [],
       "limits": "表达规范试点；生成器并非结构边界。常规分格可复用，跨层、分组、不等宽结构允许依规范重绘。原版已确认；后续机制重写版独立保留试验状态。",
       "standard": "materials/REL-004.md",
       "referenceImplementation": "archive/分层架构表达标准/参考实现.js",
@@ -1067,19 +822,10 @@
       "question": "说明中心与周边主体联系",
       "minimumInput": "中心、外围主体与关系",
       "parameters": "主体、方向、标注",
-      "sheets": [
-        {
-          "name": "已确认原版",
-          "path": "archive/中心辐射组件/REL-005.html",
-          "rationale": "样张周边均匀是视觉安排，不表示所有关系强度或权力相等。",
-          "status": "已确认"
-        }
-      ],
+      "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [
-        "已确认原版复核.json"
-      ],
+      "evidence": [],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
