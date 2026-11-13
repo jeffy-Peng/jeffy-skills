@@ -12,7 +12,7 @@ question: 观察两项数值的关联和分布
 minimumInput: 对象名称与 X、Y 两项有限数值
 status: 仅规范·模型绘制
 standard: materials/SCATTER-001.md
-sources: [archive/表达规范/SCATTER-001.md]
+sources: []
 sheets: []
 ---
 

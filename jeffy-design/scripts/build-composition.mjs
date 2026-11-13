@@ -47,7 +47,7 @@ for (const id of used) {
   // 主题绘制层是唯一实现，构建期不再从素材示例里切代码。
   adapters[id] = { ...a, code: '' };
 }
-const lineLabels = readFileSync(resolve(root, 'assets/archive/共用/line-labels.js'), 'utf8');
+const lineLabels = readFileSync(resolve(root, 'lib/kit/line-labels.js'), 'utf8');
 const themeDrawing = readFileSync(resolve(root, 'lib/theming/drawing.js'), 'utf8');
 const fontCheck = readFileSync(resolve(root, 'lib/theming/drawing-fonts.js'), 'utf8');
 const fatal = readFileSync(resolve(root, 'lib/composition/fatal.js'), 'utf8');

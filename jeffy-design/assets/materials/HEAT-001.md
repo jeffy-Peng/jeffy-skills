@@ -12,7 +12,7 @@ question: 比较两类维度交叉后的数值
 minimumInput: 行列标签与对应数值矩阵，缺失 null
 status: 仅规范·模型绘制
 standard: materials/HEAT-001.md
-sources: [archive/表达规范/HEAT-001.md]
+sources: []
 sheets: []
 ---
 

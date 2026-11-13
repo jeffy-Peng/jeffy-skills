@@ -12,7 +12,7 @@ question: 表示一段工作的持续范围
 minimumInput: 段名称、开始与结束位置、可选说明
 status: 仅规范·模型绘制
 standard: materials/TIME-002.md
-sources: [archive/表达规范/TIME-002.md]
+sources: []
 sheets: []
 ---
 

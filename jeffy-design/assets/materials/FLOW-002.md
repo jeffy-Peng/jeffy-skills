@@ -12,7 +12,7 @@ question: 解释跨角色交接
 minimumInput: 角色、步骤与所属泳道
 status: 仅规范·模型绘制
 standard: materials/FLOW-002.md
-sources: [archive/表达规范/FLOW-002.md]
+sources: []
 sheets: []
 ---
 

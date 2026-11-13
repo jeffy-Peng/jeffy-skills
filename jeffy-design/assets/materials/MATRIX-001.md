@@ -12,7 +12,7 @@ question: 在两个维度上定位对象
 minimumInput: 对象坐标、维度名称、分界依据
 status: 仅规范·模型绘制
 standard: materials/MATRIX-001.md
-sources: [archive/表达规范/MATRIX-001.md]
+sources: []
 sheets: []
 ---
 

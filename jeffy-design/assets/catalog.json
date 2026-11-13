@@ -130,9 +130,7 @@
           "rationale": "样张把正负项并置便于看方向，正负项数无需相等。"
         }
       ],
-      "sources": [
-        "archive/表达规范/BAR-005.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/柱状图组件/进阶组件验证.json"
@@ -207,9 +205,7 @@
           "rationale": "样张统一目标标记便于对照，但不要求每项共用同一个目标值。"
         }
       ],
-      "sources": [
-        "archive/表达规范/BAR-007.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/柱状图组件/进阶组件验证.json"
@@ -322,9 +318,7 @@
           "rationale": "样张点较疏便于展示坐标，不规定密集数据也必须逐点贴字。"
         }
       ],
-      "sources": [
-        "archive/表达规范/SCATTER-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/散点图组件/验证记录.json"
@@ -427,9 +421,7 @@
           "rationale": "样张四个区域均衡只为示范定位，真实点数和分界不必对称。"
         }
       ],
-      "sources": [
-        "archive/表达规范/MATRIX-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "默认中点不是业务判断",
@@ -574,9 +566,7 @@
           "rationale": "样张时段少所以可以宽松排布，不意味着复杂计划必须缩成同一行。"
         }
       ],
-      "sources": [
-        "archive/表达规范/TIME-002.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "各段使用同一时间口径",
@@ -609,9 +599,7 @@
           "rationale": "样张容器并列是为了展示各自归属，不限制真实范围必须同宽或无嵌套。"
         }
       ],
-      "sources": [
-        "archive/表达规范/REL-003.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "与SET-001定性集合交集不同",
@@ -681,9 +669,7 @@
           "rationale": "样张使用单向明度比较大小，不代表所有正负矩阵都适合单向灰度。"
         }
       ],
-      "sources": [
-        "archive/表达规范/HEAT-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/简洁线条组件/新增三类素材-验证.json"
@@ -718,9 +704,7 @@
           "rationale": "样张等宽箱便于解释频数，不意味着每个分布都用同一组箱界。"
         }
       ],
-      "sources": [
-        "archive/表达规范/DIST-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/简洁线条组件/新增三类素材-验证.json"
@@ -785,9 +769,7 @@
           "rationale": "样张单漏斗表达单一路径，不限制真实分析必须没有分支。"
         }
       ],
-      "sources": [
-        "archive/表达规范/FUNNEL-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/简洁线条组件/四类关系素材-验证.json"
@@ -822,9 +804,7 @@
           "rationale": "样张均匀圆周便于示范循环，不要求现实反馈速度或节点重要性相等。"
         }
       ],
-      "sources": [
-        "archive/表达规范/LOOP-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/简洁线条组件/四类关系素材-验证.json"
@@ -859,9 +839,7 @@
           "rationale": "样张两个集合仅为关系示范，不限制内容只有两个集合。"
         }
       ],
-      "sources": [
-        "archive/表达规范/SET-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/简洁线条组件/四类关系素材-验证.json"
@@ -896,9 +874,7 @@
           "rationale": "样张仅用箱体概括分布，不要求隐藏样本量或所有原始点。"
         }
       ],
-      "sources": [
-        "archive/表达规范/BOX-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/分布与轮廓组件/validation.json"
@@ -933,9 +909,7 @@
           "rationale": "样张归一到0—100是其评分口径，并不是原始指标不经处理就可输入。"
         }
       ],
-      "sources": [
-        "archive/表达规范/RADAR-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "archive/分布与轮廓组件/validation.json"
@@ -971,9 +945,7 @@
           "status": "已确认"
         }
       ],
-      "sources": [
-        "archive/表达规范/FLOW-002.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "已确认原版复核.json"
@@ -1014,9 +986,7 @@
           "status": "已确认"
         }
       ],
-      "sources": [
-        "archive/表达规范/REL-002.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "已确认原版复核.json"
@@ -1062,9 +1032,7 @@
           "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
         }
       ],
-      "sources": [
-        "表达规范/REL-004.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "已确认原版复核.json"
@@ -1107,9 +1075,7 @@
           "status": "已确认"
         }
       ],
-      "sources": [
-        "archive/表达规范/REL-005.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [
         "已确认原版复核.json"
@@ -1143,9 +1109,7 @@
       "minimumInput": "参与者唯一 ID 与有序消息，消息包含发送方、接收方和标签",
       "parameters": "消息数量、返回线型",
       "sheets": [],
-      "sources": [
-        "archive/表达规范/SEQ-001.md"
-      ],
+      "sources": [],
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "暂不支持自消息、激活条、并行与条件组合片段；结构适配案例作为参考源件，当前未接入克莱因蓝区域引擎。",

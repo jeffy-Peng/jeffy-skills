@@ -12,7 +12,7 @@ question: 说明逐阶段筛选和转化
 minimumInput: 同一批对象各阶段非递增数量
 status: 仅规范·模型绘制
 standard: materials/FUNNEL-001.md
-sources: [archive/表达规范/FUNNEL-001.md]
+sources: []
 sheets: []
 ---
 

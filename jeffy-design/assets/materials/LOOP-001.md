@@ -12,7 +12,7 @@ question: 表达循环顺序与方向
 minimumInput: 至少两个环节及有意义的有向反馈关系
 status: 仅规范·模型绘制
 standard: materials/LOOP-001.md
-sources: [archive/表达规范/LOOP-001.md]
+sources: []
 sheets: []
 ---
 

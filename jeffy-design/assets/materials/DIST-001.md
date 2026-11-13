@@ -12,7 +12,7 @@ question: 查看原始样本的区间分布
 minimumInput: 有限数值的原始样本数组
 status: 仅规范·模型绘制
 standard: materials/DIST-001.md
-sources: [archive/表达规范/DIST-001.md]
+sources: []
 sheets: []
 ---
 
