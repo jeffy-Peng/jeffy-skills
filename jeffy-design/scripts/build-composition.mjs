@@ -51,8 +51,6 @@ const lineLabels = readFileSync(resolve(root, 'lib/kit/line-labels.js'), 'utf8')
 const themeDrawing = readFileSync(resolve(root, 'lib/theming/drawing.js'), 'utf8');
 const fontCheck = readFileSync(resolve(root, 'lib/theming/drawing-fonts.js'), 'utf8');
 const fatal = readFileSync(resolve(root, 'lib/composition/fatal.js'), 'utf8');
-const pixel = readFileSync(resolve(root, 'lib/styles/pixel-brush.js'), 'utf8');
-const glass = readFileSync(resolve(root, 'lib/styles/glass-brush.js'), 'utf8');
 const kit = ['legend', 'unit', 'axis', 'layout']
   .map((name) => readFileSync(resolve(root, 'lib/kit', name + '.js'), 'utf8'))
   .join('\n');
@@ -66,15 +64,13 @@ const payload = JSON.stringify({
   themeDrawing,
   themeRenderers,
   fontCheck,
-  pixel,
-  glass,
   kit,
   fontMetrics,
 }).replace(/</g, '\\u003c');
 mkdirSync(dirname(resolve(output)), { recursive: true });
 writeFileSync(
   output,
-  `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>组件组装验证</title><style>body{margin:24px;background:#eee;color:#222}main{width:${theme.page.canvas.width}px;margin:auto}.sheet{background:white;position:relative;width:${theme.page.canvas.width}px;height:${theme.page.canvas.height}px;margin:28px 0;overflow:hidden}.block{position:absolute;box-sizing:border-box}.component{overflow:hidden}.component iframe{border:0;width:100%;height:100%;display:block}table{border-collapse:collapse;width:100%;table-layout:fixed}caption{text-align:left;font-weight:600;padding-bottom:8px}th,td{font-weight:400;text-align:center;vertical-align:middle;padding:9px 10px;border-bottom:1px solid #ddd}thead{background:#EEF2FB}.panel-title{margin:0}.failure{background:#eee;padding:12px;overflow:auto;font:14px Georgia,serif}details{padding:16px;background:white;margin:12px 0}.report{font:14px Georgia,serif;white-space:pre-wrap}@media print{body{margin:0}details,.report{display:none}.sheet{margin:0;break-after:page}}</style><main></main><script>window.compositionInput=${payload};</script><script>${fatal}</script><script>${fontCheck}</script><script>${kit}</script><script>${pixel}</script><script>${glass}</script><script>${lineLabels}</script><script>${themeDrawing}</script><script>${themeRenderers}</script><script>${runtime}</script></html>`,
+  `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>组件组装验证</title><style>body{margin:24px;background:#eee;color:#222}main{width:${theme.page.canvas.width}px;margin:auto}.sheet{background:white;position:relative;width:${theme.page.canvas.width}px;height:${theme.page.canvas.height}px;margin:28px 0;overflow:hidden}.block{position:absolute;box-sizing:border-box}.component{overflow:hidden}.component iframe{border:0;width:100%;height:100%;display:block}table{border-collapse:collapse;width:100%;table-layout:fixed}caption{text-align:left;font-weight:600;padding-bottom:8px}th,td{font-weight:400;text-align:center;vertical-align:middle;padding:9px 10px;border-bottom:1px solid #ddd}thead{background:#EEF2FB}.panel-title{margin:0}.failure{background:#eee;padding:12px;overflow:auto;font:14px Georgia,serif}details{padding:16px;background:white;margin:12px 0}.report{font:14px Georgia,serif;white-space:pre-wrap}@media print{body{margin:0}details,.report{display:none}.sheet{margin:0;break-after:page}}</style><main></main><script>window.compositionInput=${payload};</script><script>${fatal}</script><script>${fontCheck}</script><script>${kit}</script><script>${lineLabels}</script><script>${themeDrawing}</script><script>${themeRenderers}</script><script>${runtime}</script></html>`,
 );
 writeFileSync(
   output.replace(/\.html?$/i, '') + '.notes.md',

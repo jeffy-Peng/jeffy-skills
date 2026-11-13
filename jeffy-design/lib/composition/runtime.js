@@ -1,6 +1,5 @@
 (async () => {
-  const { deck, theme, adapters, kit, lineLabels, themeDrawing, themeRenderers, pixel, glass, fontCheck } =
-      window.compositionInput,
+  const { deck, theme, adapters, kit, lineLabels, themeDrawing, themeRenderers, fontCheck } = window.compositionInput,
     roles = Object.fromEntries(theme.scale.map((x) => [x.role, x])),
     reports = [];
   const issue = (code, message, extra = {}) => ({ code, message, ...extra });
@@ -26,7 +25,7 @@
     const frame = document.createElement('div');
     frame.className = 'component jd-component';
     frame.style.cssText = `position:relative;width:${spec.box.width}px;height:${spec.box.height}px;font-size:${roles.body.size}px`;
-    const surf = theme.glass?.surface;
+    const surf = null;
     if (surf) {
       // 液态玻璃面：半透明 + 背景模糊 + 亮边 + 柔和投影，图形画在这层之上。
       frame.style.background = `rgba(255,255,255,${surf.tintAlpha})`;

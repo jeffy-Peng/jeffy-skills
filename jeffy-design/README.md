@@ -8,7 +8,7 @@
 
 需要用户判断时最多一次在聊天中提供整稿方案；不逐页确认、不弹确认 HTML。已有决定直接沿用。
 
-- [主题目录](themes/索引.md)：两套设计语言，`simple-line` 与 `pixel-mono`。
+- [主题目录](themes/索引.md)：一套设计语言 `simple-line`，两个色板。
 - [Catalog](assets/index.html)：按用途和形态找到素材规范。
 - [主题自适应](references/主题自适应.md)：统一测量、布局与绘制接口。
 - [页面组装](references/页面组装.md)：工具调用、绘制规则、失败反馈与验收。
@@ -33,7 +33,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 ## 三层结构
 
 - 主题 `themes/*.json`：颜色、字体、字号阶梯、间距、圆角、线宽、网格、密度档，以及 `brush` 指定的笔触。
-- 笔触 `lib/styles/*.js`：只管怎么落笔，坐标吸附、硬边、阴影。不算位置，不选颜色。
+- 笔触 `lib/styles/line.js`：默认线条笔触，只管怎么落笔。不算位置，不选颜色。
 - 素材 `assets/materials/<ID>.md`：一条素材一个文件，写语义、画法、可调参数、规则和验收。
 
 几何在 `lib/theming/renderers.js`，七族各一份，属于引擎。素材和笔触都不复制它，所以新增一条同族素材常常零代码。
@@ -72,10 +72,11 @@ Catalog 唯一维护源为 [assets/catalog.json](assets/catalog.json)，运行 `
 ## 验证
 
 ```sh
-npm test                           # 主题契约 + 组装 + 适配器 + 主题 + 素材契约
+npm test                           # 同步检查 + 主题契约
+npm run gen:rules                  # 从 contract 生成规则清单
 npm run test:composition           # 12 项组装回归
 npm run test:adapters              # 23 项参数回归
-npm run test:themes                # 29 项主题与区域检查
+npm run test:themes                # 17 项主题与区域检查
 npm run test:materials             # 39 项素材契约用例
 npm run specimen BAR-001           # 生成素材示意图（只有图表，12 条引擎素材）
 npm run baseline                   # 素材与骨架的像素基线回归

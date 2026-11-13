@@ -14,8 +14,8 @@
     "test:composition": "node scripts/test-composition.mjs build/reports/composition.json",
     "test:adapters": "node scripts/test-composition-extended.mjs build/reports/adapters.json",
     "test:themes": "node scripts/test-themes.mjs build/theming",
-    "format": "node node_modules/prettier/bin/prettier.cjs --write \"lib/**/*.{js,mjs}\" \"scripts/*.mjs\"",
-    "format:check": "node node_modules/prettier/bin/prettier.cjs --check \"lib/**/*.{js,mjs}\" \"scripts/*.mjs\"",
+    "format": "prettier --write \"lib/**/*.{js,mjs}\" \"scripts/*.mjs\"",
+    "format:check": "prettier --check \"lib/**/*.{js,mjs}\" \"scripts/*.mjs\"",
     "outline": "node scripts/validate-outline.mjs",
     "notes": "node scripts/check-notes.mjs",
     "embed": "node scripts/embed-fonts.mjs",
@@ -29,7 +29,8 @@
     "test:all": "npm run test && npm run test:composition && npm run test:adapters && npm run test:themes && npm run test:materials",
     "specimen": "node scripts/build-specimen.mjs",
     "baseline": "node scripts/visual-baseline.mjs",
-    "baseline:update": "node scripts/visual-baseline.mjs --update"
+    "baseline:update": "node scripts/visual-baseline.mjs --update",
+    "gen:rules": "node scripts/gen-rules.mjs"
   },
   "devDependencies": {
     "playwright": "^1.65.0",

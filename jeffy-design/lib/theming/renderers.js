@@ -12,8 +12,6 @@ window.ThemeRenderers = (() => {
     const brushConfig = theme.brush || {};
     const brush = (brushConfig.byFamily && brushConfig.byFamily[archetype]) || brushConfig.default || 'line';
     const params = (brushConfig.params && brushConfig.params[brush]) || {};
-    if (brush === 'pixel' && window.PixelBrush) return window.PixelBrush.create(svg, theme, params);
-    if (brush === 'glass' && window.GlassBrush) return window.GlassBrush.create(svg, theme, params);
     return ThemeDrawing.create(svg, theme);
   }
   function domain(vals, zero = true) {

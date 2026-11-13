@@ -134,7 +134,9 @@ try {
   });
   results.push({ name: 'missing-font-explicit', pass: font });
   const invalid = JSON.parse(readFileSync(join(root, 'themes', themes[0] + '.json')));
+  // 主题可能带色板，ink 要从主色和每个色板里都删掉才算真的缺。
   delete invalid.colors.ink;
+  for (const p of Object.values(invalid.palettes || {})) delete p.colors?.ink;
   let rejected = false;
   try {
     resolveTheme(invalid, defaults);

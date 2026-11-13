@@ -7,32 +7,5 @@
     ],
     "params": {},
     "fontUnit": 1
-  },
-  "pixel": {
-    "file": "lib/styles/pixel-brush.js",
-    "families": [
-      "compare",
-      "table"
-    ],
-    "params": {
-      "gridPx": 3,
-      "shadow": true,
-      "hardEdges": true
-    },
-    "fontUnit": 12
-  },
-  "glass": {
-    "file": "lib/styles/glass-brush.js",
-    "families": [
-      "share"
-    ],
-    "params": {
-      "tintAlpha": 0.3,
-      "rimPx": 1.6,
-      "specularAlpha": 0.62,
-      "innerShadow": 0.16,
-      "shadowBlurPx": 26
-    },
-    "fontUnit": 1
   }
 }

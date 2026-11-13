@@ -21,7 +21,7 @@ metadata:
 
 确定给谁看、使用场合，以及希望读者理解什么或作出什么判断。交付默认HTML，并配逐字稿；只有题目时，默认面向非专业读者解释核心问题，说明假设后推进。只有会实质改变目标的缺失才澄清。
 
-从[主题目录](themes/索引.md)读取适用场景。主题是设计语言，现在两套，`simple-line` 简洁线条和 `pixel-mono` 像素风。提纲里写 `theme` 选设计语言，写 `palette` 选色板，`simple-line` 目前带 `klein-blue` 和 `mono` 两个色板，不写就用默认色板。
+从[主题目录](themes/索引.md)读取适用场景。主题是设计语言，现在一套 `simple-line` 简洁线条，带 `klein-blue` 和 `mono` 两个色板。提纲里写 `theme` 选设计语言，写 `palette` 选色板，不写用默认色板。
 
 读取主题的 `usage`、`writing`、`brush`、`palettes` 与 `formats`。`brush` 决定每一族用哪套笔触（`default` 默认、`byFamily` 按原型分、`params` 笔触参数如 `gridPx`、`shadow`）。`formats` 现在有 `slide` 和 `chart` 两种版式规格，幻灯片走页面骨架，单图只出素材。受众与使用场合决定解释深度、文案和讲稿语气。主题提示词是写作要求，不替代事实研究；用户明确的表达偏好优先。
 
@@ -106,7 +106,6 @@ metadata:
 
 改风格只动主题和笔触，素材 md 和几何都不跟着变。只有引入一种新的落笔质感时，才动 `lib/styles/registry.json`（一行登记）和 `renderers.js` 的笔触分派（一行）；素材实现里不许出现颜色、透明度、模糊这类数值，一律问主题或笔触要。
 
-要做背景模糊（玻璃一类），组件必须挂在页面文档里：iframe 有自己的背景层，`backdrop-filter` 透不过去，只能做出假的雾面。落笔的多层叠加（外亮边、内侧暗边、镜面高光、投影）写在笔触里，不要写进渲染器。
 
 加主题或加素材只改数据，然后 `npm run sync`。它生成 `lib/composition/adapters.json`、`assets/capability.json`、`build/generated/*`。生成物不要手改；`npm test` 与构建都会先跑 `sync --check`，声明改了没同步会直接停下。
 
