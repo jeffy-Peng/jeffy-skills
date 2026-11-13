@@ -1,0 +1,236 @@
+{
+  "name": "pixel-mono",
+  "label": "像素单色",
+  "fonts": {
+    "ea": "Fusion Pixel 12px Prop zh-Hans",
+    "latin": "Fusion Pixel 12px Prop zh-Hans"
+  },
+  "colors": {
+    "ink": "1B1B1B",
+    "body": "3A3A3A",
+    "muted": "8C8C8C",
+    "line": "D5D5D5",
+    "soft": "F0F0F0",
+    "accent": "2C5F2D",
+    "accent2": "97A97C",
+    "paper": "FBFBF7",
+    "inverse": "2C5F2D",
+    "muted_inv": "C9C9C9"
+  },
+  "scale": [
+    {
+      "role": "title",
+      "size": 36,
+      "lineHeight": 1.0,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "ink"
+    },
+    {
+      "role": "index",
+      "size": 24,
+      "lineHeight": 1.0,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "accent",
+      "font": "latin"
+    },
+    {
+      "role": "cardTitle",
+      "size": 24,
+      "lineHeight": 1.0,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "ink"
+    },
+    {
+      "role": "body",
+      "size": 12,
+      "lineHeight": 1.9,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "body"
+    },
+    {
+      "role": "english",
+      "size": 12,
+      "lineHeight": 1.7,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "muted",
+      "font": "latin"
+    },
+    {
+      "role": "pill",
+      "size": 12,
+      "lineHeight": 1.4,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "body"
+    },
+    {
+      "role": "label",
+      "size": 12,
+      "lineHeight": 1.5,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "muted"
+    },
+    {
+      "role": "source",
+      "size": 12,
+      "lineHeight": 1.6,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "muted"
+    },
+    {
+      "role": "pageNo",
+      "size": 12,
+      "lineHeight": 1,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "muted",
+      "font": "latin",
+      "tabular": true
+    },
+    {
+      "role": "claim",
+      "size": 24,
+      "lineHeight": 1.2,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "ink"
+    },
+    {
+      "role": "category",
+      "size": 12,
+      "lineHeight": 1.2,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "body"
+    },
+    {
+      "role": "value",
+      "size": 12,
+      "lineHeight": 1.2,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "body"
+    },
+    {
+      "role": "axis",
+      "size": 12,
+      "lineHeight": 1.2,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "muted"
+    },
+    {
+      "role": "unit",
+      "size": 12,
+      "lineHeight": 1.2,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "muted"
+    },
+    {
+      "role": "legend",
+      "size": 12,
+      "lineHeight": 1.2,
+      "weight": 400,
+      "tracking": "0px",
+      "color": "body"
+    }
+  ],
+  "paragraph": {
+    "beforePx": 8,
+    "afterPx": 0
+  },
+  "rules": {
+    "headerWidthPx": 1,
+    "headerGapPx": 26,
+    "dividerWidthPx": 1
+  },
+  "usage": {
+    "scenarios": "研究分析、市场概览、产品研究、商业机制讲解",
+    "audience": "需要事实依据与清楚判断的非专业读者或业务讨论者",
+    "note": "适用场景是选择建议；不替代本次受众与用途。"
+  },
+  "page": {
+    "canvas": {
+      "width": 1280,
+      "height": 720
+    },
+    "title": {
+      "x": 64,
+      "y": 34,
+      "width": 1152,
+      "height": 70
+    },
+    "headerRule": {
+      "x": 64,
+      "y": 111,
+      "width": 1152
+    },
+    "content": {
+      "x": 64,
+      "y": 136,
+      "width": 1152,
+      "height": 518
+    },
+    "source": {
+      "x": 64,
+      "y": 675,
+      "width": 1110,
+      "height": 25
+    },
+    "pageNo": {
+      "x": 1180,
+      "y": 675,
+      "width": 36,
+      "height": 25
+    },
+    "specialPages": "封面、目录、过渡与结束页可按用途另行构图，仍遵守主题字体、字号、颜色与安全边界；未提供四类样张。"
+  },
+  "writing": {
+    "prompt": "理性、清楚、有依据；保留研究深度，用自然直接的中文讲清楚。 面向本次受众写作，让每句增加事实、机制或必要解释。不要把制作过程、验收用语写进正文。",
+    "title": "直接写对象及本页能支持的判断，或一个具体问题；不玩比喻、不编口号，不为了结论感夸大证据。",
+    "body": "先说明发生了什么，再解释为什么及意味着什么。使用具体名词和动词，术语首次出现就解释。图注交代必要口径，避免正文到处重复“分析框架”“本次核验”“并不意味着”。不确定性就近说明一次，不削弱本来成立的事实。",
+    "narration": "像熟悉材料的人向同事解释。顺着画面逐区说清对象、关系和证据，再自然落到判断；补充页面省略的背景，不逐句念正文、不逐项报数。指图只在必要时使用“左侧”“下方”，不要每页都说“这一页回答”“首先看”“再看”。",
+    "review": "逐句问：具体说了什么？证据支持吗？删掉是否损失信息？是否可以说得更直接？保留必要限定，删除空洞总结、机械对仗、密集否定和重复提示。",
+    "examples": [
+      {
+        "before": "从流量到留量，构建增长闭环",
+        "after": "体验客会不会再来，是岩馆经营的关键。"
+      },
+      {
+        "before": "供给端与需求端形成双轮驱动",
+        "after": "新馆在增加，新客也在进入；单馆仍要证明复购。"
+      }
+    ]
+  },
+  "style": "pixel",
+  "materials": {
+    "radius": 0,
+    "barMode": "solid",
+    "padding": 12
+  },
+  "brush": {
+    "default": "line",
+    "byFamily": {
+      "compare": "pixel"
+    },
+    "params": {
+      "pixel": {
+        "gridPx": 4,
+        "shadow": true,
+        "hardEdges": true
+      }
+    }
+  },
+  "labels": {
+    "separator": "：",
+    "source": "数据来源："
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "BAR-001": {
+    "capability": "assemble",
+    "archetype": "compare",
+    "status": "已入库·自动组装",
+    "standard": "materials/BAR-001.md"
+  },
+  "BAR-002": {
+    "capability": "assemble",
+    "archetype": "compare",
+    "status": "已入库·自动组装",
+    "standard": "materials/BAR-002.md"
+  },
+  "BAR-003": {
+    "capability": "assemble",
+    "archetype": "compare",
+    "status": "已入库·自动组装",
+    "standard": "materials/BAR-003.md"
+  },
+  "BAR-005": {
+    "capability": "model-drawn",
+    "archetype": "compare",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/BAR-005.md"
+  },
+  "BAR-006": {
+    "capability": "assemble",
+    "archetype": "compare",
+    "status": "已入库·自动组装",
+    "standard": "materials/BAR-006.md"
+  },
+  "BAR-007": {
+    "capability": "model-drawn",
+    "archetype": "compare",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/BAR-007.md"
+  },
+  "LINE-001": {
+    "capability": "assemble",
+    "archetype": "trend",
+    "status": "已入库·自动组装",
+    "standard": "materials/LINE-001.md"
+  },
+  "PIE-001": {
+    "capability": "assemble",
+    "archetype": "share",
+    "status": "已入库·自动组装",
+    "standard": "materials/PIE-001.md"
+  },
+  "SCATTER-001": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/SCATTER-001.md"
+  },
+  "TABLE-001": {
+    "capability": "assemble",
+    "archetype": "table",
+    "status": "已入库·自动组装",
+    "standard": "materials/TABLE-001.md"
+  },
+  "TABLE-002": {
+    "capability": "assemble",
+    "archetype": "table",
+    "status": "已入库·自动组装",
+    "standard": "materials/TABLE-002.md"
+  },
+  "MATRIX-001": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/MATRIX-001.md"
+  },
+  "REL-001": {
+    "capability": "assemble",
+    "archetype": "relation",
+    "status": "已入库·自动组装",
+    "standard": "materials/REL-001.md"
+  },
+  "FLOW-001": {
+    "capability": "assemble",
+    "archetype": "flow",
+    "status": "已入库·自动组装",
+    "standard": "materials/FLOW-001.md"
+  },
+  "TIME-001": {
+    "capability": "assemble",
+    "archetype": "timeline",
+    "status": "已入库·自动组装",
+    "standard": "materials/TIME-001.md"
+  },
+  "TIME-002": {
+    "capability": "model-drawn",
+    "archetype": "timeline",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/TIME-002.md"
+  },
+  "REL-003": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/REL-003.md"
+  },
+  "REL-006": {
+    "capability": "assemble",
+    "archetype": "relation",
+    "status": "已入库·自动组装",
+    "standard": "materials/REL-006.md"
+  },
+  "HEAT-001": {
+    "capability": "model-drawn",
+    "archetype": "table",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/HEAT-001.md"
+  },
+  "DIST-001": {
+    "capability": "model-drawn",
+    "archetype": "compare",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/DIST-001.md"
+  },
+  "SANKEY-001": {
+    "capability": "model-drawn",
+    "archetype": "flow",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/SANKEY-001.md"
+  },
+  "FUNNEL-001": {
+    "capability": "model-drawn",
+    "archetype": "flow",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/FUNNEL-001.md"
+  },
+  "LOOP-001": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/LOOP-001.md"
+  },
+  "SET-001": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/SET-001.md"
+  },
+  "BOX-001": {
+    "capability": "model-drawn",
+    "archetype": "compare",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/BOX-001.md"
+  },
+  "RADAR-001": {
+    "capability": "model-drawn",
+    "archetype": "compare",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/RADAR-001.md"
+  },
+  "FLOW-002": {
+    "capability": "model-drawn",
+    "archetype": "flow",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/FLOW-002.md"
+  },
+  "REL-002": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/REL-002.md"
+  },
+  "REL-004": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/REL-004.md"
+  },
+  "REL-005": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/REL-005.md"
+  },
+  "SEQ-001": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/SEQ-001.md"
+  }
+}

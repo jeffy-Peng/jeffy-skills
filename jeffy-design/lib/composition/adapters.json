@@ -1,118 +1,74 @@
 {
   "BAR-001": {
-    "file": "柱状图组件/bar.js",
-    "cut": "const sample=",
-    "fn": "renderChart",
-    "defaults": {
-      "kind": "single"
-    },
-    "renderer": "theme-v1"
-  },
-  "LINE-001": {
-    "file": "折线图组件/line.js",
-    "cut": "const sample=",
-    "fn": "renderLine",
-    "defaults": {},
-    "renderer": "theme-v1"
-  },
-  "PIE-001": {
-    "file": "占比图组件/pie.js",
-    "cut": "const sample=",
-    "fn": "renderPie",
-    "defaults": {},
-    "renderer": "theme-v1"
-  },
-  "REL-006": {
-    "file": "架构关系组件/network.js",
-    "cut": "function refresh()",
-    "fn": "renderNetwork",
-    "defaults": {},
-    "renderer": "theme-v1"
-  },
-  "FLOW-001": {
-    "file": "流程图组件/flow.js",
-    "cut": "const sample=",
-    "fn": "renderFlow",
-    "defaults": {},
-    "renderer": "theme-v1"
-  },
-  "TABLE-001": {
-    "file": "表格组件/table.js",
-    "cut": "const detailSample=",
-    "fn": "renderTable",
-    "defaults": {},
-    "renderer": "theme-v1"
-  },
-  "TABLE-002": {
-    "file": "表格组件/table.js",
-    "cut": "const detailSample=",
-    "fn": "renderTable",
-    "defaults": {},
-    "renderer": "theme-v1"
+    "archetype": "compare",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/柱状图组件/bar.js"
   },
   "BAR-002": {
-    "file": "柱状图组件/bar.js",
-    "cut": "const sample=",
-    "fn": "renderChart",
-    "defaults": {
-      "kind": "grouped"
-    },
-    "renderer": "theme-v1"
+    "archetype": "compare",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/柱状图组件/bar.js"
   },
   "BAR-003": {
-    "file": "柱状图组件/bar.js",
-    "cut": "const sample=",
-    "fn": "renderChart",
-    "defaults": {
-      "kind": "stacked"
-    },
-    "renderer": "theme-v1"
+    "archetype": "compare",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/柱状图组件/bar.js"
   },
   "BAR-006": {
-    "file": "柱状图组件/advanced-bar.js",
-    "cut": "const kind=document.body",
-    "fn": "renderChart",
-    "defaults": {
-      "kind": "waterfall"
-    },
-    "renderer": "theme-v1"
+    "archetype": "compare",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/柱状图组件/advanced-bar.js"
   },
-  "TIME-001": {
-    "file": "时间组件/timeline.js",
-    "cut": "const sample=",
-    "fn": "renderTimeline",
-    "defaults": {
-      "details": false
-    },
-    "renderer": "theme-v1"
+  "LINE-001": {
+    "archetype": "trend",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/折线图组件/line.js"
+  },
+  "PIE-001": {
+    "archetype": "share",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/占比图组件/pie.js"
+  },
+  "TABLE-001": {
+    "archetype": "table",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/表格组件/table.js"
+  },
+  "TABLE-002": {
+    "archetype": "table",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/表格组件/table.js"
   },
   "REL-001": {
-    "file": "架构关系组件/hierarchy.js",
-    "cut": "function refresh()",
-    "fn": "renderHierarchy",
-    "defaults": {},
-    "sheet": "原方案（root/children 接口）",
-    "renderer": "theme-v1"
+    "archetype": "relation",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/架构关系组件/hierarchy.js"
   },
-  "FLOW-002": {
-    "file": "../drafts/机制表达审核/mechanisms.js",
-    "cut": "const samples=",
-    "fn": "renderSwimlaneReview",
-    "defaults": {},
-    "status": "draft-preview-only"
+  "FLOW-001": {
+    "archetype": "flow",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/流程图组件/flow.js"
   },
-  "REL-004": {
-    "file": "../drafts/机制表达审核/mechanisms.js",
-    "cut": "const samples=",
-    "fn": "renderLayersReview",
-    "defaults": {},
-    "status": "draft-preview-only"
+  "TIME-001": {
+    "archetype": "timeline",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/时间组件/timeline.js"
   },
-  "SEQ-001": {
-    "file": "../drafts/机制表达审核/mechanisms.js",
-    "cut": "const samples=",
-    "fn": "renderSequenceReview",
-    "defaults": {},
-    "status": "draft-preview-only"
+  "REL-006": {
+    "archetype": "relation",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": "archive/架构关系组件/network.js"
   }
 }

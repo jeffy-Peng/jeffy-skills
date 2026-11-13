@@ -1,0 +1,53 @@
+{
+  "updated": "2026-11-12",
+  "note": "主题声明的族名必须命中这些文件。换版本会让字宽变化，0.2px 的字号断言会跟着飘。",
+  "fonts": [
+    {
+      "family": "Noto Serif SC",
+      "weight": "200 900 可变字重",
+      "url": "https://github.com/google/fonts/raw/main/ofl/notoserifsc/NotoSerifSC%5Bwght%5D.ttf",
+      "file": "NotoSerifSC.ttf",
+      "sha256": "050080d9255a86808f2945bffac582b31ef32bc36411ce29563b4961670c66f9",
+      "source": "google/fonts ofl/notoserifsc",
+      "metrics": {
+        "probe": "订单增长五十个百分点 0123456789 ABC abc",
+        "advance": 2009,
+        "ascent": 85,
+        "descent": -9
+      },
+      "probe": "订单增长五十个百分点 0123456789 ABC abc"
+    },
+    {
+      "family": "Noto Sans SC",
+      "weight": "100 900 可变字重",
+      "url": "https://github.com/google/fonts/raw/main/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+      "file": "NotoSansSC.ttf",
+      "sha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+      "source": "google/fonts ofl/notosanssc",
+      "metrics": {
+        "probe": "订单增长五十个百分点 0123456789 ABC abc",
+        "advance": 1986,
+        "ascent": 85,
+        "descent": -9
+      },
+      "probe": "订单增长五十个百分点 0123456789 ABC abc"
+    },
+    {
+      "family": "Georgia",
+      "weight": "400 700",
+      "url": "https://downloads.sourceforge.net/corefonts/georgi32.exe",
+      "file": "georgi32.exe",
+      "sha256": "2c2c7dcda6606ea5cf08918fb7cd3f3359e9e84338dc690013f20cd42e930301",
+      "source": "corefonts georgi32.exe，用 cabextract 解出 Georgia.TTF",
+      "extract": "cabextract",
+      "metricsFile": "Georgia.TTF",
+      "metrics": {
+        "probe": "Georgia 0123456789 ABC abc mmmmWWii",
+        "advance": 1944,
+        "ascent": 76,
+        "descent": -22
+      },
+      "probe": "Georgia 0123456789 ABC abc mmmmWWii"
+    }
+  ]
+}

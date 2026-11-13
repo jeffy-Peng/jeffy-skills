@@ -4,5 +4,17 @@
   "labelGap": 7,
   "radius": 0,
   "barMode": "solid",
-  "nodeFill": "paper"
+  "nodeFill": "paper",
+  "grid": true,
+  "clearPx": 8,
+  "minBarPx": 8,
+  "valueGapPx": 16,
+  "labelOffsetPx": 20,
+  "centerGapPx": 12,
+  "blockGapPx": 30,
+  "axisPadPx": 35,
+  "legendSwatchW": 16,
+  "legendSwatchH": 12,
+  "nodeWidthPx": 18,
+  "labelGutterPx": 120
 }

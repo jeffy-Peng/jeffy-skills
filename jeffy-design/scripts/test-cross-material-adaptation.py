@@ -1,9 +1,10 @@
 from pathlib import Path
 import json
 from playwright.sync_api import sync_playwright
+from _browser import find_chrome
 ROOT=Path(__file__).resolve().parents[1];case=ROOT/'examples/cross-material-adaptation';data=json.loads((case/'input.json').read_text(encoding='utf-8'))
 with sync_playwright() as w:
- b=w.chromium.launch(channel='msedge');p=b.new_page(viewport={'width':1340,'height':950},reduced_motion='reduce');errors=[];p.on('pageerror',lambda e:errors.append(str(e)));p.goto((case/'index.html').as_uri());p.wait_for_function('window.renderComplete===true');assert not errors,errors
+ b=w.chromium.launch(executable_path=find_chrome());p=b.new_page(viewport={'width':1340,'height':950},reduced_motion='reduce');errors=[];p.on('pageerror',lambda e:errors.append(str(e)));p.goto((case/'index.html').as_uri());p.wait_for_function('window.renderComplete===true');assert not errors,errors
  report=[]
  for id in ['flow','bar','sequence']:
   s=p.locator('svg#'+id);s.screenshot(path=str(case/(id+'.png')))

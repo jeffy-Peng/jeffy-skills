@@ -1,95 +1,117 @@
 {
   "version": 2,
-  "updated": "2026-11-11",
+  "updated": "2026-11-12",
   "entries": [
     {
       "id": "BAR-001",
       "aliases": [],
       "purpose": "数值比较",
-      "form": "单系列比较",
+      "form": "单项比较",
       "question": "比较各对象的单项数量",
       "minimumInput": "类别名称与一组非负数值",
       "parameters": "横纵方向、类别数量",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-001.html",
-          "rationale": "样张的规整柱列便于演示共同基线，不要求等字数或相同类别数量。"
-        },
-        {
-          "name": "跨素材结构适配案例",
-          "path": "../examples/cross-material-adaptation/index.html",
-          "rationale": "对应本项的结构变化案例保留语义规范，但按本次分支、分组或条件交互重新绘制；不是另一套固定模板。"
+          "path": "archive/柱状图组件/BAR-001.html",
+          "rationale": "规整柱列便于演示共同基线，不要求等字数或相同类别数量。"
         }
       ],
       "sources": [
-        "柱状图组件/bar.js"
+        "archive/柱状图组件/bar.js"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "已入库·自动组装",
       "evidence": [
-        "柱状图组件/验证记录.json",
-        "../examples/cross-material-adaptation/validation.json"
+        "archive/柱状图组件/验证记录.json"
       ],
       "limits": "正负数据选BAR-005",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/BAR-001.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/BAR-001.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "sort",
+        "widthRatio"
+      ],
+      "materialFile": "materials/BAR-001.md",
+      "shape": "compare-items",
+      "tier": "primary"
     },
     {
       "id": "BAR-002",
       "aliases": [],
       "purpose": "数值比较",
-      "form": "分组比较",
+      "form": "同一类别下比较多组数值",
       "question": "同一类别下比较多组数值",
       "minimumInput": "类别、系列名与等长非负数值",
       "parameters": "横纵方向、类别数量、系列数量",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-002.html",
-          "rationale": "样张把系列均匀并排是为了便于逐项比较，系列数量和间距并非固定。"
+          "path": "archive/柱状图组件/BAR-002.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "柱状图组件/bar.js"
+        "archive/柱状图组件/bar.js"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "已入库·自动组装",
       "evidence": [
-        "柱状图组件/验证记录.json",
-        "../tests/composition/extended-validation.json"
+        "archive/柱状图组件/验证记录.json"
       ],
       "limits": "系列须使用可比单位",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/BAR-002.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/BAR-002.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "mode",
+        "widthRatio"
+      ],
+      "shape": "compare-groups",
+      "tier": "primary",
+      "materialFile": "materials/BAR-002.md"
     },
     {
       "id": "BAR-003",
       "aliases": [],
       "purpose": "数值比较",
-      "form": "分类拆解",
+      "form": "比较整体及各部分构成",
       "question": "比较整体及各部分构成",
       "minimumInput": "类别、分项与可相加的非负数值",
       "parameters": "横纵方向、类别数量、系列数量、数值 / 百分比",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-003.html",
-          "rationale": "样张分项规则一致便于理解构成，不要求每个对象都有相同非零分项。"
+          "path": "archive/柱状图组件/BAR-003.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "柱状图组件/bar.js"
+        "archive/柱状图组件/bar.js"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "已入库·自动组装",
       "evidence": [
-        "柱状图组件/验证记录.json",
-        "../tests/composition/extended-validation.json"
+        "archive/柱状图组件/验证记录.json"
       ],
       "limits": "百分比总量为零时无占比",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/BAR-003.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/BAR-003.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "mode",
+        "widthRatio"
+      ],
+      "shape": "parts-stacked",
+      "tier": "primary",
+      "materialFile": "materials/BAR-003.md"
     },
     {
       "id": "BAR-005",
@@ -97,28 +119,38 @@
         "BAR-005-A"
       ],
       "purpose": "数值比较",
-      "form": "正负变化",
+      "form": "正负向比较",
       "question": "比较各对象的正向或负向变化",
       "minimumInput": "类别与一组有限数值，可含负数",
       "parameters": "横纵方向、数据驱动范围与布局",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-005.html",
+          "path": "archive/柱状图组件/BAR-005.html",
           "rationale": "样张把正负项并置便于看方向，正负项数无需相等。"
         }
       ],
       "sources": [
-        "柱状图组件/advanced-bar.js"
+        "archive/表达规范/BAR-005.md"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "柱状图组件/进阶组件验证.json"
+        "archive/柱状图组件/进阶组件验证.json"
       ],
       "limits": "不是累计金额过程",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/BAR-005.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/BAR-005.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "compare-sign",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/BAR-005.md"
     },
     {
       "id": "BAR-006",
@@ -126,29 +158,37 @@
         "BAR-006-A"
       ],
       "purpose": "数值比较",
-      "form": "瀑布图",
+      "form": "解释起点如何逐项变化至终点",
       "question": "解释起点如何逐项变化至终点",
       "minimumInput": "有序增减项、起点或总计标记",
       "parameters": "横纵方向、数据驱动范围与布局",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-006.html",
-          "rationale": "样张只有起点和最终合计是一个简单账目，非所有分析都只有这两种总计。"
+          "path": "archive/柱状图组件/BAR-006.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "柱状图组件/advanced-bar.js"
+        "archive/柱状图组件/advanced-bar.js"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "已入库·自动组装",
       "evidence": [
-        "柱状图组件/进阶组件验证.json",
-        "../tests/composition/extended-validation.json"
+        "archive/柱状图组件/进阶组件验证.json"
       ],
       "limits": "增减项顺序影响解释",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/BAR-006.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/BAR-006.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "widthRatio"
+      ],
+      "shape": "waterfall",
+      "tier": "backup",
+      "materialFile": "materials/BAR-006.md"
     },
     {
       "id": "BAR-007",
@@ -163,180 +203,249 @@
       "sheets": [
         {
           "name": "统一组件",
-          "path": "柱状图组件/BAR-007.html",
+          "path": "archive/柱状图组件/BAR-007.html",
           "rationale": "样张统一目标标记便于对照，但不要求每项共用同一个目标值。"
         }
       ],
       "sources": [
-        "柱状图组件/advanced-bar.js"
+        "archive/表达规范/BAR-007.md"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "柱状图组件/进阶组件验证.json"
+        "archive/柱状图组件/进阶组件验证.json"
       ],
       "limits": "实际与目标须同单位",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/BAR-007.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/BAR-007.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "bar-target",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/BAR-007.md"
     },
     {
       "id": "LINE-001",
       "aliases": [],
       "purpose": "时间变化",
       "form": "折线图",
-      "question": "比较时期变化及多条趋势",
-      "minimumInput": "有序时期与等长数值系列，缺失用null",
+      "question": "比较同一指标随时间的变化",
+      "minimumInput": "有序时期与等长数值系列，缺失用 null",
       "parameters": "单/多系列、普通/阶梯、面积、累计/指数、重点与终点标注",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "折线图组件/LINE-001.html",
+          "path": "archive/折线图组件/LINE-001.html",
           "rationale": "样张等距类别轴只适合其时间口径，不意味着任意日期都必须等距。"
         }
       ],
       "sources": [
-        "折线图组件/line.js"
+        "archive/折线图组件/line.js"
       ],
-      "status": "已入库",
+      "status": "已入库·自动组装",
       "evidence": [
-        "折线图组件/验证记录.json",
-        "折线图组件/模式验证.json"
+        "archive/折线图组件/验证记录.json",
+        "archive/折线图组件/模式验证.json"
       ],
       "limits": "累计需可相加；指数基期非零",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/LINE-001.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/LINE-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "trend",
+      "options": [
+        "mode",
+        "area",
+        "cumulative",
+        "index"
+      ],
+      "shape": "time-series",
+      "tier": "primary",
+      "materialFile": "materials/LINE-001.md"
     },
     {
       "id": "PIE-001",
       "aliases": [],
       "purpose": "整体构成",
-      "form": "占比图",
-      "question": "说明一个整体的组成",
-      "minimumInput": "同口径非负分项及名称",
+      "form": "饼图",
+      "question": "总量由哪几部分组成，各占多少",
+      "minimumInput": "三到八个互斥类别及其非负数值，总和大于零",
       "parameters": "饼图/环形图、数值/百分比",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "占比图组件/PIE-001.html",
-          "rationale": "样张分项较少便于展示构成，不代表任意长尾都适合塞进一圈。"
+          "path": "archive/占比图组件/PIE-001.html",
+          "rationale": "扇区按数值切分，读者看的是相对大小；类目多于六个时改用条形更可靠。"
         }
       ],
       "sources": [
-        "占比图组件/pie.js"
+        "archive/占比图组件/pie.js"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "已入库·自动组装",
       "evidence": [
-        "占比图组件/验证记录.json"
+        "archive/占比图组件/验证记录.json"
       ],
       "limits": "不直接比较多期变化；零总量无占比",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/PIE-001.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/PIE-001.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "share",
+      "options": [
+        "donut",
+        "startAngle",
+        "sort",
+        "labels"
+      ],
+      "shape": "parts-of-whole",
+      "tier": "primary",
+      "materialFile": "materials/PIE-001.md",
+      "implementation": "engine"
     },
     {
       "id": "SCATTER-001",
       "aliases": [],
       "purpose": "数值关系",
-      "form": "散点图",
+      "form": "两项数值的关联",
       "question": "观察两项数值的关联和分布",
-      "minimumInput": "对象名称与X、Y两项有限数值",
+      "minimumInput": "对象名称与 X、Y 两项有限数值",
       "parameters": "名称标注、包含零、重点对象",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "散点图组件/SCATTER-001.html",
+          "path": "archive/散点图组件/SCATTER-001.html",
           "rationale": "样张点较疏便于展示坐标，不规定密集数据也必须逐点贴字。"
         }
       ],
       "sources": [
-        "散点图组件/scatter.js"
+        "archive/表达规范/SCATTER-001.md"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "散点图组件/验证记录.json"
+        "archive/散点图组件/验证记录.json"
       ],
       "limits": "相关不代表因果；密集标注需成页检查",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/SCATTER-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/SCATTER-001.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "scatter",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/SCATTER-001.md"
     },
     {
       "id": "TABLE-001",
       "aliases": [],
       "purpose": "信息查阅",
-      "form": "明细表",
+      "form": "查阅多对象的详细字段",
       "question": "查阅多对象的详细字段",
       "minimumInput": "表头及等列数记录",
       "parameters": "行列自适应、重点列、隔行底色",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "表格组件/TABLE-001.html",
-          "rationale": "样张字段短所以列宽接近，真实内容不必平均分列。"
+          "path": "archive/表格组件/TABLE-001.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "表格组件/table.js"
+        "archive/表格组件/table.js"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "已入库·自动组装",
       "evidence": [
-        "表格组件/验证记录.json"
+        "archive/表格组件/验证记录.json"
       ],
       "limits": "长表需分页或增加区域，不能降字号",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/TABLE-001.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/TABLE-001.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "table",
+      "options": [
+        "focus"
+      ],
+      "shape": "table-records",
+      "tier": "primary",
+      "materialFile": "materials/TABLE-001.md"
     },
     {
       "id": "TABLE-002",
       "aliases": [],
       "purpose": "交叉比较",
-      "form": "比较矩阵",
+      "form": "按相同维度逐项比较对象",
       "question": "按相同维度逐项比较对象",
       "minimumInput": "对象×维度的状态或数值",
       "parameters": "具备状态/数值、重点列",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "表格组件/TABLE-002.html",
-          "rationale": "样张的简单矩阵便于逐格查看，不要求所有维度有同等决策权。"
+          "path": "archive/表格组件/TABLE-002.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "表格组件/table.js"
+        "archive/表格组件/table.js"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "已入库·自动组装",
       "evidence": [],
       "limits": "不能混淆缺失与不具备",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/TABLE-002.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/TABLE-002.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "table",
+      "options": [
+        "focus"
+      ],
+      "shape": "matrix",
+      "tier": "backup",
+      "materialFile": "materials/TABLE-002.md"
     },
     {
       "id": "MATRIX-001",
       "aliases": [],
       "purpose": "二维定位",
-      "form": "四象限矩阵",
+      "form": "两个维度上的定位",
       "question": "在两个维度上定位对象",
       "minimumInput": "对象坐标、维度名称、分界依据",
       "parameters": "分界值、象限名称、名称标注、重点对象",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "矩阵组件/MATRIX-001.html",
+          "path": "archive/矩阵组件/MATRIX-001.html",
           "rationale": "样张四个区域均衡只为示范定位，真实点数和分界不必对称。"
         }
       ],
       "sources": [
-        "矩阵组件/matrix.js"
+        "archive/表达规范/MATRIX-001.md"
       ],
-      "status": "已登记·旧验收待核对",
+      "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "默认中点不是业务判断",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/MATRIX-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/MATRIX-001.md",
+      "statusLegacy": "已登记·旧验收待核对",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "quadrant",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/MATRIX-001.md"
     },
     {
       "id": "REL-001",
@@ -344,586 +453,719 @@
         "TREE-001"
       ],
       "purpose": "架构与关系",
-      "form": "层级结构",
+      "form": "表达父子层级与分类拆解",
       "question": "表达父子层级与分类拆解",
       "minimumInput": "唯一ID、节点名称及父子关系",
       "parameters": "方向、节点和分支数量、重点",
       "sheets": [
         {
-          "name": "原方案（旧状态待核对）",
-          "path": "架构关系组件/REL-001.html",
-          "rationale": "样张树形整齐是分支较均衡的结果，不应删节点来保持对称。"
-        },
-        {
-          "name": "简洁线条",
-          "path": "简洁线条组件/TREE-001.html",
-          "rationale": "样张树形整齐是分支较均衡的结果，不应删节点来保持对称。"
+          "name": "统一组件",
+          "path": "archive/架构关系组件/REL-001.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "架构关系组件/hierarchy.js",
-        "简洁线条组件/components.js"
+        "archive/架构关系组件/hierarchy.js"
       ],
-      "status": "已入库（简洁线条）；原方案待核对",
+      "status": "已入库·自动组装",
       "evidence": [
-        "简洁线条组件/四类关系素材-验证.json",
-        "../tests/composition/extended-validation.json"
+        "archive/简洁线条组件/四类关系素材-验证.json"
       ],
       "limits": "区域组装目前接入原方案root/children；简洁线条TREE方案未迁移。两款方案接口不同；TREE-001仅为方案文件名",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/REL-001.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/REL-001.md",
+      "statusLegacy": "已入库（简洁线条）；原方案待核对",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "details",
+        "focus"
+      ],
+      "shape": "hierarchy",
+      "tier": "primary",
+      "materialFile": "materials/REL-001.md"
     },
     {
       "id": "FLOW-001",
       "aliases": [],
       "purpose": "流程与时间",
-      "form": "流程图",
+      "form": "表达处理步骤、判断与返回",
       "question": "表达处理步骤、判断与返回",
       "minimumInput": "节点ID、类型、连线；返回边标feedback",
       "parameters": "节点类型、关系、方向、反馈",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "流程图组件/FLOW-001.html",
-          "rationale": "样张有限分支用于示范节点类型，不要求真实流程只有一个判断或一次返回。"
-        },
-        {
-          "name": "跨素材结构适配案例",
-          "path": "../examples/cross-material-adaptation/index.html",
-          "rationale": "对应本项的结构变化案例保留语义规范，但按本次分支、分组或条件交互重新绘制；不是另一套固定模板。"
+          "path": "archive/流程图组件/FLOW-001.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "流程图组件/flow.js"
+        "archive/流程图组件/flow.js"
       ],
-      "status": "已入库",
-      "evidence": [
-        "../examples/cross-material-adaptation/validation.json"
-      ],
+      "status": "已入库·自动组装",
+      "evidence": [],
       "limits": "流程完整性由内容决定；条件文字共用遮线",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/FLOW-001.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/FLOW-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "flow",
+      "options": [
+        "direction",
+        "details",
+        "arrows",
+        "labels",
+        "focus"
+      ],
+      "shape": "process",
+      "tier": "primary",
+      "materialFile": "materials/FLOW-001.md"
     },
     {
       "id": "TIME-001",
       "aliases": [],
       "purpose": "流程与时间",
-      "form": "时间线",
+      "form": "说明事件先后或时间位置",
       "question": "说明事件先后或时间位置",
       "minimumInput": "事件名称、日期或顺序",
       "parameters": "方向、间隔、节点说明",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "时间组件/TIME-001.html",
-          "rationale": "样张相隔较开的日期便于贴标签，不限制同一日期只能有一件事。"
+          "path": "archive/时间组件/TIME-001.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "时间组件/timeline.js"
+        "archive/时间组件/timeline.js"
       ],
-      "status": "已入库",
-      "evidence": [
-        "../tests/composition/extended-validation.json"
-      ],
+      "status": "已入库·自动组装",
+      "evidence": [],
       "limits": "时间比例与等距模式含义不同",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/TIME-001.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/TIME-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "timeline",
+      "options": [
+        "direction",
+        "spacing",
+        "details",
+        "focus"
+      ],
+      "shape": "timeline",
+      "tier": "primary",
+      "materialFile": "materials/TIME-001.md"
     },
     {
       "id": "TIME-002",
       "aliases": [],
       "purpose": "流程与时间",
-      "form": "时间段",
+      "form": "一段工作的持续范围",
       "question": "表示一段工作的持续范围",
       "minimumInput": "段名称、开始与结束位置、可选说明",
       "parameters": "日期、数量、节点说明",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "时间组件/TIME-002.html",
+          "path": "archive/时间组件/TIME-002.html",
           "rationale": "样张时段少所以可以宽松排布，不意味着复杂计划必须缩成同一行。"
         }
       ],
       "sources": [
-        "时间组件/duration.js"
+        "archive/表达规范/TIME-002.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "各段使用同一时间口径",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/TIME-002.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/TIME-002.md",
+      "statusLegacy": "已入库",
+      "archetype": "timeline",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "time-span",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/TIME-002.md"
     },
     {
       "id": "REL-003",
       "aliases": [],
       "purpose": "架构与关系",
-      "form": "包含关系",
+      "form": "范围包含与内部组成",
       "question": "说明范围包含与内部组成",
       "minimumInput": "范围、内部模块及归属",
       "parameters": "层级、同级等高、说明",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "架构关系组件/REL-003.html",
+          "path": "archive/架构关系组件/REL-003.html",
           "rationale": "样张容器并列是为了展示各自归属，不限制真实范围必须同宽或无嵌套。"
         }
       ],
       "sources": [
-        "架构关系组件/containment.js"
+        "archive/表达规范/REL-003.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "与SET-001定性集合交集不同",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/REL-003.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/REL-003.md",
+      "statusLegacy": "已入库",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "containment",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/REL-003.md"
     },
     {
       "id": "REL-006",
       "aliases": [],
       "purpose": "架构与关系",
-      "form": "多方关系网络",
+      "form": "说明多方主体及有向动作",
       "question": "说明多方主体及有向动作",
       "minimumInput": "唯一节点ID、关系两端与动作",
       "parameters": "主体、关系、方向、标注",
       "sheets": [
         {
           "name": "统一组件",
-          "path": "架构关系组件/REL-006.html",
-          "rationale": "样张环形排布适合无明显层次的关系，不代表所有网络都该围成一圈。"
+          "path": "archive/架构关系组件/REL-006.html",
+          "rationale": "样张固定布局，不继承到本页，只作画法参照。"
         }
       ],
       "sources": [
-        "架构关系组件/network.js"
+        "archive/架构关系组件/network.js"
       ],
-      "status": "已入库",
+      "status": "已入库·自动组装",
       "evidence": [],
       "limits": "复杂交叉可能需拆图；共用透明遮线",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/REL-006.md"
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/REL-006.md",
+      "statusLegacy": "已入库",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "details",
+        "arrows",
+        "labels",
+        "focus"
+      ],
+      "shape": "network",
+      "tier": "backup",
+      "materialFile": "materials/REL-006.md"
     },
     {
       "id": "HEAT-001",
       "aliases": [],
       "purpose": "交叉比较",
-      "form": "热力矩阵",
+      "form": "两类维度交叉后的数值",
       "question": "比较两类维度交叉后的数值",
-      "minimumInput": "行列标签与对应数值矩阵，缺失null",
+      "minimumInput": "行列标签与对应数值矩阵，缺失 null",
       "parameters": "数值标注、包含零",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/HEAT-001.html",
+          "path": "archive/简洁线条组件/HEAT-001.html",
           "rationale": "样张使用单向明度比较大小，不代表所有正负矩阵都适合单向灰度。"
         }
       ],
       "sources": [
-        "简洁线条组件/charts.js"
+        "archive/表达规范/HEAT-001.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "简洁线条组件/新增三类素材-验证.json"
+        "archive/简洁线条组件/新增三类素材-验证.json"
       ],
       "limits": "颜色深浅需同口径；不作因果推断",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/HEAT-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/HEAT-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "table",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "heatmap",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/HEAT-001.md"
     },
     {
       "id": "DIST-001",
       "aliases": [],
       "purpose": "数据分布",
-      "form": "基础分布",
+      "form": "原始样本的区间分布",
       "question": "查看原始样本的区间分布",
       "minimumInput": "有限数值的原始样本数组",
       "parameters": "分箱数量、数值标注",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/DIST-001.html",
+          "path": "archive/简洁线条组件/DIST-001.html",
           "rationale": "样张等宽箱便于解释频数，不意味着每个分布都用同一组箱界。"
         }
       ],
       "sources": [
-        "简洁线条组件/charts.js"
+        "archive/表达规范/DIST-001.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "简洁线条组件/新增三类素材-验证.json"
+        "archive/简洁线条组件/新增三类素材-验证.json"
       ],
       "limits": "分箱影响观察，不是类别柱状图",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/DIST-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/DIST-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "distribution",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/DIST-001.md"
     },
     {
       "id": "SANKEY-001",
       "aliases": [],
       "purpose": "流量去向",
-      "form": "两端桑基图",
-      "question": "说明数量由哪些来源流向哪些去向",
-      "minimumInput": "来源、去向或阶段节点及对应非负流量；需说明守恒与损耗口径",
+      "form": "桑基图",
+      "question": "总量从哪里来、到哪里去",
+      "minimumInput": "两列节点与一张流量表，每行一个来源到一个去向及其数值",
       "parameters": "节点与流量、数值标注",
-      "sheets": [
-        {
-          "name": "简洁线条",
-          "path": "简洁线条组件/SANKEY-001.html",
-          "rationale": "现有样张与代码只有两端，是参考实现能力边界，不是流量表达只能有两端。"
-        }
-      ],
-      "sources": [
-        "简洁线条组件/charts.js"
-      ],
-      "status": "已入库",
+      "sheets": [],
+      "sources": [],
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "简洁线条组件/新增三类素材-验证.json"
+        "archive/简洁线条组件/新增三类素材-验证.json"
       ],
       "limits": "当前仅两端，不支持多阶段或循环流",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/SANKEY-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/SANKEY-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "flow",
+      "options": [
+        "unit",
+        "sort",
+        "nodeGap"
+      ],
+      "shape": "flow-matrix",
+      "tier": "backup",
+      "materialFile": "materials/SANKEY-001.md",
+      "implementation": "model"
     },
     {
       "id": "FUNNEL-001",
       "aliases": [],
       "purpose": "阶段转化",
-      "form": "漏斗图",
+      "form": "逐阶段筛选和转化",
       "question": "说明逐阶段筛选和转化",
       "minimumInput": "同一批对象各阶段非递增数量",
       "parameters": "阶段数量、转化率标注",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/FUNNEL-001.html",
+          "path": "archive/简洁线条组件/FUNNEL-001.html",
           "rationale": "样张单漏斗表达单一路径，不限制真实分析必须没有分支。"
         }
       ],
       "sources": [
-        "简洁线条组件/components.js"
+        "archive/表达规范/FUNNEL-001.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "简洁线条组件/四类关系素材-验证.json"
+        "archive/简洁线条组件/四类关系素材-验证.json"
       ],
       "limits": "首阶段非零；不可混用不同人群",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/FUNNEL-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/FUNNEL-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "flow",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "funnel",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/FUNNEL-001.md"
     },
     {
       "id": "LOOP-001",
       "aliases": [],
       "purpose": "循环关系",
-      "form": "循环图",
+      "form": "循环顺序与方向",
       "question": "表达循环顺序与方向",
       "minimumInput": "至少两个环节及有意义的有向反馈关系",
       "parameters": "节点数量、顺逆方向",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/LOOP-001.html",
+          "path": "archive/简洁线条组件/LOOP-001.html",
           "rationale": "样张均匀圆周便于示范循环，不要求现实反馈速度或节点重要性相等。"
         }
       ],
       "sources": [
-        "简洁线条组件/components.js"
+        "archive/表达规范/LOOP-001.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "简洁线条组件/四类关系素材-验证.json"
+        "archive/简洁线条组件/四类关系素材-验证.json"
       ],
       "limits": "不表示各环节耗时或贡献大小",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/LOOP-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/LOOP-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "loop",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/LOOP-001.md"
     },
     {
       "id": "SET-001",
       "aliases": [],
       "purpose": "集合边界",
-      "form": "集合关系",
+      "form": "交集、包含或互斥",
       "question": "表达交集、包含或互斥",
       "minimumInput": "集合名称与定性关系",
       "parameters": "交集、包含、互斥；定性",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "简洁线条组件/SET-001.html",
+          "path": "archive/简洁线条组件/SET-001.html",
           "rationale": "样张两个集合仅为关系示范，不限制内容只有两个集合。"
         }
       ],
       "sources": [
-        "简洁线条组件/components.js"
+        "archive/表达规范/SET-001.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "简洁线条组件/四类关系素材-验证.json"
+        "archive/简洁线条组件/四类关系素材-验证.json"
       ],
       "limits": "面积不表示数量；不能代替定量Venn图",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/SET-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/SET-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "set",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/SET-001.md"
     },
     {
       "id": "BOX-001",
       "aliases": [],
       "purpose": "数据分布",
-      "form": "箱线图",
+      "form": "多组样本分布与离群值",
       "question": "比较多组样本分布及离群值",
       "minimumInput": "每组有限数值原始样本",
       "parameters": "横纵方向、组数、中位数标注",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "分布与轮廓组件/BOX-001.html",
+          "path": "archive/分布与轮廓组件/BOX-001.html",
           "rationale": "样张仅用箱体概括分布，不要求隐藏样本量或所有原始点。"
         }
       ],
       "sources": [
-        "分布与轮廓组件/components.js"
+        "archive/表达规范/BOX-001.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "分布与轮廓组件/validation.json"
+        "archive/分布与轮廓组件/validation.json"
       ],
       "limits": "线性插值分位数，须为1.5×IQR范围内观测",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/BOX-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/BOX-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "box",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/BOX-001.md"
     },
     {
       "id": "RADAR-001",
       "aliases": [],
       "purpose": "多维比较",
-      "form": "雷达图",
+      "form": "对象的多维评分轮廓",
       "question": "比较对象的多维评分轮廓",
       "minimumInput": "至少三个同方向、可解释且可比的维度评分；需明确标准化口径",
       "parameters": "维度数量、对象对照、数值标注",
       "sheets": [
         {
           "name": "简洁线条",
-          "path": "分布与轮廓组件/RADAR-001.html",
+          "path": "archive/分布与轮廓组件/RADAR-001.html",
           "rationale": "样张归一到0—100是其评分口径，并不是原始指标不经处理就可输入。"
         }
       ],
       "sources": [
-        "分布与轮廓组件/components.js"
+        "archive/表达规范/RADAR-001.md"
       ],
-      "status": "已入库",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "分布与轮廓组件/validation.json"
+        "archive/分布与轮廓组件/validation.json"
       ],
       "limits": "不直接混用单位；当前只验证有限系列",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/RADAR-001.md"
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/RADAR-001.md",
+      "statusLegacy": "已入库",
+      "archetype": "compare",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "radar",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/RADAR-001.md"
     },
     {
       "id": "FLOW-002",
       "aliases": [],
       "purpose": "流程与时间",
-      "form": "泳道图",
+      "form": "跨角色交接",
       "question": "解释跨角色交接",
       "minimumInput": "角色、步骤与所属泳道",
       "parameters": "角色、步骤、方向",
       "sheets": [
         {
           "name": "已确认原版",
-          "path": "泳道图组件/FLOW-002.html",
+          "path": "archive/泳道图组件/FLOW-002.html",
           "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。",
           "status": "已确认"
-        },
-        {
-          "name": "后续试验版（不继承原版确认）",
-          "path": "../drafts/机制表达审核/FLOW-002.html",
-          "rationale": "样张把每一步放在不同位置便于展示交接，不要求每个角色只能做一个步骤。",
-          "status": "试验版·未单独确认"
         }
       ],
       "sources": [
-        "泳道图组件/swimlane.js",
-        "../drafts/机制表达审核/mechanisms.js"
+        "archive/表达规范/FLOW-002.md"
       ],
-      "status": "已入库·原版已确认",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "../drafts/机制表达审核/validation.json",
         "已确认原版复核.json"
       ],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/FLOW-002.md",
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/FLOW-002.md",
       "approval": {
-        "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
+        "scope": "前序已确认原版及表达方向；机制重写版草稿已删除，不再登记",
         "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
-      }
+      },
+      "statusLegacy": "已入库·原版已确认",
+      "archetype": "flow",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "swimlane",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/FLOW-002.md"
     },
     {
       "id": "REL-002",
       "aliases": [],
       "purpose": "架构与关系",
-      "form": "交换关系",
+      "form": "主体间的双向交换",
       "question": "说明主体间双向交换",
       "minimumInput": "主体与交换内容、方向",
       "parameters": "主体、关系、说明",
       "sheets": [
         {
           "name": "已确认原版",
-          "path": "交换关系组件/REL-002.html",
+          "path": "archive/交换关系组件/REL-002.html",
           "rationale": "样张对称排布便于看两端，不代表交换内容或价值相等。",
           "status": "已确认"
         }
       ],
       "sources": [
-        "交换关系组件/exchange.js"
+        "archive/表达规范/REL-002.md"
       ],
-      "status": "已入库·原版已确认",
+      "status": "仅规范·模型绘制",
       "evidence": [
         "已确认原版复核.json"
       ],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/REL-002.md",
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/REL-002.md",
       "approval": {
         "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
         "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
-      }
+      },
+      "statusLegacy": "已入库·原版已确认",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "exchange",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/REL-002.md"
     },
     {
       "id": "REL-004",
       "aliases": [],
       "purpose": "架构与关系",
-      "form": "分层架构",
+      "form": "层级与内部模块",
       "question": "说明层级与内部模块",
       "minimumInput": "层级、模块及可选说明",
       "parameters": "层数、模块、说明",
       "sheets": [
         {
           "name": "已确认原版",
-          "path": "分层架构组件/REL-004.html",
+          "path": "archive/分层架构组件/REL-004.html",
           "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。",
           "status": "已确认"
         },
         {
-          "name": "后续试验版（不继承原版确认）",
-          "path": "../drafts/机制表达审核/REL-004.html",
-          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。",
-          "status": "试验版·未单独确认"
-        },
-        {
           "name": "样张与设计理由",
-          "path": "分层架构表达标准/参考样张.html",
-          "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
-        },
-        {
-          "name": "依规范重绘案例（非模板）",
-          "path": "../examples/layer-adaptation/index.html",
+          "path": "archive/分层架构表达标准/参考样张.html",
           "rationale": "常规分格适合地位相近的模块；跨层、分组与不等宽案例依同一规范重绘，设计理由在对应页面说明。"
         }
       ],
       "sources": [
-        "分层架构组件/layers.js",
-        "../drafts/机制表达审核/mechanisms.js",
-        "分层架构表达标准/参考实现.js"
+        "表达规范/REL-004.md"
       ],
-      "status": "已入库·原版已确认",
+      "status": "仅规范·模型绘制",
       "evidence": [
-        "../drafts/机制表达审核/validation.json",
-        "../examples/layer-adaptation/validation.json",
         "已确认原版复核.json"
       ],
       "limits": "表达规范试点；生成器并非结构边界。常规分格可复用，跨层、分组、不等宽结构允许依规范重绘。原版已确认；后续机制重写版独立保留试验状态。",
-      "standard": "分层架构表达标准/规范.md",
-      "referenceImplementation": "分层架构表达标准/参考实现.js",
+      "standard": "materials/REL-004.md",
+      "referenceImplementation": "archive/分层架构表达标准/参考实现.js",
       "adaptationCase": "../examples/layer-adaptation/index.html",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "approval": {
         "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
         "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
-      }
+      },
+      "statusLegacy": "已入库·原版已确认",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "layers",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/REL-004.md"
     },
     {
       "id": "REL-005",
       "aliases": [],
       "purpose": "架构与关系",
-      "form": "中心辐射",
+      "form": "中心与周边主体的联系",
       "question": "说明中心与周边主体联系",
       "minimumInput": "中心、外围主体与关系",
       "parameters": "主体、方向、标注",
       "sheets": [
         {
           "name": "已确认原版",
-          "path": "中心辐射组件/REL-005.html",
+          "path": "archive/中心辐射组件/REL-005.html",
           "rationale": "样张周边均匀是视觉安排，不表示所有关系强度或权力相等。",
           "status": "已确认"
         }
       ],
       "sources": [
-        "中心辐射组件/hub.js"
+        "archive/表达规范/REL-005.md"
       ],
-      "status": "已入库·原版已确认",
+      "status": "仅规范·模型绘制",
       "evidence": [
         "已确认原版复核.json"
       ],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/REL-005.md",
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/REL-005.md",
       "approval": {
         "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
         "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
-      }
+      },
+      "statusLegacy": "已入库·原版已确认",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "hub",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/REL-005.md"
     },
     {
       "id": "SEQ-001",
       "aliases": [],
       "purpose": "架构与关系",
-      "form": "时序图",
-      "question": "谁先请求谁，谁在什么时候返回？",
-      "minimumInput": "参与者唯一ID与有序消息，消息包含发送方、接收方和标签",
+      "form": "谁先请求谁、何时返回",
+      "question": "时序图：谁先请求谁，谁在什么时候返回？",
+      "minimumInput": "参与者唯一 ID 与有序消息，消息包含发送方、接收方和标签",
       "parameters": "消息数量、返回线型",
-      "sheets": [
-        {
-          "name": "独立组件试验版",
-          "path": "../drafts/机制表达审核/SEQ-001.html",
-          "rationale": "样张只展示简单请求和返回，参考实现尚不支持的片段不构成语义禁令。",
-          "status": "未单独确认"
-        },
-        {
-          "name": "已认可的结构适配案例",
-          "path": "../examples/cross-material-adaptation/index.html",
-          "rationale": "对应本项的结构变化案例保留语义规范，但按本次分支、分组或条件交互重新绘制；不是另一套固定模板。",
-          "status": "案例已认可"
-        }
-      ],
+      "sheets": [],
       "sources": [
-        "../drafts/机制表达审核/mechanisms.js"
+        "archive/表达规范/SEQ-001.md"
       ],
-      "status": "草稿·独立组件版本待核对",
-      "evidence": [
-        "../drafts/机制表达审核/validation.json",
-        "../examples/cross-material-adaptation/validation.json"
-      ],
-      "limits": "暂不支持自消息、激活条、并行与条件组合片段；结构适配案例与独立试验实现分开记录，当前未接入克莱因蓝区域引擎。",
+      "status": "仅规范·模型绘制",
+      "evidence": [],
+      "limits": "暂不支持自消息、激活条、并行与条件组合片段；结构适配案例作为参考源件，当前未接入克莱因蓝区域引擎。",
       "implementationRole": "reference",
-      "standardCoverage": "规则已整理；非全库重绘验证",
-      "standard": "表达规范/SEQ-001.md",
+      "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
+      "standard": "materials/SEQ-001.md",
       "approval": {
         "scope": "跨素材结构适配案例已获整体认可；独立机制审核稿不等同该案例",
         "basis": "沿用前序案例反馈，不要求用户重复审核已认可案例。"
-      }
+      },
+      "statusLegacy": "草稿·独立组件版本待核对",
+      "archetype": "relation",
+      "options": [
+        "direction",
+        "sort"
+      ],
+      "shape": "sequence",
+      "tier": "backup",
+      "implementation": "model",
+      "materialFile": "materials/SEQ-001.md"
     }
   ],
   "policy": "每项为表达规范、带理由的样张与参考实现；规范覆盖不等于行为验收，生成器能力不等于结构边界。"

@@ -1,28 +1,230 @@
-import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
-import {resolve,dirname,join} from 'node:path';
-import {fileURLToPath,pathToFileURL} from 'node:url';
-import {spawnSync} from 'node:child_process';
-import {loadChromium,findChrome} from '../lib/browser.mjs';
-import {resolveTheme} from '../lib/theming/resolve.mjs';
-const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),out=resolve(process.argv[2]||'build/theming');mkdirSync(out,{recursive:true});
-const registry=JSON.parse(readFileSync(join(root,'lib/composition/adapters.json'))),defaults=JSON.parse(readFileSync(join(root,'lib/theming/defaults.json'))),components=new Map();
-for(const fixture of ['pressure','extended'])for(const p of JSON.parse(readFileSync(join(root,'tests/composition',fixture+'.json'))).pages)for(const c of p.components)components.set(c.material,c);
-const themes=['klein-blue'],results=[],geometry={};
-const browser=await loadChromium().launch({executablePath:findChrome()});
-try{const page=await browser.newPage({viewport:{width:1340,height:900},reducedMotion:'reduce'});
- for(const name of themes){const theme=JSON.parse(readFileSync(join(root,'themes',name+'.json'))),resolved=resolveTheme(theme,defaults),pages=[];
- for(const [id,a] of Object.entries(registry).filter(([,a])=>a.renderer==='theme-v1')){if(!components.has(id))throw Error('No fixture '+id);const c=structuredClone(components.get(id));c.id='subject';c.box={x:64,y:170,width:1152,height:430};pages.push({id,title:id+' · 主题自适应',question:'同一内容能否按主题重算？',claim:'数据不变，主题决定样式与实际测量。',readingOrder:['subject'],components:[c],source:'来源：合成测试数据，仅验证样式与绘制。',speakerNotes:'本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。'})}
- const input=join(out,name+'.json'),html=join(out,name+'.html');writeFileSync(input,JSON.stringify({theme:name,pages},null,2));const built=spawnSync(process.execPath,[join(root,'scripts/build-composition.mjs'),input,html],{encoding:'utf8'});if(built.status)throw Error(built.stderr);
- const errors=[],handler=e=>errors.push(e.message);page.on('pageerror',handler);await page.goto(pathToFileURL(html).href);await page.waitForFunction(()=>window.renderComplete===true);page.off('pageerror',handler);const reports=await page.evaluate(()=>window.validationReport);
- const styles=await page.evaluate(({theme,resolved})=>[...document.querySelectorAll('iframe')].map(frame=>{const d=frame.contentDocument,w=frame.contentWindow,roles=Object.fromEntries(theme.scale.map(r=>[r.role,r]));let ok=true;const toRGB=hex=>'rgb('+hex.match(/../g).map(x=>parseInt(x,16)).join(', ')+')';for(const t of d.querySelectorAll('text[data-theme-role]')){const r=roles[t.dataset.themeRole],s=w.getComputedStyle(t);ok&&=parseFloat(s.fontSize)===r.size&&+s.fontWeight===r.weight&&s.fontFamily.includes(theme.fonts.latin)&&s.fontFamily.includes(theme.fonts.ea)}for(const cell of d.querySelectorAll('th,td')){const s=w.getComputedStyle(cell);ok&&=s.textAlign==='center'&&s.verticalAlign==='middle'&&parseFloat(s.fontSize)===roles.body.size}for(const n of [...d.querySelectorAll('[data-shape-role]')].filter(n=>!n.closest('mask'))){if(n.getAttribute('stroke')&&n.getAttribute('stroke')!=='none')ok&&=parseFloat(w.getComputedStyle(n).strokeWidth)===theme.rules.dividerWidthPx}const rect=d.querySelector('rect[data-key^="bar"]');if(rect){ok&&=+rect.getAttribute('rx')===resolved.materials.radius;if(resolved.materials.barMode==='outline')ok&&=w.getComputedStyle(rect).fill===toRGB(theme.colors.paper)}const svg=d.querySelector('svg');return{ok,geometry:svg?[...svg.querySelectorAll('[data-key]')].filter(n=>!n.closest('[data-unified-legend]')).map(n=>n.outerHTML).join(''):d.querySelector('table')?.outerHTML}}),{theme,resolved});
- for(let i=0;i<reports.length;i++)results.push({name:name+'/'+pages[i].id,pass:reports[i].ok&&styles[i].ok&&!errors.length,issues:reports[i].issues});geometry[name]=styles.map(s=>s.geometry);writeFileSync(join(out,name+'-validation.json'),JSON.stringify({reports,errors},null,2));await page.locator('.sheet').first().screenshot({path:join(out,name+'.png')});for(const id of ['LINE-001','PIE-001','FLOW-001','REL-001','TABLE-001'])await page.locator('.sheet').nth(pages.findIndex(p=>p.id===id)).screenshot({path:join(out,name+'-'+id+'.png')});
- }
- const font=await page.evaluate(async()=>{try{await ThemeDrawing.fonts(document,{fonts:{ea:'Definitely Missing Font 987xyz',latin:'Arial'}});return false}catch(e){return e.code==='FONT'}});results.push({name:'missing-font-explicit',pass:font});
- const invalid=JSON.parse(readFileSync(join(root,'themes/klein-blue.json')));delete invalid.colors.ink;let rejected=false;try{resolveTheme(invalid,defaults)}catch(e){rejected=e.message.includes('THEME')}results.push({name:'missing-token-explicit',pass:rejected});
- // A larger font must report capacity rather than silently shrink in a small slot.
- const unsupported=await page.evaluate(()=>{const f=document.querySelector('iframe');try{f.contentWindow.ThemeRenderers.render(f.contentDocument.querySelector('svg'),{},{area:true},compositionInput.theme,{width:800,height:400},'LINE-001');return false}catch(e){return e.code==='UNSUPPORTED'}});results.push({name:'unsupported-option-explicit',pass:unsupported});
- const small=await page.evaluate(()=>{const f=document.querySelector('iframe'),w=f.contentWindow,d=f.contentDocument;try{w.ThemeRenderers.render(d.querySelector('svg'),{series:['A'],data:[{label:'长标签'.repeat(20),values:[10]}]},{},compositionInput.theme,{width:100,height:70},'BAR-001');return false}catch(e){return e.code==='CAPACITY'}});results.push({name:'no-silent-shrinking',pass:small});
- const runtime=readFileSync(join(root,'lib/composition/runtime.js'),'utf8');
- const geometryContract=await page.evaluate(async runtime=>{const t=compositionInput.theme;t.page.title.x=80;t.page.title.width=1100;t.page.source.x=80;t.page.source.width=1080;t.page.content.x=80;t.page.content.width=1100;compositionInput.deck.pages=compositionInput.deck.pages.slice(0,1);document.querySelector('main').replaceChildren();window.renderComplete=false;eval(runtime);await new Promise((resolve,reject)=>{let n=0;const poll=()=>{if(window.renderComplete)return resolve();if(++n>200)return reject(Error('timeout'));setTimeout(poll,50)};poll()});return document.querySelector('[data-block="title"]').style.left==='80px'&&document.querySelector('[data-block="source"]').style.left==='80px'&&validationReport[0].issues.some(x=>x.code==='CAPACITY'&&x.message.includes('页眉页脚'))},runtime);results.push({name:'configured-page-regions-enforced',pass:geometryContract});
- writeFileSync(join(out,'validation.json'),JSON.stringify({results,scope:'12个静态区域适配器 × 克莱因蓝主题；字体角色、线宽、轮廓、圆角、居中、容量及缺失配置；不验证动效或任意布局。'},null,2));console.log(results.filter(x=>x.pass).length+'/'+results.length+' passed');if(results.some(x=>!x.pass)){console.log(results.filter(x=>!x.pass));process.exitCode=1}
-}finally{await browser.close()}
+import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { resolve, dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import { loadChromium, findChrome } from '../lib/browser.mjs';
+import { resolveTheme } from '../lib/theming/resolve.mjs';
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+  out = resolve(process.argv[2] || 'build/theming');
+mkdirSync(out, { recursive: true });
+const registry = JSON.parse(readFileSync(join(root, 'lib/composition/adapters.json'))),
+  defaults = JSON.parse(readFileSync(join(root, 'lib/theming/defaults.json'))),
+  components = new Map();
+for (const fixture of ['pressure', 'extended'])
+  for (const p of JSON.parse(readFileSync(join(root, 'tests/composition', fixture + '.json'))).pages)
+    for (const c of p.components) components.set(c.material, c);
+const themes = readdirSync(join(root, 'themes'))
+    .filter((x) => x.endsWith('.json'))
+    .map((x) => x.replace(/\.json$/, '')),
+  results = [],
+  geometry = {};
+const browser = await loadChromium().launch({ executablePath: findChrome() });
+try {
+  const page = await browser.newPage({ viewport: { width: 1340, height: 900 }, reducedMotion: 'reduce' });
+  for (const name of themes) {
+    const theme = JSON.parse(readFileSync(join(root, 'themes', name + '.json'))),
+      resolved = resolveTheme(theme, defaults),
+      pages = [];
+    for (const [id, a] of Object.entries(registry).filter(([, a]) => a.renderer === 'theme-v1')) {
+      if (!components.has(id)) throw Error('No fixture ' + id);
+      const c = structuredClone(components.get(id));
+      c.id = 'subject';
+      c.box = { x: 64, y: 170, width: 1152, height: 430 };
+      pages.push({
+        id,
+        title: id + ' · 主题自适应',
+        question: '同一内容能否按主题重算？',
+        claim: '数据不变，主题决定样式与实际测量。',
+        readingOrder: ['subject'],
+        components: [c],
+        source: '来源：合成测试数据，仅验证样式与绘制。',
+        speakerNotes: '本页核对同一素材在不同主题下的实际字体、尺寸、图形、数据与连接。',
+      });
+    }
+    const input = join(out, name + '.json'),
+      html = join(out, name + '.html');
+    writeFileSync(input, JSON.stringify({ theme: name, pages }, null, 2));
+    const built = spawnSync(process.execPath, [join(root, 'scripts/build-composition.mjs'), input, html], {
+      encoding: 'utf8',
+    });
+    if (built.status) throw Error(built.stderr);
+    const errors = [],
+      handler = (e) => errors.push(e.message);
+    page.on('pageerror', handler);
+    await page.goto(pathToFileURL(html).href);
+    await page.waitForFunction(() => window.renderComplete === true);
+    page.off('pageerror', handler);
+    const reports = await page.evaluate(() => window.validationReport);
+    const styles = await page.evaluate(
+      ({ theme, resolved }) =>
+        [...document.querySelectorAll('.jd-component')].map((host) => {
+          const d = host,
+            w = window,
+            roles = Object.fromEntries(theme.scale.map((r) => [r.role, r]));
+          let ok = true;
+          const toRGB = (hex) =>
+            'rgb(' +
+            hex
+              .match(/../g)
+              .map((x) => parseInt(x, 16))
+              .join(', ') +
+            ')';
+          for (const t of d.querySelectorAll('text[data-theme-role]')) {
+            const r = roles[t.dataset.themeRole],
+              s = w.getComputedStyle(t);
+            ok &&=
+              parseFloat(s.fontSize) === r.size &&
+              +s.fontWeight === r.weight &&
+              s.fontFamily.includes(theme.fonts.latin) &&
+              s.fontFamily.includes(theme.fonts.ea);
+          }
+          for (const cell of d.querySelectorAll('th,td')) {
+            const s = w.getComputedStyle(cell);
+            ok &&=
+              s.textAlign === 'center' && s.verticalAlign === 'middle' && parseFloat(s.fontSize) === roles.body.size;
+          }
+          for (const n of [...d.querySelectorAll('[data-shape-role]')].filter((n) => !n.closest('mask'))) {
+            if (n.getAttribute('stroke') && n.getAttribute('stroke') !== 'none')
+              ok &&= parseFloat(w.getComputedStyle(n).strokeWidth) === theme.rules.dividerWidthPx;
+          }
+          const rect = d.querySelector('rect[data-key^="bar"]');
+          if (rect) {
+            ok &&= +rect.getAttribute('rx') === resolved.materials.radius;
+            if (resolved.materials.barMode === 'outline')
+              ok &&= w.getComputedStyle(rect).fill === toRGB(theme.colors.paper);
+          }
+          const svg = d.querySelector('svg');
+          return {
+            ok,
+            geometry: svg
+              ? [...svg.querySelectorAll('[data-key]')]
+                  .filter((n) => !n.closest('[data-unified-legend]'))
+                  .map((n) => n.outerHTML)
+                  .join('')
+              : d.querySelector('table')?.outerHTML,
+          };
+        }),
+      { theme, resolved },
+    );
+    for (let i = 0; i < reports.length; i++)
+      results.push({
+        name: name + '/' + pages[i].id,
+        pass: reports[i].ok && styles[i].ok && !errors.length,
+        issues: reports[i].issues,
+      });
+    geometry[name] = styles.map((s) => s.geometry);
+    writeFileSync(join(out, name + '-validation.json'), JSON.stringify({ reports, errors }, null, 2));
+    await page
+      .locator('.sheet')
+      .first()
+      .screenshot({ path: join(out, name + '.png') });
+    for (const id of ['LINE-001', 'PIE-001', 'FLOW-001', 'REL-001', 'TABLE-001'])
+      await page
+        .locator('.sheet')
+        .nth(pages.findIndex((p) => p.id === id))
+        .screenshot({ path: join(out, name + '-' + id + '.png') });
+  }
+  const font = await page.evaluate(async () => {
+    try {
+      await ThemeDrawing.fonts(document, { fonts: { ea: 'Definitely Missing Font 987xyz', latin: 'Arial' } });
+      return false;
+    } catch (e) {
+      return e.code === 'FONT';
+    }
+  });
+  results.push({ name: 'missing-font-explicit', pass: font });
+  const invalid = JSON.parse(readFileSync(join(root, 'themes', themes[0] + '.json')));
+  delete invalid.colors.ink;
+  let rejected = false;
+  try {
+    resolveTheme(invalid, defaults);
+  } catch (e) {
+    rejected = e.message.includes('THEME');
+  }
+  results.push({ name: 'missing-token-explicit', pass: rejected });
+  // A larger font must report capacity rather than silently shrink in a small slot.
+  const unsupported = await page.evaluate(() => {
+    const f = document.querySelector('.jd-component');
+    try {
+      window.ThemeRenderers.render(
+        f.querySelector('svg'),
+        {},
+        { area: true },
+        compositionInput.theme,
+        { width: 800, height: 400 },
+        'LINE-001',
+      );
+      return false;
+    } catch (e) {
+      return e.code === 'UNSUPPORTED';
+    }
+  });
+  results.push({ name: 'unsupported-option-explicit', pass: unsupported });
+  const small = await page.evaluate(() => {
+    const f = document.querySelector('.jd-component'),
+      w = window,
+      d = f;
+    try {
+      w.ThemeRenderers.render(
+        d.querySelector('svg'),
+        { series: ['A'], data: [{ label: '长标签'.repeat(20), values: [10] }] },
+        {},
+        compositionInput.theme,
+        { width: 100, height: 70 },
+        'BAR-001',
+      );
+      return false;
+    } catch (e) {
+      return e.code === 'CAPACITY';
+    }
+  });
+  results.push({ name: 'no-silent-shrinking', pass: small });
+  const runtime = readFileSync(join(root, 'lib/composition/runtime.js'), 'utf8');
+  const geometryContract = await page.evaluate(async (runtime) => {
+    const t = compositionInput.theme;
+    t.page.title.x = 80;
+    t.page.title.width = 1100;
+    t.page.source.x = 80;
+    t.page.source.width = 1080;
+    t.page.content.x = 80;
+    t.page.content.width = 1100;
+    compositionInput.deck.pages = compositionInput.deck.pages.slice(0, 1);
+    document.querySelector('main').replaceChildren();
+    window.renderComplete = false;
+    eval(runtime);
+    await new Promise((resolve, reject) => {
+      let n = 0;
+      const poll = () => {
+        if (window.renderComplete) return resolve();
+        if (++n > 200) return reject(Error('timeout'));
+        setTimeout(poll, 50);
+      };
+      poll();
+    });
+    return (
+      document.querySelector('[data-block="title"]').style.left === '80px' &&
+      document.querySelector('[data-block="source"]').style.left === '80px' &&
+      validationReport[0].issues.some((x) => x.code === 'CAPACITY' && x.message.includes('页眉页脚'))
+    );
+  }, runtime);
+  results.push({ name: 'configured-page-regions-enforced', pass: geometryContract });
+  writeFileSync(
+    join(out, 'validation.json'),
+    JSON.stringify(
+      {
+        results,
+        scope:
+          '12个静态区域适配器 × 克莱因蓝主题；字体角色、线宽、轮廓、圆角、居中、容量及缺失配置；不验证动效或任意布局。',
+      },
+      null,
+      2,
+    ),
+  );
+  console.log(results.filter((x) => x.pass).length + '/' + results.length + ' passed');
+  if (results.some((x) => !x.pass)) {
+    console.log(results.filter((x) => !x.pass));
+    process.exitCode = 1;
+  }
+} finally {
+  await browser.close();
+}
