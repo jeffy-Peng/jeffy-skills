@@ -51,14 +51,6 @@ function normalizeChineseNumbers(text) {
     .replace(/[零〇一二两三四五六七八九十百千万]{2,}/g, (m) => String(cnNumber(m)));
 }
 
-function numbersIn(text) {
-  text = normalizeChineseNumbers(text);
-  return [...String(text).matchAll(/-?\d[\d,]*(?:\.\d+)?/g)]
-    .map((m) => m[0].replace(/,/g, ''))
-    .filter((v) => v.includes('.') || Math.abs(Number(v)) >= 10)
-    .map((v) => Number(v).toFixed(v.includes('.') ? 2 : 0));
-}
-
 const browser = await loadChromium().launch({ executablePath: findChrome() });
 let pageTexts = [];
 try {
@@ -80,7 +72,7 @@ try {
           }
         })
         .join('\n');
-      return own + '\n' + inner;
+      return own + '\n' + [...sheet.querySelectorAll('svg text')].map((t) => t.textContent).join(' ') + '\n' + inner;
     }),
   );
 } finally {
@@ -88,33 +80,62 @@ try {
 }
 if (!pageTexts.length) throw Error('页面里没有 .sheet，先确认渲染是否失败');
 
-// 两个方向不对称。讲稿里的数字必须都能在画面上找到，这是硬要求。
-// 画面上的数字不需要全被念到，但标题和观点里出现的必须念，其余多是刻度和表格行。
+// 自动检查只声称数量/单位一致，不推定对象、分母和因果正确。
+// facts 可显式绑定 metric/value/unit/time/denominator 与 screen/notes 中的原文。
 const sections = notes.split(/\n(?=##\s)/).map((chunk) => chunk.replace(/^##[^\n]*\n?/, ''));
-const problems = [];
+const quantities = (text) =>
+  [
+    ...normalizeChineseNumbers(text).matchAll(/(-?\d[\d,]*(?:\.\d+)?)\s*(亿|万|千)?\s*(元|人|单|次|家|个|天|年|%|％)/g),
+  ].map((m) => ({
+    label: normalizeChineseNumbers(text)
+      .slice(Math.max(0, m.index - 16), m.index)
+      .split(/[，。；\n：:]/)
+      .at(-1)
+      .replace(/[是为约达共计\s]/g, ''),
+    raw: m[0],
+    value: Number(m[1].replaceAll(',', '')) * ({ 亿: 1e8, 万: 1e4, 千: 1e3 }[m[2]] || 1),
+    unit: m[3].replace('％', '%'),
+  }));
+const problems = [],
+  warnings = [];
+if (pageTexts.length !== deck.pages.length || sections.length !== deck.pages.length)
+  problems.push({ code: 'COVERAGE', message: '页面、讲稿和输入数量不符' });
 for (const [index, screen] of pageTexts.entries()) {
-  const pageSet = new Set(numbersIn(screen));
-  const noteSet = new Set(numbersIn(sections[index] || ''));
-  const headline = new Set(
-    numbersIn(
-      `${deck.pages?.[index]?.title || ''} ${deck.pages?.[index]?.claim || ''} ${deck.pages?.[index]?.question || ''}`,
-    ),
-  );
-  // 单位经常只在画面上出现（八十万元对 80），比较时允许万、亿级的换算。
-  const same = (a, b) =>
-    [1, 1e4, 1e8, 1e-4, 1e-8].some(
-      (f) => Math.abs(Number(a) * f - Number(b)) <= Math.max(0.01, Math.abs(Number(b)) * 0.005),
-    );
-  const onlyNotes = [...noteSet].filter((v) => ![...pageSet].some((p) => same(v, p)));
-  const missedHeadline = [...headline].filter((v) => pageSet.has(v) && ![...noteSet].some((n) => same(n, v)));
-  const id = deck.pages?.[index]?.id || `第${index + 1}页`;
-  if (onlyNotes.length) problems.push({ page: id, direction: '讲稿有、画面上没有', values: onlyNotes });
-  if (missedHeadline.length)
-    problems.push({ page: id, direction: '标题或观点里的数字讲稿没念', values: missedHeadline });
+  const id = deck.pages[index]?.id || String(index + 1),
+    note = sections[index] || '';
+  const sq = quantities(screen),
+    nq = quantities(note);
+  for (const q of nq) {
+    if (!sq.some((p) => p.unit === q.unit && Math.abs(p.value - q.value) < 1e-8))
+      warnings.push({ page: id, quantity: q.raw, message: '画面未出现此数量，检查是否为有来源的补充背景' });
+    // 同名指标按真实单位换算比较；不同对象/时点需用 facts 明确绑定，不用倍率猜测放行。
+    const sameMetric = sq.filter((p) => p.label.length > 1 && p.label === q.label && p.unit === q.unit);
+    if (sameMetric.length && !sameMetric.some((p) => Math.abs(p.value - q.value) < 1e-8))
+      problems.push({ page: id, code: 'UNIT', message: '画面与讲稿数量级冲突', quantity: q.raw });
+  }
+  for (const f of deck.pages[index]?.facts || []) {
+    if (!f.metric || !Number.isFinite(f.value) || !f.unit || !f.screen || !f.notes) {
+      problems.push({ page: id, code: 'FACT', message: 'facts 需 metric/value/unit/screen/notes' });
+      continue;
+    }
+    const expected = quantities(String(f.value) + f.unit)[0];
+    const matches = (text) =>
+      expected && quantities(text).some((q) => q.unit === expected.unit && Math.abs(q.value - expected.value) < 1e-8);
+    if (!screen.includes(f.screen) || !note.includes(f.notes) || !matches(f.screen) || !matches(f.notes))
+      problems.push({ page: id, code: 'FACT', metric: f.metric, message: '事实绑定原文缺失或数量单位不符' });
+  }
 }
-if (problems.length) {
-  console.error(JSON.stringify({ ok: false, problems }, null, 2));
-  process.exitCode = 1;
-} else {
-  console.log(`数字一致：${pageTexts.length} 页`);
-}
+console.log(
+  JSON.stringify(
+    {
+      ok: !problems.length,
+      pages: pageTexts.length,
+      problems,
+      warnings,
+      boundary: '自动核对数量与显式绑定；对象、时点、分母和背景来源仍须内容审查',
+    },
+    null,
+    2,
+  ),
+);
+if (problems.length) process.exitCode = 1;

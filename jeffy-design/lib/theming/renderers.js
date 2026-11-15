@@ -302,6 +302,7 @@ window.ThemeRenderers = (() => {
           fill: 'none',
           stroke: p.color('ink'),
           'stroke-width': Math.max(2, theme.rules.headerWidthPx * 2),
+          'data-stroke-role': 'target',
         });
       });
     }
@@ -313,6 +314,7 @@ window.ThemeRenderers = (() => {
         fill: 'none',
         stroke: p.color('ink'),
         'stroke-width': theme.rules.headerWidthPx,
+        'data-stroke-role': 'zero-line',
       });
     }
     f.finish();
@@ -721,6 +723,7 @@ window.ThemeRenderers = (() => {
         ls.forEach((line, i) => p.text(tx, ty + i * lineH, line, 'cardTitle', 'start', { 'data-node-title': n.id }));
         p.block(tx, ty + ls.length * lineH + p.tokens.gap, n.body, nodeW - pad, 'body', 'start', {
           'data-line-label': 'true',
+          'data-label-for': 'node' + n.id,
         });
       } else
         ls.forEach((line, i) =>
@@ -1401,6 +1404,7 @@ window.ThemeRenderers = (() => {
         fill: 'none',
         stroke: p.color('ink'),
         'stroke-width': Math.max(2, theme.rules.dividerWidthPx * 2),
+        'data-stroke-role': 'median',
       });
       (d.outliers || []).forEach((v) =>
         p.add('circle', {
@@ -1422,6 +1426,25 @@ window.ThemeRenderers = (() => {
       r = input.right || [],
       links = input.links || [];
     if (!l.length || !r.length || !links.length) fail('DATA', '桑基需要左右节点与流量');
+    const valid = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+    for (const list of [l, r]) {
+      if (list.some((n) => !n.name || !valid(n.value)) || new Set(list.map((n) => n.name)).size !== list.length)
+        fail('DATA', '桑基节点需唯一名称与有限非负值');
+    }
+    const sums = { l: new Map(l.map((n) => [n.name, 0])), r: new Map(r.map((n) => [n.name, 0])) };
+    for (const k of links) {
+      if (!sums.l.has(k.from) || !sums.r.has(k.to) || !valid(k.value)) fail('DATA', '桑基连线引用无效或流量非法');
+      sums.l.set(k.from, sums.l.get(k.from) + k.value);
+      sums.r.set(k.to, sums.r.get(k.to) + k.value);
+    }
+    for (const [side, list] of [
+      ['l', l],
+      ['r', r],
+    ])
+      for (const n of list)
+        if (Math.abs(sums[side].get(n.name) - n.value) > Math.max(1e-9, n.value * 1e-9))
+          fail('DATA', '桑基节点与流量不守恒：' + n.name);
+    if (!l.some((n) => n.value > 0)) fail('DATA', '桑基总流量必须大于零');
     const pad = p.tokens.padding * 2,
       nodeW = p.tokens.nodeWidthPx,
       gutter = p.tokens.gap * 2,
@@ -1431,9 +1454,9 @@ window.ThemeRenderers = (() => {
       top = pad,
       bottom = box.height - pad,
       lTotal = l.reduce((a, b) => a + b.value, 0),
-      rTotal = r.reduce((a, b) => a + b.value, 0),
-      lH = (bottom - top - gutter * (l.length - 1)) / lTotal,
-      rH = (bottom - top - gutter * (r.length - 1)) / rTotal;
+      lH = (bottom - top - gutter * (Math.max(l.length, r.length) - 1)) / lTotal,
+      rH = lH;
+    if (lH <= 0) fail('CAPACITY', '桑基节点间距超出可用高度');
     const pos = { l: {}, r: {} };
     let y = top;
     l.forEach((n) => {
@@ -1452,7 +1475,7 @@ window.ThemeRenderers = (() => {
     links.forEach((k, i) => {
       const a = off.l[k.from],
         b = off.r[k.to];
-      if (!Number.isFinite(a) || !Number.isFinite(b)) return;
+      if (!Number.isFinite(a) || !Number.isFinite(b)) fail('DATA', '桑基连线引用无效');
       const th = k.value * lH,
         th2 = k.value * rH;
       off.l[k.from] += th;

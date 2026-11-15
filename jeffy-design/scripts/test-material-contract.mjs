@@ -108,10 +108,31 @@ if (built.status !== 0) {
   console.error('构建失败：' + (built.stderr || '').trim().split('\n')[0]);
   process.exit(1);
 }
-spawnSync(process.execPath, [resolve(root, 'scripts/verify-page.mjs'), htmlPath, reportPath, THEME], {
+const verified = spawnSync(process.execPath, [resolve(root, 'scripts/verify-page.mjs'), htmlPath, reportPath, THEME], {
   encoding: 'utf8',
 });
 const report = JSON.parse(readFileSync(reportPath, 'utf8'));
+if (
+  verified.error ||
+  verified.signal ||
+  !report.audit ||
+  !Array.isArray(report.audit.issues) ||
+  verified.status === null ||
+  report.errors?.length ||
+  report.audit?.error ||
+  report.pages?.length !== pages.length
+)
+  throw Error('验收未完成或报告覆盖不足');
+if (
+  !report.audit ||
+  !Array.isArray(report.audit.issues) ||
+  !Array.isArray(report.errors) ||
+  verified.error ||
+  verified.signal
+)
+  throw Error('验收基础设施或报告缺失');
+const reportedFailure = report.pages.some((p) => !p.ok) || report.audit.issues.length > 0;
+if (verified.status !== (reportedFailure ? 1 : 0)) throw Error('验收退出码与报告不一致，不能读取旧报告放行');
 const byPage = new Map(report.pages.map((p) => [p.id, p]));
 
 const allowed = new Set(['CAPACITY', 'LAYOUT']);
@@ -119,10 +140,13 @@ const results = [];
 const problems = [];
 for (const page of pages) {
   const got = byPage.get(page.id);
-  const codes = [...new Set((got?.issues || []).map((i) => i.code))];
+  const auditIssues = (report.audit?.issues || []).filter((i) => i.page === page.id || !i.page);
+  const codes = [...new Set([...(got?.issues || []), ...auditIssues].map((i) => i.code))];
   const bad = codes.filter((c) => !allowed.has(c));
   const baseShouldPass = page.id.endsWith('-base');
-  const pass = Boolean(got?.ok) || (!baseShouldPass && codes.every((c) => allowed.has(c)));
+  const pass =
+    Boolean(got) &&
+    ((got.ok && !codes.length) || (!baseShouldPass && codes.length > 0 && codes.every((c) => allowed.has(c))));
   results.push({
     page: page.id,
     material: page.components[0].material,

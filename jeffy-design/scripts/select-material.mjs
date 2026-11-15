@@ -35,7 +35,7 @@ const add = (id, score, why) => {
 };
 
 // 数据形状优先，命中即高分
-if (has('stages')) add('FUNNEL-001', 100, '有 stages，阶段递减');
+if (has('stages')) add('FUNNEL-001', 100, '有阶段数据；需核对是否同口径连续转化');
 if (has('left', 'right', 'links')) add('SANKEY-001', 100, '有左右节点与连线，是流向数据');
 if (has('rows', 'cols', 'values')) add('HEAT-001', 100, '有行列表头与数值矩阵');
 if (has('layers')) add('REL-004', 100, '有 layers，是分层结构');
@@ -44,7 +44,7 @@ if (Array.isArray(d.groups) && d.groups.every((g) => 'q1' in g && 'median' in g)
 if (Array.isArray(d.axes)) add('RADAR-001', 100, '有 axes，是多维评分');
 if (has('name', 'items') && Array.isArray(d.items)) add('REL-003', 100, '有范围名与内部模块，是包含关系');
 if (Array.isArray(d.nodes) && Array.isArray(d.edges)) {
-  const flowish = d.edges.some((e) => ['start', 'decision', 'end'].includes(e.type));
+  const flowish = intent === '流程' || d.nodes.some((e) => ['start', 'decision', 'end'].includes(e.type));
   add(flowish ? 'FLOW-001' : 'REL-006', 95, flowish ? '节点带起止与判断，是流程' : '节点与连线，是关系网络');
 }
 if (Array.isArray(d.points) && d.points.every((p) => isNum(p.x) && isNum(p.y)))
@@ -70,7 +70,8 @@ if (values.length) {
 // 构成
 if (Array.isArray(d.data) && d.data.every((r) => 'value' in r)) {
   if (d.data.some((r) => 'intensity' in r)) add('PIE-002', 90, '每项还带强度，是双编码');
-  else add('PIE-001', 75, '互斥类别合计构成整体');
+  else if (intent === '构成' || d.partOfWhole === true)
+    add('PIE-001', 75, '构成候选；须确认类别互斥、可相加且整体完整');
 }
 
 // 序列与表格
@@ -93,6 +94,7 @@ candidates.sort((a, b) => b.score - a.score);
 const top = candidates[0];
 const out = {
   intent: intent || '(未指定)',
+  boundary: '字段只用于召回候选，不证明互斥、连续、因果或可加性；最终依据内容与口径判断。',
   dataShape: has('stages')
     ? 'funnel'
     : has('layers')

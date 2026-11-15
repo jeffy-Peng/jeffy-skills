@@ -1,10 +1,12 @@
 # Jeffy Design
 
-从内容到整页表达的演示设计 Skill。默认交付 HTML 和逐页讲稿，支持整稿、共创和单页修改。
+从内容到整页表达的演示设计 Skill。默认交付自包含、可交互的 PPT 式 HTML 和逐页讲稿，支持整稿、共创和单页修改。
 
 ## 使用
 
 [SKILL.md](SKILL.md) 是唯一主流程：受众、用途与主题 → 问题与逐页提纲 → 研究并明确内容 → 设计可用区域 → 选材适配与组装 → 逐字稿 → 验收修改交付。
+
+HTML 分支与验收见 [PPT HTML](references/PPT-HTML.md)，默认执行[交互规则](docs/交互规则.md)。
 
 需要用户判断时最多一次在聊天中提供整稿方案；不逐页确认、不弹确认 HTML。已有决定直接沿用。
 
@@ -16,14 +18,15 @@
 
 ## 安装与运行
 
-完整目录安装，不能只复制 SKILL.md。需要 Node.js 18+、Python 3、Playwright 与所选主题字体。
+完整目录安装，不能只复制 SKILL.md。需要 Node.js 18+、Playwright 与所选主题字体；嵌入字体才需 Python、fonttools 和 brotli。
 
 ```sh
 git clone https://github.com/jeffy-Peng/jeffy-skills.git
 cd jeffy-skills/jeffy-design
 npm ci
 npx playwright install chromium
-npm run doctor                     # 七项自检自修：Node、Playwright、Chromium、字体、子集工具、生成物、验收冒烟
+npm run sync                       # 首次生成本地清单
+npm run doctor -- --no-install     # 检查实际渲染环境；需要嵌入字体时加 --embed
 node scripts/build-composition.mjs tests/composition/pressure.json build/pressure/index.html
 node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation.json
 ```
@@ -42,18 +45,18 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 
 `formats.slide.types` 定义六种页面，提纲里用 `type` 指定，不写默认内容页。
 
-- `content` 内容页：标题、分隔线、内容区、页脚。结论行写了才占位。
+- `content` 内容页：标题、分隔线、内容区、页脚。claim 记录核心结论，showClaim:true 显式显示。
 - `cover` 封面：标题、副标题、日期，居中，无页脚。
 - `section` 转折页：一句话，居中。
 - `toc` 目录：条目由转折页自动推，也可手写 `items`。
 - `appendix` 附录：同内容页，页码带 A 前缀。
 - `closing` 结束页：标题加一行联系方式。
 
-骨架图在 `assets/skeletons/`，改骨架跑 `npm run baseline` 看漂移。
+骨架图在 assets/skeletons/，属于参考快照；修改后实际渲染各页面类型验收。
 
 ## 版面规则
 
-所有页面落在 8 像素基线上，横向四栏、栏距 24。间距只用 8、16、24 三档。密度只管组件数量上限：稀疏 1、常规 2、密集 3，留白由模型放几个东西决定。结论行按实测文字宽度算行数，页面不得手写高度。柱宽取槽位比例，默认一半，夹在 8 像素与槽位八成之间，代码里没有固定像素上限。
+间距、字体、字号与区域读取主题。先按内容分区并明确 box；不靠固定组件数量限制信息密度。简单纵向布局可按权重自动分配，混合固定区域时应明确所有 box。容量不足须重排或换表达，不缩字号、不丢数据。
 
 完整规则见 [docs/素材规则.md](docs/素材规则.md)。
 
@@ -65,7 +68,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 - 加素材：写 `assets/materials/<ID>.md`，跑 `npm run sync`，登记表、能力表与目录一起生成。
 - 生成物是 `lib/composition/adapters.json`、`assets/capability.json` 与 `build/generated/`，不要手改。`npm run sync:check` 只检查不写。
 
-Catalog 唯一维护源为 [assets/catalog.json](assets/catalog.json)，运行 `npm run catalog` 更新目录及资源记录。32 项素材每条一个 md 文件：26 条有代码实现，进基线；6 条只写规范，由模型按规范绘制，不进像素基线。素材库只保留规范与示意图。
+条目机器声明源为 assets/materials/*.md，sync 合并到 catalog.json 并保留审批、证据与展示补充字段；运行 `npm run catalog` 更新目录及资源记录。32 项素材每条一个 md 文件：26 条有代码实现，进基线；6 条只写规范，由模型按规范绘制，不进像素基线。素材库只保留规范与示意图。
 
 默认仅保证 HTML 路径，没有原生可编辑 PPTX 导出。
 
@@ -74,12 +77,12 @@ Catalog 唯一维护源为 [assets/catalog.json](assets/catalog.json)，运行 `
 ```sh
 npm test                           # 同步检查 + 主题契约
 npm run gen:rules                  # 从 contract 生成规则清单
-npm run test:composition           # 12 项组装回归
-npm run test:adapters              # 23 项参数回归
-npm run test:themes                # 17 项主题与区域检查
-npm run test:materials             # 39 项素材契约用例
+npm run test:composition           # 组装回归
+npm run test:adapters              # 参数回归
+npm run test:themes                # 主题与区域检查
+npm run test:materials             # 素材契约用例
 npm run specimen BAR-001           # 生成素材示意图（只有图表，26 条引擎素材）
-npm run baseline                   # 素材与骨架的像素基线回归
+npm run baseline                   # 从当前源码重绘引擎素材后比较已批准基线
 ```
 
 交付前另有三道检查：
@@ -89,6 +92,7 @@ node scripts/validate-outline.mjs 提纲.json                 # 每页的问题�
 node scripts/verify-page.mjs 输出.html                      # 页面报告 + 整页检查
 node scripts/check-notes.mjs 输入.json 输出.html             # 讲稿与画面数字比对
 node scripts/embed-fonts.mjs 输出.html 输出.embedded.html    # 字体内嵌，交付自包含
+node scripts/verify-page.mjs 输出.embedded.html             # 验收最终交付件
 node scripts/export-pages.mjs 输出.html build/export --scale=2  # 每页导出 PNG，贴 PPT 用
 ```
 
@@ -102,7 +106,7 @@ node scripts/export-pages.mjs 输出.html build/export --scale=2  # 每页导出
 ```text
 SKILL.md       七步制作流程
 assets/        素材规范、示意图、页面骨架与样张、Catalog
-themes/        场景、空间、写作、视觉、页面类型配置
+themes/        场景、空间、视觉、页面类型配置
 references/    适配、工具和维护细则
 lib/           布局、绘制、组装、检查
 scripts/       构建与验收

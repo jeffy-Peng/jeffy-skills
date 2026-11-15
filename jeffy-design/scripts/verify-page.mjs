@@ -9,7 +9,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const generatedThemes = resolve(root, 'build', 'generated', 'themes.json');
 const defaultTheme = existsSync(generatedThemes)
   ? JSON.parse(readFileSync(generatedThemes, 'utf8'))[0].name
-  : 'klein-blue';
+  : 'simple-line';
 const [file, out = 'validation.json', themeName = defaultTheme] = process.argv.slice(2);
 if (!file) throw Error('用法 node scripts/verify-page.mjs out.html [report.json] [主题名]');
 
@@ -19,11 +19,22 @@ try {
   const page = await browser.newPage({ viewport: { width: 1400, height: 1000 }, reducedMotion: 'reduce' });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(pathToFileURL(resolve(file)).href);
+  const staticUrl = pathToFileURL(resolve(file));
+  staticUrl.searchParams.set('static', '1');
+  await page.goto(staticUrl.href);
   await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 });
   const failed = await page.evaluate(() => Boolean(window.renderFailed));
-  const report = await page.evaluate(() => window.validationReport);
+  const report = await page.evaluate(() => window.validationReport || []);
   const audit = await auditDeck(page, theme).catch((e) => ({ pages: 0, nodes: 0, issues: [], error: e.message }));
+  if (audit.error) errors.push('AUDIT: ' + audit.error);
+  if (!Array.isArray(report) || !report.length || report.length !== audit.pages)
+    errors.push('COVERAGE: 页面报告缺失或与画布数量不符');
+  if (report.some((p) => typeof p.ok !== 'boolean' || !Array.isArray(p.issues)))
+    errors.push('CONTRACT: 页面报告字段非法');
+  const sheetIds = await page.locator('.sheet').evaluateAll((nodes) => nodes.map((n) => n.dataset.page));
+  if (new Set(report.map((p) => p.id)).size !== report.length || report.some((p, i) => p.id !== sheetIds[i]))
+    errors.push('COVERAGE: 报告页面 ID 与实际页面不对应');
+  if (!audit.pages || !audit.nodes) errors.push('COVERAGE: 未测量任何页面或文字');
   writeFileSync(out, JSON.stringify({ errors, pages: report, audit }, null, 2));
 
   if (failed) {
@@ -36,8 +47,11 @@ try {
     if (errors.length || report.some((p) => !p.ok) || auditIssues.length) process.exitCode = 1;
     const pass = report.filter((p) => p.ok).length;
     console.log(
-      `${pass}/${report.length} 页通过，整页检查 ${auditIssues.length ? auditIssues.length + ' 项问题' : (audit.pages || 0) + ' 页无问题'}，${out}`,
+      `${process.exitCode ? '验收失败' : '验收通过'}：页面 ${pass}/${report.length}，整页检查 ${auditIssues.length ? auditIssues.length + ' 项问题' : (audit.pages || 0) + ' 页无问题'}，${out}`,
     );
+    for (const error of errors) console.error('  ' + error);
+    if (audit.unclassifiedStrokes)
+      console.log('  覆盖说明：' + audit.unclassifiedStrokes + ' 条未标注语义的线未参与同角色线宽比较');
     for (const issue of auditIssues.slice(0, 8))
       console.log(`  [${issue.code}] ${issue.page ? issue.page + ' ' : ''}${issue.message}`);
   }

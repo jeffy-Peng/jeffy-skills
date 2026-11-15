@@ -1,6 +1,8 @@
 // 环境自检与自修。换机器、容器重建、隔了几个月回来，先跑这一条。
 // 用法 node scripts/doctor.mjs [--no-install]
-import { readFileSync, existsSync, mkdirSync } from 'node:fs';
+import { fontPython } from '../lib/font-environment.mjs';
+import { tmpdir } from 'node:os';
+import { readFileSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -47,7 +49,7 @@ await check('Node 18+', () => {
   return process.versions.node;
 });
 
-check(
+await check(
   'Playwright 模块',
   () => {
     const pkg = resolve(root, 'node_modules/playwright/package.json');
@@ -71,43 +73,18 @@ await check(
   },
 );
 
-const lock = JSON.parse(readFileSync(resolve(root, 'scripts/fonts.lock.json'), 'utf8'));
-await check(
-  '主题字体',
-  () => {
-    if (process.platform === 'win32') return 'Windows 上跳过 fc-match 检查';
-    const missing = lock.fonts.filter((entry) => {
-      const hit = run('fc-match', ['-f', '%{family}', entry.family]);
-      return hit.status !== 0 || !hit.stdout.toLowerCase().includes(entry.family.toLowerCase());
-    });
-    if (missing.length) throw Error('缺 ' + missing.map((f) => f.family).join('、'));
-    return lock.fonts.map((f) => f.family).join('、');
-  },
-  { description: 'bash scripts/install-fonts.sh（带校验和）', run: () => run('bash', ['scripts/install-fonts.sh']) },
-);
-
-check(
-  '字体子集工具',
-  () => {
-    const candidates = [process.env.FONTTOOLS_PYTHON, '/opt/data/venvs/fonts/bin/python', 'python3', 'python'].filter(
-      Boolean,
-    );
-    for (const candidate of candidates) {
-      const probe = run(candidate, ['-c', 'import fontTools, brotli; print(fontTools.version)']);
-      if (probe.status === 0) return `${candidate} fonttools ${probe.stdout.trim()}`;
-    }
-    throw Error('缺 fonttools 与 brotli');
-  },
-  {
-    description: '新建 /opt/data/venvs/fonts 并安装 fonttools brotli',
-    run: () => {
-      mkdirSync('/opt/data/venvs', { recursive: true });
-      const venv = run('python3', ['-m', 'venv', '/opt/data/venvs/fonts']);
-      if (venv.status !== 0) return venv;
-      return run('/opt/data/venvs/fonts/bin/pip', ['install', '-q', 'fonttools', 'brotli']);
-    },
-  },
-);
+const theme = JSON.parse(readFileSync(resolve(root, 'themes/simple-line.json'), 'utf8'));
+await check('主题字体（真实浏览器）', async () => {
+  const b = await browser.loadChromium().launch({ executablePath: browser.findChrome() });
+  try {
+    const p = await b.newPage();
+    await p.addScriptTag({ content: readFileSync(resolve(root, 'lib/theming/drawing-fonts.js'), 'utf8') });
+    return (await p.evaluate((t) => window.ThemeFontCheck.fonts(document, t), theme)).join('、');
+  } finally {
+    await b.close();
+  }
+});
+if (process.argv.includes('--embed')) await check('字体子集工具', () => fontPython());
 
 await check(
   '生成物一致性',
@@ -123,10 +100,14 @@ await check('验收冒烟', () => {
   const built = run(process.execPath, [
     'scripts/build-composition.mjs',
     'tests/composition/pressure.json',
-    '/tmp/doctor-smoke.html',
+    resolve(tmpdir(), 'jeffy-doctor-smoke.html'),
   ]);
   if (built.status !== 0) throw Error((built.stderr || '构建失败').trim().split('\n')[0]);
-  const verify = run(process.execPath, ['scripts/verify-page.mjs', '/tmp/doctor-smoke.html', '/tmp/doctor-smoke.json']);
+  const verify = run(process.execPath, [
+    'scripts/verify-page.mjs',
+    resolve(tmpdir(), 'jeffy-doctor-smoke.html'),
+    resolve(tmpdir(), 'jeffy-doctor-smoke.json'),
+  ]);
   if (verify.status !== 0) throw Error((verify.stderr || verify.stdout || '验收失败').trim().split('\n')[0]);
   return (verify.stdout || '').trim().split('\n')[0];
 });

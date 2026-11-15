@@ -55,14 +55,10 @@ window.KitLayout = {
       (theme.scale || []).find((x) => x.role === 'claim') || (theme.scale || []).find((x) => x.role === 'body');
     const gap = theme.grid?.gutter || r.gap;
     const tier = theme.density?.[page.density || 'normal'] || { maxComponents: 3, minHeight: 120, fill: 0.9 };
-    // 密度只约束由布局分配的组件；页面自己给了坐标的按原样走。
-    const laidOut = (page.components || []).filter((c) => !c.box);
-    if (laidOut.length > tier.maxComponents)
-      issues.push({ code: 'CAPACITY', page: page.id, message: `当前密度最多 ${tier.maxComponents} 个组件` });
     let top = this.snap(r.content.y, theme);
     let claim = null;
     const text = typeof page.claim === 'string' ? page.claim.trim() : '';
-    if (text) {
+    if (text && page.showClaim !== false && (page.showClaim === true || (page.components || []).some((c) => !c.box))) {
       const width = this.measure(text, claimRole, theme);
       const lines = Math.max(1, Math.ceil(width / r.content.width));
       const height = this.snapUp(lines * claimRole.size * claimRole.lineHeight + 8, theme);
@@ -73,9 +69,11 @@ window.KitLayout = {
     const fixed = (page.components || []).filter((c) => c.box);
     const available = Math.max(0, r.content.y + r.content.height - top);
     const totalWeight = items.reduce((sum, c) => sum + (Number(c.weight) || 1), 0) || 1;
-    // 留白交给模型：密度只限制组件数量，可用高度不按比例砍。
+    // 留白交给内容判断，可用高度不按固定填充比例削减。
     const usable = available - gap * Math.max(0, items.length - 1);
-    const minHeight = 96;
+    const minHeight = tier.minHeight;
+    if (items.length && [...fixed, ...(page.text || [])].length)
+      issues.push({ code: 'CONTRACT', message: '混合固定区域时请为所有组件提供 box，避免自动布局侵占固定区域' });
     let cursor = top;
     const boxes = items.map((c) => {
       const weight = Number(c.weight) || 1;

@@ -38,53 +38,36 @@ function readMaterialFiles() {
 }
 
 function mergeMaterials(catalog, files) {
-  const byId = new Map(files.map((f) => [f.data.id, f]));
-  let merged = 0;
-  for (const entry of catalog.entries) {
-    const file = byId.get(entry.id);
-    if (!file) continue;
-    const d = file.data;
-    entry.form = d.form || entry.form;
-    entry.question = d.question || entry.question;
-    entry.minimumInput = d.minimumInput || entry.minimumInput;
-    entry.archetype = d.archetype || entry.archetype;
-    entry.status = d.status || entry.status;
-    entry.standard = d.standard || file.file;
-    if (Array.isArray(d.sources) && d.sources.length) entry.sources = d.sources;
-    if (Array.isArray(d.sheets) && d.sheets.length) entry.sheets = d.sheets;
-    if (Array.isArray(d.options)) entry.options = d.options;
-    if (d.shape) entry.shape = d.shape;
-    if (d.tier) entry.tier = d.tier;
-    if (d.implementation) entry.implementation = d.implementation;
-    for (const k of ['encoding', 'readingTime', 'cost']) if (d[k]) entry[k] = d[k];
-    if (Array.isArray(d.alternates)) entry.alternates = d.alternates;
-    // 实现方式与验证证据由同步统一写，避免手工维护时漂移。
-    entry.implementationRole = (entry.implementation || 'engine') === 'model' ? 'model' : 'engine';
-    if (entry.implementationRole === 'engine') entry.evidence = ['materials/specimens/' + entry.id + '.png'];
-    else entry.evidence = [];
-    delete entry.statusLegacy;
-    entry.materialFile = file.file;
-    merged += 1;
-  }
+  const ids = files.map((f) => f.data.id);
+  if (new Set(ids).size !== ids.length) throw Error('素材 ID 重复');
+  const old = new Map(catalog.entries.map((e) => [e.id, e]));
+  // md 是登记来源；catalog 仅保留审批、证据和展示补充字段。
+  catalog.entries = files
+    .sort((a, b) => a.data.id.localeCompare(b.data.id))
+    .map((file) => {
+      const d = file.data;
+      if (!ARCHETYPES.includes(d.archetype) || !['engine', 'model'].includes(d.implementation))
+        throw Error(d.id + ' 缺少有效 archetype/implementation');
+      const entry = {
+        aliases: [],
+        purpose: d.name || d.form,
+        parameters: '按规范调整',
+        limits: '以素材规范与实际验收为准',
+        standardCoverage: '规范声明；未推定行为覆盖',
+        sources: [],
+        sheets: [],
+        ...(old.get(d.id) || {}),
+        ...d,
+        materialFile: file.file,
+      };
+      entry.standard = d.standard || file.file;
+      entry.implementationRole = d.implementation || 'engine';
+      entry.evidence = old.get(d.id)?.evidence || [];
+      delete entry.statusLegacy;
+      return entry;
+    });
+  const merged = files.length;
   return merged;
-}
-
-function readMaterials() {
-  const catalog = JSON.parse(readFileSync(join(root, 'assets', 'catalog.json'), 'utf8'));
-  return catalog.entries.map((entry) => {
-    const archetype = entry.archetype || null;
-    if (archetype && !ARCHETYPES.includes(archetype)) {
-      throw Error(`${entry.id} 的 archetype「${archetype}」不在 ${ARCHETYPES.join('/')} 里`);
-    }
-    return {
-      id: entry.id,
-      standard: entry.standard,
-      status: entry.status,
-      archetype,
-      sources: entry.sources || [],
-      implementation: entry.implementation || 'engine',
-    };
-  });
 }
 
 function build() {
@@ -93,7 +76,7 @@ function build() {
   const catalogPath = join(root, 'assets', 'catalog.json');
   const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
   const merged = mergeMaterials(catalog, files);
-  if (!checkOnly) writeFileSync(catalogPath, JSON.stringify(catalog, null, 2) + '\n');
+
   const materials = catalog.entries.map((entry) => ({
     id: entry.id,
     standard: entry.standard,
@@ -156,12 +139,14 @@ function build() {
     '',
   ].join('\n');
   return {
+    'catalog.json': catalog,
     'themes.json': themes,
     '选图表.md': chart,
     'adapters.json': adapters,
     'capability.json': capability,
     'materials.json': materials.map(
-      ({ id, archetype, standard, shape, tier, status, encoding, readingTime, cost, alternates }) => ({
+      ({ id, archetype, implementation, standard, shape, tier, status, encoding, readingTime, cost, alternates }) => ({
+        implementation,
         id,
         archetype,
         standard,
@@ -179,6 +164,7 @@ function build() {
 
 const outputs = build();
 const targets = [
+  [join(root, 'assets', 'catalog.json'), outputs['catalog.json']],
   [join(outDir, 'themes.json'), outputs['themes.json']],
   [join(root, 'lib', 'composition', 'adapters.json'), outputs['adapters.json']],
   [join(root, 'assets', 'capability.json'), outputs['capability.json']],
