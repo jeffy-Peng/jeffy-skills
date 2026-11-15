@@ -723,6 +723,7 @@ window.ThemeRenderers = (() => {
         ls.forEach((line, i) => p.text(tx, ty + i * lineH, line, 'cardTitle', 'start', { 'data-node-title': n.id }));
         p.block(tx, ty + ls.length * lineH + p.tokens.gap, n.body, nodeW - pad, 'body', 'start', {
           'data-line-label': 'true',
+          'data-label-for': 'node' + n.id,
         });
       } else
         ls.forEach((line, i) =>

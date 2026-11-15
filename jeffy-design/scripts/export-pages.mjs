@@ -21,7 +21,9 @@ const checked = spawnSync(
 if (checked.status !== 0) throw Error('最终文件未通过验收，不导出图片：' + checked.stdout + checked.stderr);
 const browser = await loadChromium().launch({ executablePath: findChrome() });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 }, deviceScaleFactor: scale });
-await page.goto(pathToFileURL(resolve(input)).href);
+const staticUrl = pathToFileURL(resolve(input));
+staticUrl.searchParams.set('static', '1');
+await page.goto(staticUrl.href);
 await page.waitForFunction(() => window.renderComplete === true, null, { timeout: 30000 });
 await page.waitForTimeout(200);
 

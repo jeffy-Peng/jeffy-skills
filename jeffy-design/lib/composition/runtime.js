@@ -28,6 +28,7 @@
         host.append(img);
         await img.decode();
       } else {
+        host.classList.add('jd-component');
         host.innerHTML = content;
         const svg = host.querySelector('svg');
         // 保持绘制时的像素字号；只接受按目标区域绘制的矢量。
@@ -430,7 +431,7 @@
         report.issues.push(issue('CAPACITY', '文字区域装不下', { block: n.dataset.block }));
     report.ok = report.issues.length === 0;
     const note = document.createElement('details');
-    note.innerHTML = '<summary>逐字稿与验收状态</summary>';
+    note.innerHTML = '<summary>逐字稿</summary>';
     const content = document.createElement('p');
     content.textContent = page.speakerNotes;
     note.append(content);
@@ -445,7 +446,7 @@
       null,
       2,
     );
-    note.append(status);
+    if (deck.debug === true) note.append(status);
     document.querySelector('main').append(note);
   }
   window.validationReport = reports;

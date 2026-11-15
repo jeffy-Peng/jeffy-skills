@@ -19,7 +19,9 @@ try {
   const page = await browser.newPage({ viewport: { width: 1400, height: 1000 }, reducedMotion: 'reduce' });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(pathToFileURL(resolve(file)).href);
+  const staticUrl = pathToFileURL(resolve(file));
+  staticUrl.searchParams.set('static', '1');
+  await page.goto(staticUrl.href);
   await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 });
   const failed = await page.evaluate(() => Boolean(window.renderFailed));
   const report = await page.evaluate(() => window.validationReport || []);

@@ -354,7 +354,9 @@ for (const id of wanted) {
   );
   const report = JSON.parse(readFileSync(reportPath, 'utf8'));
   const page = await browser.newPage({ viewport: { width: 1340, height: 800 }, deviceScaleFactor: 2 });
-  await page.goto(pathToFileURL(htmlPath).href);
+  const staticUrl = pathToFileURL(htmlPath);
+  staticUrl.searchParams.set('static', '1');
+  await page.goto(staticUrl.href);
   await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 }).catch(() => {});
   await page.waitForTimeout(300);
   await page
