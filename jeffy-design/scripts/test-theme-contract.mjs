@@ -11,7 +11,7 @@ assert.equal(new Set(themes.map((t) => t.name)).size, themes.length, '主题 nam
 for (const t of themes) assert.ok(resolveTheme(t, defaults).page.content.width > 0);
 const base = themes[0];
 for (const mutate of [
-  (t) => delete t.writing.narration,
+  (t) => delete t.page.canvas,
   (t) => delete t.usage.scenarios,
   (t) => (t.page.content.y = 30),
   (t) => (t.page.source.width = 5000),

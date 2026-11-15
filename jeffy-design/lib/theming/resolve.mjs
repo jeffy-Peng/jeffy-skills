@@ -83,8 +83,7 @@ export function resolveTheme(theme, defaults, paletteName) {
   for (const key of ['title', 'source', 'pageNo'])
     if (intersects(page.content, page[key])) fail('content overlaps ' + key);
   for (const key of ['scenarios', 'audience']) if (!theme.usage?.[key]?.trim()) fail('missing usage ' + key);
-  for (const key of ['prompt', 'title', 'body', 'narration', 'review'])
-    if (!theme.writing?.[key]?.trim()) fail('missing writing ' + key);
+  // 文本风格不归主题：语气、句式、示例在 docs/写作规则.md，跨主题共用。
   const allowed = Object.keys(defaults);
   for (const k of Object.keys(theme.materials || {})) if (!allowed.includes(k)) fail('unknown material token ' + k);
   const materials = { ...defaults, ...theme.materials };
