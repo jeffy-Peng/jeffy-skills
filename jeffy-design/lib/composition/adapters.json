@@ -35,14 +35,92 @@
     "implementedIn": "lib/theming/renderers.js",
     "sampleSource": null
   },
+  "BOX-001": {
+    "archetype": "compare",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "DIST-001": {
+    "archetype": "compare",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "FLOW-001": {
+    "archetype": "flow",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "FUNNEL-001": {
+    "archetype": "flow",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "HEAT-001": {
+    "archetype": "table",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
   "LINE-001": {
     "archetype": "trend",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
     "sampleSource": null
   },
+  "MATRIX-001": {
+    "archetype": "relation",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
   "PIE-001": {
     "archetype": "share",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "PIE-002": {
+    "archetype": "share",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "RADAR-001": {
+    "archetype": "compare",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "REL-001": {
+    "archetype": "relation",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "REL-003": {
+    "archetype": "relation",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "REL-004": {
+    "archetype": "relation",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "REL-006": {
+    "archetype": "relation",
+    "renderer": "theme-v1",
+    "implementedIn": "lib/theming/renderers.js",
+    "sampleSource": null
+  },
+  "SANKEY-001": {
+    "archetype": "flow",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
     "sampleSource": null
@@ -65,24 +143,6 @@
     "implementedIn": "lib/theming/renderers.js",
     "sampleSource": null
   },
-  "MATRIX-001": {
-    "archetype": "relation",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "REL-001": {
-    "archetype": "relation",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "FLOW-001": {
-    "archetype": "flow",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
   "TIME-001": {
     "archetype": "timeline",
     "renderer": "theme-v1",
@@ -91,66 +151,6 @@
   },
   "TIME-002": {
     "archetype": "timeline",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "REL-003": {
-    "archetype": "relation",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "REL-006": {
-    "archetype": "relation",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "HEAT-001": {
-    "archetype": "table",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "DIST-001": {
-    "archetype": "compare",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "SANKEY-001": {
-    "archetype": "flow",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "FUNNEL-001": {
-    "archetype": "flow",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "BOX-001": {
-    "archetype": "compare",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "RADAR-001": {
-    "archetype": "compare",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "REL-004": {
-    "archetype": "relation",
-    "renderer": "theme-v1",
-    "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
-  },
-  "PIE-002": {
-    "archetype": "share",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
     "sampleSource": null

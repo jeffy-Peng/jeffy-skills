@@ -35,83 +35,11 @@
     "status": "已入库·自动组装",
     "standard": "materials/BAR-007.md"
   },
-  "LINE-001": {
+  "BOX-001": {
     "capability": "assemble",
-    "archetype": "trend",
+    "archetype": "compare",
     "status": "已入库·自动组装",
-    "standard": "materials/LINE-001.md"
-  },
-  "PIE-001": {
-    "capability": "assemble",
-    "archetype": "share",
-    "status": "已入库·自动组装",
-    "standard": "materials/PIE-001.md"
-  },
-  "SCATTER-001": {
-    "capability": "assemble",
-    "archetype": "relation",
-    "status": "已入库·自动组装",
-    "standard": "materials/SCATTER-001.md"
-  },
-  "TABLE-001": {
-    "capability": "assemble",
-    "archetype": "table",
-    "status": "已入库·自动组装",
-    "standard": "materials/TABLE-001.md"
-  },
-  "TABLE-002": {
-    "capability": "assemble",
-    "archetype": "table",
-    "status": "已入库·自动组装",
-    "standard": "materials/TABLE-002.md"
-  },
-  "MATRIX-001": {
-    "capability": "assemble",
-    "archetype": "relation",
-    "status": "已入库·自动组装",
-    "standard": "materials/MATRIX-001.md"
-  },
-  "REL-001": {
-    "capability": "assemble",
-    "archetype": "relation",
-    "status": "已入库·自动组装",
-    "standard": "materials/REL-001.md"
-  },
-  "FLOW-001": {
-    "capability": "assemble",
-    "archetype": "flow",
-    "status": "已入库·自动组装",
-    "standard": "materials/FLOW-001.md"
-  },
-  "TIME-001": {
-    "capability": "assemble",
-    "archetype": "timeline",
-    "status": "已入库·自动组装",
-    "standard": "materials/TIME-001.md"
-  },
-  "TIME-002": {
-    "capability": "assemble",
-    "archetype": "timeline",
-    "status": "已入库·自动组装",
-    "standard": "materials/TIME-002.md"
-  },
-  "REL-003": {
-    "capability": "assemble",
-    "archetype": "relation",
-    "status": "已入库·自动组装",
-    "standard": "materials/REL-003.md"
-  },
-  "REL-006": {
-    "capability": "assemble",
-    "archetype": "relation",
-    "status": "已入库·自动组装",
-    "standard": "materials/REL-006.md"
-  },
-  "HEAT-001": {
-    "capability": "assemble",
-    "archetype": "table",
-    "status": "已入库·自动组装",
-    "standard": "materials/HEAT-001.md"
+    "standard": "materials/BOX-001.md"
   },
   "DIST-001": {
     "capability": "assemble",
@@ -119,41 +47,11 @@
     "status": "已入库·自动组装",
     "standard": "materials/DIST-001.md"
   },
-  "SANKEY-001": {
+  "FLOW-001": {
     "capability": "assemble",
     "archetype": "flow",
     "status": "已入库·自动组装",
-    "standard": "materials/SANKEY-001.md"
-  },
-  "FUNNEL-001": {
-    "capability": "assemble",
-    "archetype": "flow",
-    "status": "已入库·自动组装",
-    "standard": "materials/FUNNEL-001.md"
-  },
-  "LOOP-001": {
-    "capability": "model-drawn",
-    "archetype": "relation",
-    "status": "仅规范·模型绘制",
-    "standard": "materials/LOOP-001.md"
-  },
-  "SET-001": {
-    "capability": "model-drawn",
-    "archetype": "relation",
-    "status": "仅规范·模型绘制",
-    "standard": "materials/SET-001.md"
-  },
-  "BOX-001": {
-    "capability": "assemble",
-    "archetype": "compare",
-    "status": "已入库·自动组装",
-    "standard": "materials/BOX-001.md"
-  },
-  "RADAR-001": {
-    "capability": "assemble",
-    "archetype": "compare",
-    "status": "已入库·自动组装",
-    "standard": "materials/RADAR-001.md"
+    "standard": "materials/FLOW-001.md"
   },
   "FLOW-002": {
     "capability": "model-drawn",
@@ -161,11 +59,71 @@
     "status": "仅规范·模型绘制",
     "standard": "materials/FLOW-002.md"
   },
+  "FUNNEL-001": {
+    "capability": "assemble",
+    "archetype": "flow",
+    "status": "已入库·自动组装",
+    "standard": "materials/FUNNEL-001.md"
+  },
+  "HEAT-001": {
+    "capability": "assemble",
+    "archetype": "table",
+    "status": "已入库·自动组装",
+    "standard": "materials/HEAT-001.md"
+  },
+  "LINE-001": {
+    "capability": "assemble",
+    "archetype": "trend",
+    "status": "已入库·自动组装",
+    "standard": "materials/LINE-001.md"
+  },
+  "LOOP-001": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/LOOP-001.md"
+  },
+  "MATRIX-001": {
+    "capability": "assemble",
+    "archetype": "relation",
+    "status": "已入库·自动组装",
+    "standard": "materials/MATRIX-001.md"
+  },
+  "PIE-001": {
+    "capability": "assemble",
+    "archetype": "share",
+    "status": "已入库·自动组装",
+    "standard": "materials/PIE-001.md"
+  },
+  "PIE-002": {
+    "capability": "assemble",
+    "archetype": "share",
+    "status": "已入库·自动组装",
+    "standard": "materials/PIE-002.md"
+  },
+  "RADAR-001": {
+    "capability": "assemble",
+    "archetype": "compare",
+    "status": "已入库·自动组装",
+    "standard": "materials/RADAR-001.md"
+  },
+  "REL-001": {
+    "capability": "assemble",
+    "archetype": "relation",
+    "status": "已入库·自动组装",
+    "standard": "materials/REL-001.md"
+  },
   "REL-002": {
     "capability": "model-drawn",
     "archetype": "relation",
     "status": "仅规范·模型绘制",
     "standard": "materials/REL-002.md"
+  },
+  "REL-003": {
+    "capability": "assemble",
+    "archetype": "relation",
+    "status": "已入库·自动组装",
+    "standard": "materials/REL-003.md"
   },
   "REL-004": {
     "capability": "assemble",
@@ -179,16 +137,58 @@
     "status": "仅规范·模型绘制",
     "standard": "materials/REL-005.md"
   },
+  "REL-006": {
+    "capability": "assemble",
+    "archetype": "relation",
+    "status": "已入库·自动组装",
+    "standard": "materials/REL-006.md"
+  },
+  "SANKEY-001": {
+    "capability": "assemble",
+    "archetype": "flow",
+    "status": "已入库·自动组装",
+    "standard": "materials/SANKEY-001.md"
+  },
+  "SCATTER-001": {
+    "capability": "assemble",
+    "archetype": "relation",
+    "status": "已入库·自动组装",
+    "standard": "materials/SCATTER-001.md"
+  },
   "SEQ-001": {
     "capability": "model-drawn",
     "archetype": "relation",
     "status": "仅规范·模型绘制",
     "standard": "materials/SEQ-001.md"
   },
-  "PIE-002": {
+  "SET-001": {
+    "capability": "model-drawn",
+    "archetype": "relation",
+    "status": "仅规范·模型绘制",
+    "standard": "materials/SET-001.md"
+  },
+  "TABLE-001": {
     "capability": "assemble",
-    "archetype": "share",
+    "archetype": "table",
     "status": "已入库·自动组装",
-    "standard": "materials/PIE-002.md"
+    "standard": "materials/TABLE-001.md"
+  },
+  "TABLE-002": {
+    "capability": "assemble",
+    "archetype": "table",
+    "status": "已入库·自动组装",
+    "standard": "materials/TABLE-002.md"
+  },
+  "TIME-001": {
+    "capability": "assemble",
+    "archetype": "timeline",
+    "status": "已入库·自动组装",
+    "standard": "materials/TIME-001.md"
+  },
+  "TIME-002": {
+    "capability": "assemble",
+    "archetype": "timeline",
+    "status": "已入库·自动组装",
+    "standard": "materials/TIME-002.md"
   }
 }

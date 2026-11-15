@@ -18,6 +18,28 @@
     return n;
   }
   async function mount(host, spec) {
+    if (spec.artifact) {
+      const { type, content } = spec.artifact;
+      if (type === 'image') {
+        const img = document.createElement('img');
+        img.src = content;
+        img.alt = spec.purpose;
+        img.style.cssText = 'width:100%;height:100%;object-fit:contain';
+        host.append(img);
+        await img.decode();
+      } else {
+        host.innerHTML = content;
+        const svg = host.querySelector('svg');
+        // 保持绘制时的像素字号；只接受按目标区域绘制的矢量。
+        const v = svg.viewBox.baseVal;
+        if (v.width !== spec.box.width || v.height !== spec.box.height)
+          return { ok: false, issues: [issue('CONTRACT', 'SVG viewBox 必须等于目标区域尺寸，禁止缩放字号')] };
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        updateLineLabelMasks(svg, theme.materials.labelGap);
+      }
+      return { ok: true, issues: [], capability: 'artifact', source: spec.artifact.source };
+    }
     const a = adapters[spec.material],
       r = roles[spec.labelRole || 'pill'];
     if (!r) return { ok: false, issues: [issue('THEME', '标签角色不存在')] };
@@ -55,7 +77,8 @@
     const win = frame.contentWindow;
     // iframe 里没有 compositionInput，度量参考单独传进去。
     win.__fontMetrics = (window.compositionInput && window.compositionInput.fontMetrics) || {};
-    ((doc = frame.contentDocument), (issues = []));
+    const doc = frame.contentDocument,
+      issues = [];
     let result;
     try {
       if (spec.labelRole && spec.labelRole !== 'pill')
@@ -196,7 +219,7 @@
   }
   await ThemeDrawing.fonts(document, theme);
   for (const [i, page] of deck.pages.entries()) {
-    const preview = page.preview === true;
+    const preview = deck.deliverable === 'chart' || page.preview === true;
     const formatName = deck.format || 'slide';
     const pageType = page.type || 'content';
     const typeSpec = theme.formats?.[formatName]?.types?.[pageType];
@@ -251,7 +274,8 @@
     // 标题的标签由页面给（类别区分、结论、对比之类），分隔符由主题给；来源前缀固定由主题给。
     const separator = theme.labels?.separator || '：';
     const withLabel = (label, text) => {
-      const value = String(text || '');
+      let value = String(text || '');
+      if (label === theme.labels?.source) value = value.replace(/^(?:数据来源|来源|Source)\s*[：:]\s*/i, '');
       if (!label || !value || value.startsWith(label)) return value;
       // 标签自带分隔符时不再补第二次。
       const clean = label.replace(/[：:]$/, '');
@@ -298,18 +322,18 @@
     if (plan?.claim) textBlock(sheet, 'claim', page.claim, plan.claim, 'claim');
     if (plan?.issues?.length) report.issues.push(...plan.issues.map((i) => ({ ...i, page: page.id })));
     const planned = new Map((plan?.boxes || []).map((item) => [item.id, item.box]));
-    const occupied = [];
+    const occupied = plan?.claim ? [{ id: 'claim', ...plan.claim }] : [];
     for (const c of page.components || []) {
       if (planned.has(c.id)) c.box = planned.get(c.id);
-      if (!c.id || !c.purpose || !c.box || !adapters[c.material]) {
+      if (!c.id || !c.purpose || !c.box || (!c.artifact && !adapters[c.material])) {
         report.issues.push(issue('CONTRACT', '组件缺少 ID、任务、目标区域或适配器'));
         continue;
       }
       if (
-        c.box.x < theme.page.content.x ||
-        c.box.y < theme.page.content.y ||
-        c.box.x + c.box.width > theme.page.content.x + theme.page.content.width ||
-        c.box.y + c.box.height > theme.page.content.y + theme.page.content.height
+        c.box.x < regions.content.x ||
+        c.box.y < regions.content.y ||
+        c.box.x + c.box.width > regions.content.x + regions.content.width ||
+        c.box.y + c.box.height > regions.content.y + regions.content.height
       )
         report.issues.push(issue('CAPACITY', '组件侵入页眉页脚或越界', { component: c.id }));
       occupied.push({ id: c.id, ...c.box });
@@ -324,10 +348,10 @@
     }
     for (const t of page.text || []) {
       if (
-        t.box.x < theme.page.content.x ||
-        t.box.y < theme.page.content.y ||
-        t.box.x + t.box.width > theme.page.content.x + theme.page.content.width ||
-        t.box.y + t.box.height > theme.page.content.y + theme.page.content.height
+        t.box.x < regions.content.x ||
+        t.box.y < regions.content.y ||
+        t.box.x + t.box.width > regions.content.x + regions.content.width ||
+        t.box.y + t.box.height > regions.content.y + regions.content.height
       )
         report.issues.push(issue('CAPACITY', '文字侵入页眉页脚或越界', { block: t.id }));
       occupied.push({ id: t.id, ...t.box });
@@ -337,7 +361,7 @@
       for (let b = a + 1; b < occupied.length; b++)
         if (overlap(occupied[a], occupied[b]))
           report.issues.push(issue('LAYOUT', '页面区域相交', { blocks: [occupied[a].id, occupied[b].id] }));
-    if (plan?.claim) occupied.push({ id: 'claim', ...plan.claim });
+
     const known = new Set(occupied.map((x) => x.id));
     if ((page.readingOrder || []).some((x) => !known.has(x)))
       report.issues.push(issue('CONTENT', '阅读顺序引用不存在的组件'));
@@ -371,13 +395,13 @@
         row.style.cssText = `display:flex;align-items:baseline;gap:16px;height:${rowH}px;border-bottom:1px solid #${theme.colors.rule};font-size:${role.size}px;color:#${theme.colors[role.color]}`;
         const no = document.createElement('span');
         no.textContent = String(k + 1).padStart(2, '0');
-        no.style.cssText = `color:#${theme.colors.muted};font-size:${Math.round(role.size * 0.85)}px`;
+        no.style.cssText = `color:#${theme.colors.muted};font-size:${roles.pageNo.size}px`;
         const name = document.createElement('span');
         name.textContent = it.title;
         name.style.flex = '1';
         const pg = document.createElement('span');
         pg.textContent = String(it.page ?? '').padStart(2, '0');
-        pg.style.cssText = `color:#${theme.colors.muted};font-size:${Math.round(role.size * 0.85)}px`;
+        pg.style.cssText = `color:#${theme.colors.muted};font-size:${roles.pageNo.size}px`;
         row.append(no, name, pg);
         list.append(row);
       });

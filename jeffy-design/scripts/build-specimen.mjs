@@ -2,7 +2,7 @@
 // 用法 node scripts/build-specimen.mjs [素材ID...]
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { loadChromium, findChrome } from '../lib/browser.mjs';
 
@@ -345,12 +345,16 @@ for (const id of wanted) {
     results.push({ id, ok: false, note: '构建失败' });
     continue;
   }
-  spawnSync(process.execPath, [resolve(root, 'scripts/verify-page.mjs'), htmlPath, reportPath, themeName], {
-    encoding: 'utf8',
-  });
+  const verified = spawnSync(
+    process.execPath,
+    [resolve(root, 'scripts/verify-page.mjs'), htmlPath, reportPath, themeName],
+    {
+      encoding: 'utf8',
+    },
+  );
   const report = JSON.parse(readFileSync(reportPath, 'utf8'));
   const page = await browser.newPage({ viewport: { width: 1340, height: 800 }, deviceScaleFactor: 2 });
-  await page.goto('file://' + htmlPath);
+  await page.goto(pathToFileURL(htmlPath).href);
   await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 }).catch(() => {});
   await page.waitForTimeout(300);
   await page
@@ -358,9 +362,11 @@ for (const id of wanted) {
     .first()
     .screenshot({ path: join(outDir, id + '.png') });
   await page.close();
-  results.push({ id, ok: report.pages?.[0]?.ok ?? false });
+  results.push({ id, ok: verified.status === 0 && report.pages?.[0]?.ok === true });
   console.log(id, results.at(-1).ok ? 'PASS' : 'FAIL', '→ assets/materials/specimens/' + id + '.png');
 }
 await browser.close();
 writeFileSync(join(workDir, 'index.json'), JSON.stringify({ theme: themeName, results }, null, 2));
 console.log(results.filter((r) => r.ok).length + '/' + results.length + ' 张示意图已生成');
+
+if (results.some((r) => !r.ok) || !results.length) process.exitCode = 1;

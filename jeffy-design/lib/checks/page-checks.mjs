@@ -11,18 +11,36 @@ export async function auditDeck(page, theme) {
       return sheets.map((sheet, index) => {
         const box = sheet.getBoundingClientRect();
         const nodes = [];
-        for (const el of sheet.querySelectorAll('.block, [data-theme-role]')) {
+        for (const el of sheet.querySelectorAll('*')) {
           const text = (el.textContent || '').trim();
-          if (!text) continue;
+          if (!text || ['SCRIPT', 'STYLE'].includes(el.tagName.toUpperCase())) continue;
+          // 测量实际承载文字的元素，避免容器重复计数；SVG tspan 由其父 text 测量。
+          if (
+            el.tagName.toLowerCase() === 'tspan' ||
+            (!['text', 'td', 'th'].includes(el.tagName.toLowerCase()) &&
+              ![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))
+          )
+            continue;
           const css = getComputedStyle(el);
+          if (css.display === 'none' || css.visibility === 'hidden') continue;
           const rect = el.getBoundingClientRect();
-          const size = parseFloat(css.fontSize);
+          if (rect.width <= 0 || rect.height <= 0) continue;
+          const matrix = typeof el.getScreenCTM === 'function' ? el.getScreenCTM() : null;
+          const size = parseFloat(css.fontSize) * (matrix ? Math.hypot(matrix.a, matrix.b) : 1);
+          const host = el.closest('.jd-component, .block.component');
+          const target = host?.getBoundingClientRect();
           nodes.push({
             text: text.slice(0, 40),
-            role: el.dataset.themeRole || null,
+            role: el.closest('[data-theme-role]')?.dataset.themeRole || null,
             size,
             family: css.fontFamily,
             inScale: inScale(size),
+            outsideComponent:
+              target &&
+              (rect.left < target.left - 2 ||
+                rect.top < target.top - 2 ||
+                rect.right > target.right + 2 ||
+                rect.bottom > target.bottom + 2),
             x: rect.x - box.x,
             y: rect.y - box.y,
             width: rect.width,
@@ -30,9 +48,9 @@ export async function auditDeck(page, theme) {
           });
         }
         const strokes = [];
-        for (const frame of sheet.querySelectorAll('iframe')) {
+        for (const frame of [sheet, ...sheet.querySelectorAll('iframe')]) {
           try {
-            const doc = frame.contentDocument;
+            const doc = frame === sheet ? sheet : frame.contentDocument;
             for (const node of doc.querySelectorAll('[stroke-width]')) {
               // 没有描边的节点（stroke:none）不算线宽，否则实心色块会被误判成 1px 线。
               const stroke = (node.getAttribute('stroke') || '').toLowerCase();
@@ -40,7 +58,10 @@ export async function auditDeck(page, theme) {
               const w = parseFloat(node.getAttribute('stroke-width'));
               // 按角色分组：网格线和轴线本来就不是一个粗细，不能互相比较。
               if (Number.isFinite(w))
-                strokes.push({ role: node.getAttribute('data-shape-role') || 'none', w: +w.toFixed(3) });
+                strokes.push({
+                  role: node.getAttribute('data-stroke-role') || node.getAttribute('data-shape-role') || null,
+                  w: +w.toFixed(3),
+                });
             }
           } catch {}
         }
@@ -52,8 +73,15 @@ export async function auditDeck(page, theme) {
 
   const issues = [];
   const roleSizes = new Map();
+  const roleScale = Object.fromEntries(theme.scale.map((x) => [x.role, x.size]));
   for (const sheet of raw) {
+    if (!sheet.nodes.length)
+      issues.push({ code: 'COVERAGE', page: sheet.id, message: '页面没有可测量文字，需提供可读文本与独立验收证据' });
     for (const node of sheet.nodes) {
+      if (node.outsideComponent)
+        issues.push({ code: 'CAPACITY', page: sheet.id, message: '文字超出组件目标区域', text: node.text });
+      if (node.role && (roleScale[node.role] === undefined || Math.abs(node.size - roleScale[node.role]) > 0.35))
+        issues.push({ code: 'THEME', page: sheet.id, message: '文字字号与主题角色不符', text: node.text });
       if (Number.isFinite(node.size) && !node.inScale) {
         issues.push({
           code: 'THEME',
@@ -63,7 +91,7 @@ export async function auditDeck(page, theme) {
         });
       }
       const declared = (node.family || '').split(',')[0].replace(/["']/g, '').trim();
-      if (declared && !families.includes(declared) && !['serif', 'sans-serif', 'system-ui'].includes(declared)) {
+      if (declared && !families.includes(declared)) {
         issues.push({ code: 'FONT', page: sheet.id, message: `字体 ${declared} 不是主题声明的族名`, text: node.text });
       }
       if (
@@ -83,6 +111,8 @@ export async function auditDeck(page, theme) {
     }
     const byRole = new Map();
     for (const stroke of sheet.strokes) {
+      // 未标注语义的线不能假定属于同一角色；覆盖范围单独记录。
+      if (!stroke.role) continue;
       if (!byRole.has(stroke.role)) byRole.set(stroke.role, new Set());
       byRole.get(stroke.role).add(stroke.w);
     }
@@ -104,5 +134,10 @@ export async function auditDeck(page, theme) {
       });
     }
   }
-  return { pages: raw.length, nodes: raw.reduce((n, s) => n + s.nodes.length, 0), issues };
+  return {
+    unclassifiedStrokes: raw.reduce((n, s) => n + s.strokes.filter((x) => !x.role).length, 0),
+    pages: raw.length,
+    nodes: raw.reduce((n, s) => n + s.nodes.length, 0),
+    issues,
+  };
 }

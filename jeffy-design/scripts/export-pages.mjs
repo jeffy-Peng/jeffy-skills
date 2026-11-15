@@ -1,8 +1,9 @@
 // 把装配好的 HTML 逐页导出 PNG，用于贴进 PPT 或做图片序列。
 // 用法 node scripts/export-pages.mjs build/samples.html build/export [--scale 2]
-import { mkdirSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { mkdirSync } from 'node:fs';
 import { resolve, dirname, basename } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 import { loadChromium, findChrome } from '../lib/browser.mjs';
 
 const [, , input, outDirArg, ...rest] = process.argv;
@@ -11,6 +12,13 @@ const scale = Number((rest.find((x) => x.startsWith('--scale=')) || '').split('=
 const outDir = resolve(outDirArg || 'build/export');
 mkdirSync(outDir, { recursive: true });
 
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const checked = spawnSync(
+  process.execPath,
+  [resolve(root, 'scripts/verify-page.mjs'), input, resolve(outDir, 'validation.json')],
+  { encoding: 'utf8' },
+);
+if (checked.status !== 0) throw Error('最终文件未通过验收，不导出图片：' + checked.stdout + checked.stderr);
 const browser = await loadChromium().launch({ executablePath: findChrome() });
 const page = await browser.newPage({ viewport: { width: 1400, height: 900 }, deviceScaleFactor: scale });
 await page.goto(pathToFileURL(resolve(input)).href);

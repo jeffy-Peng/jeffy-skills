@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { fontPython, resolveFontFile } from '../lib/font-environment.mjs';
 import { existsSync } from 'node:fs';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -16,28 +17,21 @@ const input = positional[0];
 if (!input) throw Error('用法 node scripts/embed-fonts.mjs in.html [out.html] [--budget 3000000]');
 const output = positional[1] || input.replace(/\.html?$/i, '.embedded.html');
 const budget = Number(flags.budget || 3000000);
-const fontsDir =
-  flags.fonts || process.env.FONTS_DIR || join(process.env.HOME || '', '.local/share/fonts/jeffy-design');
-
-// 先看脚本目录，再问 fontconfig。装在 /usr/local/share/fonts 也算数。
-function resolveFont(family, localName) {
-  const local = join(fontsDir, localName);
-  if (existsSync(local)) return local;
-  try {
-    const hit = execFileSync('fc-match', ['-f', '%{file}', family], { encoding: 'utf8' }).trim();
-    if (hit && existsSync(hit)) return hit;
-  } catch {}
-  return local;
-}
-const FONT_FILES = {
-  'Noto Serif SC': resolveFont('Noto Serif SC', 'NotoSerifSC.ttf'),
-  'Noto Sans SC': resolveFont('Noto Sans SC', 'NotoSansSC.ttf'),
-  Georgia: resolveFont('Georgia', 'Georgia.TTF'),
-};
-const WEIGHTS = { 'Noto Serif SC': '200 900', 'Noto Sans SC': '100 900', Georgia: '400' };
-const python = process.env.FONTTOOLS_PYTHON || '/opt/data/venvs/fonts/bin/python';
-
 const html = readFileSync(resolve(input), 'utf8');
+const match = html.match(/window\.compositionInput=(.*?);<\/script>/s);
+if (!match) throw Error('缺少 compositionInput，无法确定本交付件实际使用的主题字体');
+const used = [...new Set(Object.values(JSON.parse(match[1]).theme.fonts))];
+const lock = JSON.parse(readFileSync(join(scriptDir, 'fonts.lock.json'), 'utf8'));
+const FONT_FILES = Object.fromEntries(
+  used.map((family) => {
+    const font = lock.fonts.find((f) => f.family === family);
+    if (!font) throw Error('字体未登记文件来源：' + family);
+    return [family, resolveFontFile(family, font.metricsFile || font.file, flags.fonts)];
+  }),
+);
+const WEIGHTS = Object.fromEntries(lock.fonts.map((f) => [f.family, f.weight.replace(/[^\d ]/g, '').trim()]));
+const python = fontPython();
+
 // 抽取字符集时把内联 JSON 一起算进去，页面文字多半在脚本的 payload 里。
 const chars = new Set();
 for (const ch of html) {
