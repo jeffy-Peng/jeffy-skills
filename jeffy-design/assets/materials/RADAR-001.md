@@ -4,13 +4,17 @@ name: 雷达图
 form: 多维轮廓
 archetype: compare
 shape: radar
+encoding: angle
+readingTime: read
+cost: medium
+alternates: [BAR-002]
 tier: backup
-implementation: model
+implementation: engine
 options: [direction, sort]
 defaults: { direction: vertical, sort: given }
 question: 比较对象的多维评分轮廓
 minimumInput: 至少三个同方向、可解释且可比的维度评分；需明确标准化口径
-status: 仅规范·模型绘制
+status: 已入库·自动组装
 standard: materials/RADAR-001.md
 sources: []
 sheets: []

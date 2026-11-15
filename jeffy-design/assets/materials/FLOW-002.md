@@ -4,6 +4,10 @@ name: 泳道图
 form: 跨角色流程
 archetype: flow
 shape: swimlane
+encoding: position
+readingTime: read
+cost: large
+alternates: [FLOW-001]
 tier: backup
 implementation: model
 options: [direction, sort]

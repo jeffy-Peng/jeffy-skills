@@ -4,7 +4,12 @@ name: 比较矩阵
 form: 对象乘维度
 archetype: table
 shape: matrix
+encoding: text+lightness
+readingTime: read
+cost: small
+alternates: [TABLE-001]
 tier: backup
+implementation: engine
 options: [focus]
 defaults: {focus: 0}
 question: 按相同维度逐项比较对象

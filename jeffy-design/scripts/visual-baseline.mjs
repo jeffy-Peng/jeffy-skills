@@ -6,10 +6,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { loadChromium, findChrome } from '../lib/browser.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const specimenDir = resolve(root, 'assets/materials/specimens');
+const specimenDir = resolve(root, process.env.SPECIMEN_DIR || 'assets/materials/specimens');
 const skeletonDir = resolve(root, 'assets/skeletons');
 const pagesDir = resolve(root, 'assets/pages');
-const baselineDir = resolve(root, 'assets/materials/baselines');
+// 基线按主题分目录：同一个素材在不同主题下的像素本来就不同，混在一起会把真漂移埋掉。
+const themes = JSON.parse(readFileSync(resolve(root, 'build/generated/themes.json'), 'utf8'));
+const themeName = process.env.SPECIMEN_THEME || themes[0].name;
+const baselineDir = resolve(root, 'assets/materials/baselines', themeName);
 mkdirSync(baselineDir, { recursive: true });
 const update = process.argv.includes('--update');
 const threshold = 0.003; // 千分之三的像素不同就算漂移

@@ -4,6 +4,10 @@ name: 循环图
 form: 循环关系
 archetype: relation
 shape: loop
+encoding: position
+readingTime: fast
+cost: small
+alternates: [REL-001]
 tier: backup
 implementation: model
 options: [direction, sort]

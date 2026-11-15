@@ -84,12 +84,21 @@ try {
               s.textAlign === 'center' && s.verticalAlign === 'middle' && parseFloat(s.fontSize) === roles.body.size;
           }
           for (const n of [...d.querySelectorAll('[data-shape-role]')].filter((n) => !n.closest('mask'))) {
-            if (n.getAttribute('stroke') && n.getAttribute('stroke') !== 'none')
-              ok &&= parseFloat(w.getComputedStyle(n).strokeWidth) === theme.rules.dividerWidthPx;
+            const sw = parseFloat(w.getComputedStyle(n).strokeWidth);
+            // 圆角扇瓣的描边宽度来自主题的 petalCornerPx，其余形状必须用分隔线宽。
+            if (n.dataset.cornerRole === 'petalCorner') ok &&= sw === resolved.materials.petalCornerPx;
+            else if (n.getAttribute('stroke') && n.getAttribute('stroke') !== 'none')
+              ok &&= sw === theme.rules.dividerWidthPx;
           }
           const rect = d.querySelector('rect[data-key^="bar"]');
           if (rect) {
-            ok &&= +rect.getAttribute('rx') === resolved.materials.radius;
+            // 胶囊柱的圆角等于细边的一半，其余按主题的统一圆角校验。
+            const capsule = resolved.materials.barStyle === 'capsule';
+            ok &&= capsule
+              ? Math.abs(
+                  +rect.getAttribute('rx') - Math.min(+rect.getAttribute('width'), +rect.getAttribute('height')) / 2,
+                ) < 0.6
+              : +rect.getAttribute('rx') === resolved.materials.radius;
             if (resolved.materials.barMode === 'outline')
               ok &&= w.getComputedStyle(rect).fill === toRGB(theme.colors.paper);
           }

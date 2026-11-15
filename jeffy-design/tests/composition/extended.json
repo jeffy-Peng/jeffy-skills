@@ -359,6 +359,737 @@
       ],
       "speakerNotes": "上图按日期比例安排事件，下面按父子关系表示结构。它们回答不同问题，这里仅用于验证素材共存，不声称某个事件触发了某个模块。层级结构本轮接入root和children输入版本，简洁线条的另一款方案尚未迁移。",
       "source": "来源：素材适配合成数据；非真实业务结论。"
+    },
+    {
+      "id": "pie-bigslice",
+      "title": "双编码饼",
+      "question": "各占多少、强度差多少",
+      "claim": "三块里第二块最强，第一块占比最大但强度中等",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "",
+      "components": [
+        {
+          "id": "c1",
+          "material": "PIE-002",
+          "purpose": "share",
+          "data": {
+            "title": "",
+            "centerLabel": "合计",
+            "data": [
+              {
+                "label": "甲",
+                "value": 32,
+                "intensity": 42
+              },
+              {
+                "label": "乙",
+                "value": 27,
+                "intensity": 90
+              },
+              {
+                "label": "丙",
+                "value": 18,
+                "intensity": 25
+              },
+              {
+                "label": "丁",
+                "value": 23,
+                "intensity": 64
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 800,
+            "height": 520
+          }
+        }
+      ]
+    },
+    {
+      "id": "bar-sorted",
+      "title": "按值降序",
+      "question": "哪几项更大",
+      "claim": "降序之后最大的在最左",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "验证 sort=desc 时值与标签一起重排。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "BAR-001",
+          "purpose": "compare",
+          "data": {
+            "title": "",
+            "metric": "数值",
+            "unit": "件",
+            "series": [
+              "数值"
+            ],
+            "data": [
+              {
+                "label": "甲",
+                "values": [
+                  19
+                ]
+              },
+              {
+                "label": "乙",
+                "values": [
+                  58
+                ]
+              },
+              {
+                "label": "丙",
+                "values": [
+                  33
+                ]
+              }
+            ]
+          },
+          "options": {
+            "sort": "desc"
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "bar-sign",
+      "title": "正负变化",
+      "question": "哪些涨哪些跌",
+      "claim": "两涨两跌，零基线在中间",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "验证正负柱的零基线与负值标签。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "BAR-005",
+          "purpose": "compare",
+          "data": {
+            "title": "",
+            "metric": "变化量",
+            "unit": "件",
+            "series": [
+              "变化量"
+            ],
+            "data": [
+              {
+                "label": "甲",
+                "values": [
+                  12
+                ]
+              },
+              {
+                "label": "乙",
+                "values": [
+                  -9
+                ]
+              },
+              {
+                "label": "丙",
+                "values": [
+                  6
+                ]
+              },
+              {
+                "label": "丁",
+                "values": [
+                  -15
+                ]
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "bar-target",
+      "title": "实际与目标",
+      "question": "哪些达成了",
+      "claim": "两项未达，两项超出",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "验证目标刻线与图例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "BAR-007",
+          "purpose": "compare",
+          "data": {
+            "title": "",
+            "metric": "数值",
+            "unit": "件",
+            "series": [
+              "实际",
+              "目标"
+            ],
+            "data": [
+              {
+                "label": "甲",
+                "values": [
+                  42,
+                  50
+                ]
+              },
+              {
+                "label": "乙",
+                "values": [
+                  61,
+                  55
+                ]
+              },
+              {
+                "label": "丙",
+                "values": [
+                  38,
+                  45
+                ]
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "hist",
+      "title": "分布",
+      "question": "落在哪个区间",
+      "claim": "多数集中在第二组",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "验证直方图相邻柱。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "DIST-001",
+          "purpose": "compare",
+          "data": {
+            "title": "",
+            "metric": "频数",
+            "unit": "个",
+            "series": [
+              "频数"
+            ],
+            "data": [
+              {
+                "label": "0–10",
+                "values": [
+                  8
+                ]
+              },
+              {
+                "label": "10–20",
+                "values": [
+                  19
+                ]
+              },
+              {
+                "label": "20–30",
+                "values": [
+                  12
+                ]
+              },
+              {
+                "label": "30–40",
+                "values": [
+                  5
+                ]
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "matrix",
+      "title": "四象限",
+      "question": "各自落在哪个象限",
+      "claim": "右上最强，左下最弱",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "验证分界虚线与点标签。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "MATRIX-001",
+          "purpose": "relation",
+          "data": {
+            "title": "",
+            "xLabel": "增速 · %",
+            "yLabel": "规模 · 件",
+            "boundary": {
+              "x": 50,
+              "y": 50
+            },
+            "points": [
+              {
+                "label": "甲",
+                "x": 78,
+                "y": 72
+              },
+              {
+                "label": "乙",
+                "x": 32,
+                "y": 68
+              },
+              {
+                "label": "丙",
+                "x": 61,
+                "y": 28
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "layers",
+      "title": "分层架构",
+      "question": "分几层",
+      "claim": "三层，服务层最厚",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "验证层框与模块均分。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "REL-004",
+          "purpose": "relation",
+          "data": {
+            "title": "",
+            "layers": [
+              {
+                "name": "接入",
+                "items": [
+                  {
+                    "title": "网页"
+                  },
+                  {
+                    "title": "App"
+                  }
+                ]
+              },
+              {
+                "name": "服务",
+                "items": [
+                  {
+                    "title": "账户"
+                  },
+                  {
+                    "title": "订单"
+                  },
+                  {
+                    "title": "结算"
+                  }
+                ]
+              },
+              {
+                "name": "数据",
+                "items": [
+                  {
+                    "title": "主库"
+                  },
+                  {
+                    "title": "分析库"
+                  }
+                ]
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 980,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "funnel",
+      "title": "funnel",
+      "question": "验证",
+      "claim": "验证",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "契约用例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "FUNNEL-001",
+          "purpose": "flow",
+          "data": {
+            "title": "",
+            "stages": [
+              {
+                "label": "进店",
+                "value": 100
+              },
+              {
+                "label": "注册",
+                "value": 62
+              },
+              {
+                "label": "激活",
+                "value": 41
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "heat",
+      "title": "heat",
+      "question": "验证",
+      "claim": "验证",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "契约用例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "HEAT-001",
+          "purpose": "table",
+          "data": {
+            "title": "",
+            "rows": [
+              "甲",
+              "乙"
+            ],
+            "cols": [
+              "一",
+              "二",
+              "三"
+            ],
+            "values": [
+              [
+                34,
+                51,
+                43
+              ],
+              [
+                57,
+                null,
+                60
+              ]
+            ],
+            "min": 0,
+            "max": 60
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "scatter",
+      "title": "scatter",
+      "question": "验证",
+      "claim": "验证",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "契约用例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "SCATTER-001",
+          "purpose": "relation",
+          "data": {
+            "title": "",
+            "xLabel": "价格",
+            "yLabel": "销量",
+            "points": [
+              {
+                "label": "A",
+                "x": 12,
+                "y": 68
+              },
+              {
+                "label": "B",
+                "x": 24,
+                "y": 52
+              },
+              {
+                "label": "C",
+                "x": 31,
+                "y": 61
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "radar",
+      "title": "radar",
+      "question": "验证",
+      "claim": "验证",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "契约用例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "RADAR-001",
+          "purpose": "compare",
+          "data": {
+            "title": "",
+            "max": 100,
+            "axes": [
+              {
+                "name": "速度",
+                "value": 82
+              },
+              {
+                "name": "成本",
+                "value": 46
+              },
+              {
+                "name": "稳定",
+                "value": 74
+              },
+              {
+                "name": "易用",
+                "value": 58
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "contain",
+      "title": "contain",
+      "question": "验证",
+      "claim": "验证",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "契约用例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "REL-003",
+          "purpose": "relation",
+          "data": {
+            "title": "",
+            "name": "平台",
+            "items": [
+              {
+                "title": "账户"
+              },
+              {
+                "title": "订单"
+              },
+              {
+                "title": "结算"
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 780,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "gantt",
+      "title": "gantt",
+      "question": "验证",
+      "claim": "验证",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "契约用例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "TIME-002",
+          "purpose": "timeline",
+          "data": {
+            "title": "",
+            "unit": "天",
+            "rows": [
+              {
+                "label": "调研",
+                "start": 0,
+                "end": 6
+              },
+              {
+                "label": "设计",
+                "start": 5,
+                "end": 12
+              },
+              {
+                "label": "开发",
+                "start": 10,
+                "end": 24
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 900,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "box",
+      "title": "box",
+      "question": "验证",
+      "claim": "验证",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "契约用例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "BOX-001",
+          "purpose": "compare",
+          "data": {
+            "title": "",
+            "groups": [
+              {
+                "label": "甲",
+                "min": 8,
+                "q1": 16,
+                "median": 24,
+                "q3": 33,
+                "max": 46,
+                "outliers": [
+                  58
+                ]
+              },
+              {
+                "label": "乙",
+                "min": 12,
+                "q1": 22,
+                "median": 31,
+                "q3": 40,
+                "max": 52
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 900,
+            "height": 470
+          }
+        }
+      ]
+    },
+    {
+      "id": "sankey",
+      "title": "sankey",
+      "question": "验证",
+      "claim": "验证",
+      "source": "示例数据，2026-11",
+      "speakerNotes": "契约用例。",
+      "components": [
+        {
+          "id": "c1",
+          "material": "SANKEY-001",
+          "purpose": "flow",
+          "data": {
+            "title": "",
+            "left": [
+              {
+                "name": "甲",
+                "value": 40
+              },
+              {
+                "name": "乙",
+                "value": 35
+              }
+            ],
+            "right": [
+              {
+                "name": "x",
+                "value": 50
+              },
+              {
+                "name": "y",
+                "value": 25
+              }
+            ],
+            "links": [
+              {
+                "from": "甲",
+                "to": "x",
+                "value": 30
+              },
+              {
+                "from": "甲",
+                "to": "y",
+                "value": 10
+              },
+              {
+                "from": "乙",
+                "to": "x",
+                "value": 20
+              },
+              {
+                "from": "乙",
+                "to": "y",
+                "value": 15
+              }
+            ]
+          },
+          "box": {
+            "x": 80,
+            "y": 150,
+            "width": 900,
+            "height": 470
+          }
+        }
+      ]
     }
   ]
 }

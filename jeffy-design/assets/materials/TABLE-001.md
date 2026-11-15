@@ -4,7 +4,12 @@ name: 明细表
 form: 对象与字段
 archetype: table
 shape: table-records
+encoding: text
+readingTime: read
+cost: small
+alternates: [TABLE-002]
 tier: primary
+implementation: engine
 options: [focus]
 defaults: {focus: 0}
 question: 查阅多对象的详细字段

@@ -4,7 +4,12 @@ name: 折线图
 form: 时间趋势
 archetype: trend
 shape: time-series
+encoding: position
+readingTime: read
+cost: small
+alternates: [BAR-001]
 tier: primary
+implementation: engine
 options: [mode, area, cumulative, index]
 defaults: { mode: line, area: false, cumulative: false, index: false }
 question: 比较同一指标随时间的变化

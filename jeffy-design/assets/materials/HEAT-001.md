@@ -4,13 +4,17 @@ name: 热力矩阵
 form: 交叉强度
 archetype: table
 shape: heatmap
+encoding: lightness
+readingTime: read
+cost: medium
+alternates: [TABLE-002]
 tier: backup
-implementation: model
+implementation: engine
 options: [direction, sort]
 defaults: { direction: vertical, sort: given }
 question: 比较两类维度交叉后的数值
 minimumInput: 行列标签与对应数值矩阵，缺失 null
-status: 仅规范·模型绘制
+status: 已入库·自动组装
 standard: materials/HEAT-001.md
 sources: []
 sheets: []

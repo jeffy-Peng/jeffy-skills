@@ -4,7 +4,12 @@ name: 时间线
 form: 事件先后
 archetype: timeline
 shape: timeline
+encoding: position
+readingTime: fast
+cost: small
+alternates: [TIME-002]
 tier: primary
+implementation: engine
 options: [direction, spacing, details, focus]
 defaults: {direction: vertical, spacing: equal, details: true}
 question: 说明事件先后或时间位置

@@ -4,13 +4,17 @@ name: 漏斗图
 form: 阶段转化
 archetype: flow
 shape: funnel
+encoding: length
+readingTime: fast
+cost: medium
+alternates: [BAR-001]
 tier: backup
-implementation: model
+implementation: engine
 options: [direction, sort]
 defaults: { direction: vertical, sort: given }
 question: 说明逐阶段筛选和转化
 minimumInput: 同一批对象各阶段非递增数量
-status: 仅规范·模型绘制
+status: 已入库·自动组装
 standard: materials/FUNNEL-001.md
 sources: []
 sheets: []

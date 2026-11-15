@@ -142,14 +142,47 @@
         if (overlap(regions[i], regions[j], 1))
           issues.push(issue('LAYOUT', '主题文字碰撞', { texts: [regions[i].text, regions[j].text] }));
     const colors = new Set(Object.values(theme.colors).map((v) => '#' + v.toLowerCase()));
+    // 明度阶梯：主题在 materials.shadeRamp 里声明两个端点，落在两点连线上的中间色算派生色，
+    // 不算绕过主题。偏差容差取 shadeTolerance（每通道 0-255）。
+    const ramp = (theme.materials?.shadeRamp || [])
+      .map((r) => theme.colors[r])
+      .filter(Boolean)
+      .map((v) => v.toLowerCase());
+    const tolerance = theme.materials?.shadeTolerance ?? 2;
+    const onRamp = (hex) => {
+      const h = String(hex).replace('#', '').toLowerCase();
+      if (!/^[0-9a-f]{6}$/.test(h)) return false;
+      const c = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+      for (let i = 0; i + 1 < ramp.length; i++) {
+        const a = [0, 2, 4].map((k) => parseInt(ramp[i].slice(k, k + 2), 16)),
+          b = [0, 2, 4].map((k) => parseInt(ramp[i + 1].slice(k, k + 2), 16)),
+          d = b.map((x, k) => x - a[k]),
+          len2 = d.reduce((sum, x) => sum + x * x, 0);
+        if (!len2) continue;
+        const t = c.reduce((sum, x, k) => sum + (x - a[k]) * d[k], 0) / len2;
+        if (t < -0.01 || t > 1.01) continue;
+        const residual = Math.max(...c.map((x, k) => Math.abs(x - (a[k] + t * d[k]))));
+        if (residual <= tolerance) return true;
+      }
+      return false;
+    };
     for (const node of [...svg.querySelectorAll('[fill],[stroke]')].filter((n) => !n.closest('mask')))
       for (const key of ['fill', 'stroke']) {
         const value = node.getAttribute(key);
-        // 渐变和滤镜引用由笔触定义，不算绕过主题；其余颜色必须来自主题。
+        // 渐变和滤镜引用由笔触定义，不算绕过主题；其余颜色必须来自主题或明度阶梯。
         const brushed = value?.startsWith('url(#');
-        if (value && !brushed && !['none', 'transparent'].includes(value) && !colors.has(value.toLowerCase()))
+        if (
+          value &&
+          !brushed &&
+          !['none', 'transparent'].includes(value) &&
+          !colors.has(value.toLowerCase()) &&
+          !onRamp(value)
+        )
           issues.push(issue('THEME', '存在绕过主题的颜色', { value }));
       }
+    // 交互靠属性契约：没有可聚焦的图形，页面就是死图，算缺陷。
+    if (!(frame.container || doc).querySelectorAll('[data-focus-key]').length)
+      issues.push(issue('INTERACTION', '没有可聚焦的图形，悬停不会生效'));
     return {
       ok: !issues.length,
       issues,

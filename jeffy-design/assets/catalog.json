@@ -13,12 +13,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/BAR-001.png"
+      ],
       "limits": "正负数据选BAR-005",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/BAR-001.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "compare",
       "options": [
         "direction",
@@ -27,7 +28,15 @@
       ],
       "materialFile": "materials/BAR-001.md",
       "shape": "compare-items",
-      "tier": "primary"
+      "tier": "primary",
+      "implementation": "engine",
+      "encoding": "length",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "BAR-002",
+        "BAR-003"
+      ]
     },
     {
       "id": "BAR-002",
@@ -40,12 +49,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/BAR-002.png"
+      ],
       "limits": "系列须使用可比单位",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/BAR-002.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "compare",
       "options": [
         "direction",
@@ -54,7 +64,15 @@
       ],
       "shape": "compare-groups",
       "tier": "primary",
-      "materialFile": "materials/BAR-002.md"
+      "materialFile": "materials/BAR-002.md",
+      "implementation": "engine",
+      "encoding": "length",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "BAR-001",
+        "BAR-003"
+      ]
     },
     {
       "id": "BAR-003",
@@ -67,12 +85,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/BAR-003.png"
+      ],
       "limits": "百分比总量为零时无占比",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/BAR-003.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "compare",
       "options": [
         "direction",
@@ -81,7 +100,15 @@
       ],
       "shape": "parts-stacked",
       "tier": "primary",
-      "materialFile": "materials/BAR-003.md"
+      "materialFile": "materials/BAR-003.md",
+      "implementation": "engine",
+      "encoding": "length",
+      "readingTime": "read",
+      "cost": "small",
+      "alternates": [
+        "BAR-002",
+        "BAR-001"
+      ]
     },
     {
       "id": "BAR-005",
@@ -96,12 +123,13 @@
       "sheets": [],
       "sources": [],
       "status": "仅规范·模型绘制",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/BAR-005.png"
+      ],
       "limits": "不是累计金额过程",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/BAR-005.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "compare",
       "options": [
         "direction",
@@ -109,8 +137,14 @@
       ],
       "shape": "compare-sign",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/BAR-005.md"
+      "implementation": "engine",
+      "materialFile": "materials/BAR-005.md",
+      "encoding": "position",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "BAR-001"
+      ]
     },
     {
       "id": "BAR-006",
@@ -125,12 +159,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/BAR-006.png"
+      ],
       "limits": "增减项顺序影响解释",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/BAR-006.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "compare",
       "options": [
         "direction",
@@ -138,7 +173,14 @@
       ],
       "shape": "waterfall",
       "tier": "backup",
-      "materialFile": "materials/BAR-006.md"
+      "materialFile": "materials/BAR-006.md",
+      "implementation": "engine",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "small",
+      "alternates": [
+        "BAR-003"
+      ]
     },
     {
       "id": "BAR-007",
@@ -152,13 +194,14 @@
       "parameters": "横纵方向、数据驱动范围与布局",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/BAR-007.png"
+      ],
       "limits": "实际与目标须同单位",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/BAR-007.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "compare",
       "options": [
         "direction",
@@ -166,8 +209,15 @@
       ],
       "shape": "bar-target",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/BAR-007.md"
+      "implementation": "engine",
+      "materialFile": "materials/BAR-007.md",
+      "encoding": "length+position",
+      "readingTime": "read",
+      "cost": "small",
+      "alternates": [
+        "BAR-001",
+        "BOX-001"
+      ]
     },
     {
       "id": "LINE-001",
@@ -180,12 +230,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/LINE-001.png"
+      ],
       "limits": "累计需可相加；指数基期非零",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/LINE-001.md",
-      "statusLegacy": "已入库",
       "archetype": "trend",
       "options": [
         "mode",
@@ -195,7 +246,14 @@
       ],
       "shape": "time-series",
       "tier": "primary",
-      "materialFile": "materials/LINE-001.md"
+      "materialFile": "materials/LINE-001.md",
+      "implementation": "engine",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "small",
+      "alternates": [
+        "BAR-001"
+      ]
     },
     {
       "id": "PIE-001",
@@ -208,12 +266,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/PIE-001.png"
+      ],
       "limits": "不直接比较多期变化；零总量无占比",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/PIE-001.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "share",
       "options": [
         "donut",
@@ -224,7 +283,13 @@
       "shape": "parts-of-whole",
       "tier": "primary",
       "materialFile": "materials/PIE-001.md",
-      "implementation": "engine"
+      "implementation": "engine",
+      "encoding": "angle",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "PIE-002"
+      ]
     },
     {
       "id": "SCATTER-001",
@@ -236,13 +301,14 @@
       "parameters": "名称标注、包含零、重点对象",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/SCATTER-001.png"
+      ],
       "limits": "相关不代表因果；密集标注需成页检查",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/SCATTER-001.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "relation",
       "options": [
         "direction",
@@ -250,8 +316,14 @@
       ],
       "shape": "scatter",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/SCATTER-001.md"
+      "implementation": "engine",
+      "materialFile": "materials/SCATTER-001.md",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "MATRIX-001"
+      ]
     },
     {
       "id": "TABLE-001",
@@ -264,19 +336,27 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/TABLE-001.png"
+      ],
       "limits": "长表需分页或增加区域，不能降字号",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/TABLE-001.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "table",
       "options": [
         "focus"
       ],
       "shape": "table-records",
       "tier": "primary",
-      "materialFile": "materials/TABLE-001.md"
+      "materialFile": "materials/TABLE-001.md",
+      "implementation": "engine",
+      "encoding": "text",
+      "readingTime": "read",
+      "cost": "small",
+      "alternates": [
+        "TABLE-002"
+      ]
     },
     {
       "id": "TABLE-002",
@@ -289,19 +369,27 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/TABLE-002.png"
+      ],
       "limits": "不能混淆缺失与不具备",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/TABLE-002.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "table",
       "options": [
         "focus"
       ],
       "shape": "matrix",
       "tier": "backup",
-      "materialFile": "materials/TABLE-002.md"
+      "materialFile": "materials/TABLE-002.md",
+      "implementation": "engine",
+      "encoding": "text+lightness",
+      "readingTime": "read",
+      "cost": "small",
+      "alternates": [
+        "TABLE-001"
+      ]
     },
     {
       "id": "MATRIX-001",
@@ -313,13 +401,14 @@
       "parameters": "分界值、象限名称、名称标注、重点对象",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/MATRIX-001.png"
+      ],
       "limits": "默认中点不是业务判断",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/MATRIX-001.md",
-      "statusLegacy": "已登记·旧验收待核对",
       "archetype": "relation",
       "options": [
         "direction",
@@ -327,8 +416,14 @@
       ],
       "shape": "quadrant",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/MATRIX-001.md"
+      "implementation": "engine",
+      "materialFile": "materials/MATRIX-001.md",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "SCATTER-001"
+      ]
     },
     {
       "id": "REL-001",
@@ -343,12 +438,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/REL-001.png"
+      ],
       "limits": "区域组装目前接入原方案root/children；简洁线条TREE方案未迁移。两款方案接口不同；TREE-001仅为方案文件名",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/REL-001.md",
-      "statusLegacy": "已入库（简洁线条）；原方案待核对",
       "archetype": "relation",
       "options": [
         "direction",
@@ -357,7 +453,14 @@
       ],
       "shape": "hierarchy",
       "tier": "primary",
-      "materialFile": "materials/REL-001.md"
+      "materialFile": "materials/REL-001.md",
+      "implementation": "engine",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "REL-004"
+      ]
     },
     {
       "id": "FLOW-001",
@@ -370,12 +473,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/FLOW-001.png"
+      ],
       "limits": "流程完整性由内容决定；条件文字共用遮线",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/FLOW-001.md",
-      "statusLegacy": "已入库",
       "archetype": "flow",
       "options": [
         "direction",
@@ -386,7 +490,14 @@
       ],
       "shape": "process",
       "tier": "primary",
-      "materialFile": "materials/FLOW-001.md"
+      "materialFile": "materials/FLOW-001.md",
+      "implementation": "engine",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "FLOW-002"
+      ]
     },
     {
       "id": "TIME-001",
@@ -399,12 +510,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/TIME-001.png"
+      ],
       "limits": "时间比例与等距模式含义不同",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/TIME-001.md",
-      "statusLegacy": "已入库",
       "archetype": "timeline",
       "options": [
         "direction",
@@ -414,7 +526,14 @@
       ],
       "shape": "timeline",
       "tier": "primary",
-      "materialFile": "materials/TIME-001.md"
+      "materialFile": "materials/TIME-001.md",
+      "implementation": "engine",
+      "encoding": "position",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "TIME-002"
+      ]
     },
     {
       "id": "TIME-002",
@@ -426,13 +545,14 @@
       "parameters": "日期、数量、节点说明",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/TIME-002.png"
+      ],
       "limits": "各段使用同一时间口径",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/TIME-002.md",
-      "statusLegacy": "已入库",
       "archetype": "timeline",
       "options": [
         "direction",
@@ -440,8 +560,14 @@
       ],
       "shape": "time-span",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/TIME-002.md"
+      "implementation": "engine",
+      "materialFile": "materials/TIME-002.md",
+      "encoding": "length",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "TIME-001"
+      ]
     },
     {
       "id": "REL-003",
@@ -453,13 +579,14 @@
       "parameters": "层级、同级等高、说明",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/REL-003.png"
+      ],
       "limits": "与SET-001定性集合交集不同",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/REL-003.md",
-      "statusLegacy": "已入库",
       "archetype": "relation",
       "options": [
         "direction",
@@ -467,8 +594,14 @@
       ],
       "shape": "containment",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/REL-003.md"
+      "implementation": "engine",
+      "materialFile": "materials/REL-003.md",
+      "encoding": "area",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "REL-004"
+      ]
     },
     {
       "id": "REL-006",
@@ -481,12 +614,13 @@
       "sheets": [],
       "sources": [],
       "status": "已入库·自动组装",
-      "evidence": [],
+      "evidence": [
+        "materials/specimens/REL-006.png"
+      ],
       "limits": "复杂交叉可能需拆图；共用透明遮线",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
       "standard": "materials/REL-006.md",
-      "statusLegacy": "已入库",
       "archetype": "relation",
       "options": [
         "direction",
@@ -497,7 +631,14 @@
       ],
       "shape": "network",
       "tier": "backup",
-      "materialFile": "materials/REL-006.md"
+      "materialFile": "materials/REL-006.md",
+      "implementation": "engine",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "large",
+      "alternates": [
+        "REL-005"
+      ]
     },
     {
       "id": "HEAT-001",
@@ -509,13 +650,14 @@
       "parameters": "数值标注、包含零",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/HEAT-001.png"
+      ],
       "limits": "颜色深浅需同口径；不作因果推断",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/HEAT-001.md",
-      "statusLegacy": "已入库",
       "archetype": "table",
       "options": [
         "direction",
@@ -523,8 +665,14 @@
       ],
       "shape": "heatmap",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/HEAT-001.md"
+      "implementation": "engine",
+      "materialFile": "materials/HEAT-001.md",
+      "encoding": "lightness",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "TABLE-002"
+      ]
     },
     {
       "id": "DIST-001",
@@ -536,13 +684,14 @@
       "parameters": "分箱数量、数值标注",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/DIST-001.png"
+      ],
       "limits": "分箱影响观察，不是类别柱状图",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/DIST-001.md",
-      "statusLegacy": "已入库",
       "archetype": "compare",
       "options": [
         "direction",
@@ -550,8 +699,14 @@
       ],
       "shape": "distribution",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/DIST-001.md"
+      "implementation": "engine",
+      "materialFile": "materials/DIST-001.md",
+      "encoding": "length",
+      "readingTime": "read",
+      "cost": "small",
+      "alternates": [
+        "BAR-001"
+      ]
     },
     {
       "id": "SANKEY-001",
@@ -563,13 +718,14 @@
       "parameters": "节点与流量、数值标注",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/SANKEY-001.png"
+      ],
       "limits": "当前仅两端，不支持多阶段或循环流",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/SANKEY-001.md",
-      "statusLegacy": "已入库",
       "archetype": "flow",
       "options": [
         "unit",
@@ -579,7 +735,13 @@
       "shape": "flow-matrix",
       "tier": "backup",
       "materialFile": "materials/SANKEY-001.md",
-      "implementation": "model"
+      "implementation": "engine",
+      "encoding": "length",
+      "readingTime": "read",
+      "cost": "large",
+      "alternates": [
+        "FLOW-001"
+      ]
     },
     {
       "id": "FUNNEL-001",
@@ -591,13 +753,14 @@
       "parameters": "阶段数量、转化率标注",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/FUNNEL-001.png"
+      ],
       "limits": "首阶段非零；不可混用不同人群",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/FUNNEL-001.md",
-      "statusLegacy": "已入库",
       "archetype": "flow",
       "options": [
         "direction",
@@ -605,8 +768,14 @@
       ],
       "shape": "funnel",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/FUNNEL-001.md"
+      "implementation": "engine",
+      "materialFile": "materials/FUNNEL-001.md",
+      "encoding": "length",
+      "readingTime": "fast",
+      "cost": "medium",
+      "alternates": [
+        "BAR-001"
+      ]
     },
     {
       "id": "LOOP-001",
@@ -621,10 +790,9 @@
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "不表示各环节耗时或贡献大小",
-      "implementationRole": "reference",
+      "implementationRole": "model",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/LOOP-001.md",
-      "statusLegacy": "已入库",
       "archetype": "relation",
       "options": [
         "direction",
@@ -633,7 +801,13 @@
       "shape": "loop",
       "tier": "backup",
       "implementation": "model",
-      "materialFile": "materials/LOOP-001.md"
+      "materialFile": "materials/LOOP-001.md",
+      "encoding": "position",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "REL-001"
+      ]
     },
     {
       "id": "SET-001",
@@ -648,10 +822,9 @@
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "面积不表示数量；不能代替定量Venn图",
-      "implementationRole": "reference",
+      "implementationRole": "model",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/SET-001.md",
-      "statusLegacy": "已入库",
       "archetype": "relation",
       "options": [
         "direction",
@@ -660,7 +833,13 @@
       "shape": "set",
       "tier": "backup",
       "implementation": "model",
-      "materialFile": "materials/SET-001.md"
+      "materialFile": "materials/SET-001.md",
+      "encoding": "area",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "REL-003"
+      ]
     },
     {
       "id": "BOX-001",
@@ -672,13 +851,14 @@
       "parameters": "横纵方向、组数、中位数标注",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/BOX-001.png"
+      ],
       "limits": "线性插值分位数，须为1.5×IQR范围内观测",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/BOX-001.md",
-      "statusLegacy": "已入库",
       "archetype": "compare",
       "options": [
         "direction",
@@ -686,8 +866,14 @@
       ],
       "shape": "box",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/BOX-001.md"
+      "implementation": "engine",
+      "materialFile": "materials/BOX-001.md",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "DIST-001"
+      ]
     },
     {
       "id": "RADAR-001",
@@ -699,13 +885,14 @@
       "parameters": "维度数量、对象对照、数值标注",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/RADAR-001.png"
+      ],
       "limits": "不直接混用单位；当前只验证有限系列",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/RADAR-001.md",
-      "statusLegacy": "已入库",
       "archetype": "compare",
       "options": [
         "direction",
@@ -713,8 +900,14 @@
       ],
       "shape": "radar",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/RADAR-001.md"
+      "implementation": "engine",
+      "materialFile": "materials/RADAR-001.md",
+      "encoding": "angle",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "BAR-002"
+      ]
     },
     {
       "id": "FLOW-002",
@@ -729,7 +922,7 @@
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
-      "implementationRole": "reference",
+      "implementationRole": "model",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/FLOW-002.md",
       "approval": {
@@ -737,7 +930,6 @@
         "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
       },
-      "statusLegacy": "已入库·原版已确认",
       "archetype": "flow",
       "options": [
         "direction",
@@ -746,7 +938,13 @@
       "shape": "swimlane",
       "tier": "backup",
       "implementation": "model",
-      "materialFile": "materials/FLOW-002.md"
+      "materialFile": "materials/FLOW-002.md",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "large",
+      "alternates": [
+        "FLOW-001"
+      ]
     },
     {
       "id": "REL-002",
@@ -761,7 +959,7 @@
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
-      "implementationRole": "reference",
+      "implementationRole": "model",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/REL-002.md",
       "approval": {
@@ -769,7 +967,6 @@
         "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
       },
-      "statusLegacy": "已入库·原版已确认",
       "archetype": "relation",
       "options": [
         "direction",
@@ -778,7 +975,13 @@
       "shape": "exchange",
       "tier": "backup",
       "implementation": "model",
-      "materialFile": "materials/REL-002.md"
+      "materialFile": "materials/REL-002.md",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "small",
+      "alternates": [
+        "FLOW-001"
+      ]
     },
     {
       "id": "REL-004",
@@ -790,20 +993,21 @@
       "parameters": "层数、模块、说明",
       "sheets": [],
       "sources": [],
-      "status": "仅规范·模型绘制",
-      "evidence": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/REL-004.png"
+      ],
       "limits": "表达规范试点；生成器并非结构边界。常规分格可复用，跨层、分组、不等宽结构允许依规范重绘。原版已确认；后续机制重写版独立保留试验状态。",
       "standard": "materials/REL-004.md",
       "referenceImplementation": "archive/分层架构表达标准/参考实现.js",
       "adaptationCase": "../examples/layer-adaptation/index.html",
-      "implementationRole": "reference",
+      "implementationRole": "engine",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "approval": {
         "scope": "前序已确认原版及表达方向；不包含后续机制重写版",
         "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
       },
-      "statusLegacy": "已入库·原版已确认",
       "archetype": "relation",
       "options": [
         "direction",
@@ -811,8 +1015,15 @@
       ],
       "shape": "layers",
       "tier": "backup",
-      "implementation": "model",
-      "materialFile": "materials/REL-004.md"
+      "implementation": "engine",
+      "materialFile": "materials/REL-004.md",
+      "encoding": "position",
+      "readingTime": "fast",
+      "cost": "small",
+      "alternates": [
+        "REL-003",
+        "REL-001"
+      ]
     },
     {
       "id": "REL-005",
@@ -827,7 +1038,7 @@
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "原版已确认；当前统一区域引擎尚未接入，按规范适配绘制。",
-      "implementationRole": "reference",
+      "implementationRole": "model",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/REL-005.md",
       "approval": {
@@ -835,7 +1046,6 @@
         "basis": "本会话已有分批通过、继续及入库指令；本轮纠正遗留草稿状态，不重复索要确认。",
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
       },
-      "statusLegacy": "已入库·原版已确认",
       "archetype": "relation",
       "options": [
         "direction",
@@ -844,7 +1054,13 @@
       "shape": "hub",
       "tier": "backup",
       "implementation": "model",
-      "materialFile": "materials/REL-005.md"
+      "materialFile": "materials/REL-005.md",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "REL-006"
+      ]
     },
     {
       "id": "SEQ-001",
@@ -859,14 +1075,13 @@
       "status": "仅规范·模型绘制",
       "evidence": [],
       "limits": "暂不支持自消息、激活条、并行与条件组合片段；结构适配案例作为参考源件，当前未接入克莱因蓝区域引擎。",
-      "implementationRole": "reference",
+      "implementationRole": "model",
       "standardCoverage": "规则已整理；无自动适配器，按规范手绘并单独验收",
       "standard": "materials/SEQ-001.md",
       "approval": {
         "scope": "跨素材结构适配案例已获整体认可；独立机制审核稿不等同该案例",
         "basis": "沿用前序案例反馈，不要求用户重复审核已认可案例。"
       },
-      "statusLegacy": "草稿·独立组件版本待核对",
       "archetype": "relation",
       "options": [
         "direction",
@@ -875,7 +1090,47 @@
       "shape": "sequence",
       "tier": "backup",
       "implementation": "model",
-      "materialFile": "materials/SEQ-001.md"
+      "materialFile": "materials/SEQ-001.md",
+      "encoding": "position",
+      "readingTime": "read",
+      "cost": "large",
+      "alternates": [
+        "FLOW-001"
+      ]
+    },
+    {
+      "id": "PIE-002",
+      "aliases": [],
+      "purpose": "占比与强度双编码",
+      "form": "部分与整体",
+      "question": "各占多少、各自的强度差多少",
+      "minimumInput": "三到六个互斥类别，各自一个非负数值与一个正的强度值",
+      "parameters": "是否标强度、是否写合计、扇瓣缝",
+      "sheets": [],
+      "sources": [],
+      "status": "已入库·自动组装",
+      "evidence": [
+        "materials/specimens/PIE-002.png"
+      ],
+      "limits": "双编码易被读成占比差异，必须解释半径含义；类目超过六个扇瓣过细",
+      "implementationRole": "engine",
+      "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
+      "standard": "materials/PIE-002.md",
+      "archetype": "share",
+      "options": [
+        "intensity",
+        "center"
+      ],
+      "shape": "parts-of-whole-2d",
+      "tier": "primary",
+      "materialFile": "materials/PIE-002.md",
+      "implementation": "engine",
+      "encoding": "dual:angle+radius",
+      "readingTime": "read",
+      "cost": "medium",
+      "alternates": [
+        "PIE-001"
+      ]
     }
   ],
   "policy": "每项为表达规范、带理由的样张与参考实现；规范覆盖不等于行为验收，生成器能力不等于结构边界。"

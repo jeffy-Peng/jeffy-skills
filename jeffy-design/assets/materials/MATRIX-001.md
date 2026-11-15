@@ -4,13 +4,17 @@ name: 四象限矩阵
 form: 二维定位
 archetype: relation
 shape: quadrant
+encoding: position
+readingTime: read
+cost: medium
+alternates: [SCATTER-001]
 tier: backup
-implementation: model
+implementation: engine
 options: [direction, sort]
 defaults: { direction: vertical, sort: given }
 question: 在两个维度上定位对象
 minimumInput: 对象坐标、维度名称、分界依据
-status: 仅规范·模型绘制
+status: 已入库·自动组装
 standard: materials/MATRIX-001.md
 sources: []
 sheets: []

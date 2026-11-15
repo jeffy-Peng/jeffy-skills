@@ -1,8 +1,13 @@
 // 单位与量纲：只在轴端出现一次（R10）。竖向转 90 度放左侧，横向放末刻度下方右对齐。
 window.KitUnit = {
   label(p, opts) {
-    const { metric, unit, horizontal, right, bottom, top, pad, labelSize } = opts;
+    const { metric, unit, horizontal, right, bottom, top, pad, labelSize, bare } = opts;
     const text = unit ? metric + ' / ' + unit : metric;
+    // 无轴时没有轴端可挂，单位落到右下角，横排一行。
+    if (bare) {
+      p.text(right, bottom + labelSize * 1.6, text, 'unit', 'end');
+      return;
+    }
     if (horizontal) {
       p.text(right, bottom + labelSize * 2.6, text, 'unit', 'end');
     } else {

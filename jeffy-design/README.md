@@ -33,7 +33,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 ## 三层结构
 
 - 主题 `themes/*.json`：颜色、字体、字号阶梯、间距、圆角、线宽、网格、密度档，以及 `brush` 指定的笔触。
-- 笔触 `lib/styles/line.js`：默认线条笔触，只管怎么落笔。不算位置，不选颜色。
+- 笔触 `lib/styles/registry.json`：登记有哪些笔触、支持哪些原型、可接受哪些参数。当前落笔质感由主题量（圆角、线宽、填充、明度阶梯）决定，笔触层只做声明与校验。
 - 素材 `assets/materials/<ID>.md`：一条素材一个文件，写语义、画法、可调参数、规则和验收。
 
 几何在 `lib/theming/renderers.js`，七族各一份，属于引擎。素材和笔触都不复制它，所以新增一条同族素材常常零代码。
@@ -65,7 +65,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 - 加素材：写 `assets/materials/<ID>.md`，跑 `npm run sync`，登记表、能力表与目录一起生成。
 - 生成物是 `lib/composition/adapters.json`、`assets/capability.json` 与 `build/generated/`，不要手改。`npm run sync:check` 只检查不写。
 
-Catalog 唯一维护源为 [assets/catalog.json](assets/catalog.json)，运行 `npm run catalog` 更新目录及资源记录。31 项素材每条一个 md 文件：12 条有代码实现，进基线；19 条只写规范，由模型按规范绘制，不进像素基线。素材库只保留规范与示意图。
+Catalog 唯一维护源为 [assets/catalog.json](assets/catalog.json)，运行 `npm run catalog` 更新目录及资源记录。32 项素材每条一个 md 文件：26 条有代码实现，进基线；6 条只写规范，由模型按规范绘制，不进像素基线。素材库只保留规范与示意图。
 
 默认仅保证 HTML 路径，没有原生可编辑 PPTX 导出。
 
@@ -78,7 +78,7 @@ npm run test:composition           # 12 项组装回归
 npm run test:adapters              # 23 项参数回归
 npm run test:themes                # 17 项主题与区域检查
 npm run test:materials             # 39 项素材契约用例
-npm run specimen BAR-001           # 生成素材示意图（只有图表，12 条引擎素材）
+npm run specimen BAR-001           # 生成素材示意图（只有图表，26 条引擎素材）
 npm run baseline                   # 素材与骨架的像素基线回归
 ```
 

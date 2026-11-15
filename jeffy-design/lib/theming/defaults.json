@@ -18,5 +18,28 @@
   "nodeWidthPx": 18,
   "labelGutterPx": 120,
   "pieRadiusH": 0.34,
-  "pieRadiusW": 0.26
+  "pieRadiusW": 0.26,
+  "petalRadiusH": 0.46,
+  "petalRadiusW": 0.3,
+  "petalMinRatio": 0.45,
+  "petalHolePx": 44,
+  "petalGapDeg": 3.2,
+  "petalCornerPx": 8,
+  "petalRingRatio": 0.66,
+  "petalRingDash": "4 8",
+  "petalRingWidthPx": 1,
+  "shadeRamp": [
+    "ink",
+    "soft"
+  ],
+  "shadeTolerance": 2,
+  "shapeDimOpacity": 0.45,
+  "labelDimOpacity": 0.35,
+  "interactMs": 160,
+  "axisMode": "auto",
+  "barRadiusRatio": 0,
+  "rungPitchPx": 6,
+  "barStyle": "solid",
+  "barPalette": "series",
+  "flowAlpha": 0.55
 }

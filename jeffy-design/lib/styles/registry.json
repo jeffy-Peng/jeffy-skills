@@ -7,5 +7,23 @@
     ],
     "params": {},
     "fontUnit": 1
+  },
+  "lieflat": {
+    "file": "lib/theming/drawing.js",
+    "families": [
+      "compare",
+      "trend",
+      "share",
+      "table",
+      "timeline"
+    ],
+    "params": {
+      "hairline": {
+        "default": 1,
+        "min": 0.5,
+        "max": 2
+      }
+    },
+    "fontUnit": 1
   }
 }

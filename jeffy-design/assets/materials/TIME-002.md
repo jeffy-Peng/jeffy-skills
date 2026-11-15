@@ -4,13 +4,17 @@ name: 甘特条
 form: 时间区间
 archetype: timeline
 shape: time-span
+encoding: length
+readingTime: read
+cost: medium
+alternates: [TIME-001]
 tier: backup
-implementation: model
+implementation: engine
 options: [direction, sort]
 defaults: { direction: vertical, sort: given }
 question: 表示一段工作的持续范围
 minimumInput: 段名称、开始与结束位置、可选说明
-status: 仅规范·模型绘制
+status: 已入库·自动组装
 standard: materials/TIME-002.md
 sources: []
 sheets: []

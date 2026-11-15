@@ -56,6 +56,13 @@ function mergeMaterials(catalog, files) {
     if (d.shape) entry.shape = d.shape;
     if (d.tier) entry.tier = d.tier;
     if (d.implementation) entry.implementation = d.implementation;
+    for (const k of ['encoding', 'readingTime', 'cost']) if (d[k]) entry[k] = d[k];
+    if (Array.isArray(d.alternates)) entry.alternates = d.alternates;
+    // 实现方式与验证证据由同步统一写，避免手工维护时漂移。
+    entry.implementationRole = (entry.implementation || 'engine') === 'model' ? 'model' : 'engine';
+    if (entry.implementationRole === 'engine') entry.evidence = ['materials/specimens/' + entry.id + '.png'];
+    else entry.evidence = [];
+    delete entry.statusLegacy;
     entry.materialFile = file.file;
     merged += 1;
   }
@@ -97,6 +104,10 @@ function build() {
     shape: entry.shape || null,
     tier: entry.tier || 'backup',
     implementation: entry.implementation || 'engine',
+    encoding: entry.encoding || null,
+    readingTime: entry.readingTime || null,
+    cost: entry.cost || null,
+    alternates: entry.alternates || [],
   }));
   if (merged) console.log(`素材文件 ${files.length} 个，已合并 ${merged} 条到 catalog.json`);
   // 只有引擎实现的素材才算可组装；模型绘制的只进规范，不进适配器。
@@ -128,18 +139,41 @@ function build() {
       },
     ]),
   );
+  const chart = [
+    '# 选图表',
+    '',
+    '按「数据形状 → 素材 → 编码 → 阅读时间」排。选型先认数据形状，再看场合与阅读时间，最后看替代关系。',
+    '',
+    '| 数据形状 | 素材 | 编码 | 阅读 | 替代 |',
+    '| --- | --- | --- | --- | --- |',
+    ...materials
+      .filter((m) => m.archetype)
+      .sort((a, b) => (a.shape || '').localeCompare(b.shape || ''))
+      .map(
+        (m) =>
+          `| ${m.shape || ''} | ${m.id} | ${m.encoding || ''} | ${m.readingTime || ''} | ${(m.alternates || []).join('、')} |`,
+      ),
+    '',
+  ].join('\n');
   return {
     'themes.json': themes,
+    '选图表.md': chart,
     'adapters.json': adapters,
     'capability.json': capability,
-    'materials.json': materials.map(({ id, archetype, standard, shape, tier, status }) => ({
-      id,
-      archetype,
-      standard,
-      shape,
-      tier,
-      status,
-    })),
+    'materials.json': materials.map(
+      ({ id, archetype, standard, shape, tier, status, encoding, readingTime, cost, alternates }) => ({
+        id,
+        archetype,
+        standard,
+        shape,
+        tier,
+        status,
+        encoding,
+        readingTime,
+        cost,
+        alternates,
+      }),
+    ),
   };
 }
 
@@ -154,6 +188,18 @@ const targets = [
 let stale = 0;
 for (const [path, value] of targets) {
   const text = JSON.stringify(value, null, 2) + '\n';
+  const exists = existsSync(path);
+  const current = exists ? readFileSync(path, 'utf8') : '';
+  if (current === text) continue;
+  stale += 1;
+  if (!checkOnly) {
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, text);
+  }
+}
+
+// 文本产物（选图表）单独写，不走 JSON 序列化。
+for (const [path, text] of [[join(root, 'docs', '选图表.md'), outputs['选图表.md']]]) {
   const exists = existsSync(path);
   const current = exists ? readFileSync(path, 'utf8') : '';
   if (current === text) continue;

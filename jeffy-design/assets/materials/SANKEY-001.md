@@ -4,13 +4,17 @@ name: 桑基图
 form: 两端流向
 archetype: flow
 shape: flow-matrix
+encoding: length
+readingTime: read
+cost: large
+alternates: [FLOW-001]
 tier: backup
-implementation: model
+implementation: engine
 options: [unit, sort, nodeGap]
 defaults: { sort: given, nodeGap: 24 }
 question: 总量从哪里来、分到哪里去
 minimumInput: 两列节点与一张流量表，每行一个来源到一个去向及其数值
-status: 仅规范·模型绘制
+status: 已入库·自动组装
 standard: materials/SANKEY-001.md
 sources: []
 sheets: []

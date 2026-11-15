@@ -407,7 +407,13 @@
     }
   },
   "materials": {
-    "grid": false
+    "grid": false,
+    "shadeRamp": [
+      "accent",
+      "line"
+    ],
+    "shapeDimOpacity": 0.45,
+    "labelDimOpacity": 0.35
   },
   "labels": {
     "separator": "：",

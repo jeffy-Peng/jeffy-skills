@@ -4,7 +4,12 @@ name: 流程图
 form: 有向步骤
 archetype: flow
 shape: process
+encoding: position
+readingTime: read
+cost: medium
+alternates: [FLOW-002]
 tier: primary
+implementation: engine
 options: [direction, details, arrows, labels, focus]
 defaults: {direction: horizontal, details: true, arrows: true, labels: true}
 question: 表达处理步骤、判断与返回

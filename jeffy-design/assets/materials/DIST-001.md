@@ -4,13 +4,17 @@ name: 直方图
 form: 分布形态
 archetype: compare
 shape: distribution
+encoding: length
+readingTime: read
+cost: small
+alternates: [BAR-001]
 tier: backup
-implementation: model
+implementation: engine
 options: [direction, sort]
 defaults: { direction: vertical, sort: given }
 question: 查看原始样本的区间分布
 minimumInput: 有限数值的原始样本数组
-status: 仅规范·模型绘制
+status: 已入库·自动组装
 standard: materials/DIST-001.md
 sources: []
 sheets: []
