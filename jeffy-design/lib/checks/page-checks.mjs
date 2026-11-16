@@ -65,7 +65,18 @@ export async function auditDeck(page, theme) {
             }
           } catch {}
         }
-        return { index, id: sheet.dataset.page || String(index + 1), nodes, strokes };
+        const centering = [...sheet.querySelectorAll('[data-text-center]')].map((shape) => {
+          const key = shape.dataset.focusKey;
+          const host = shape.closest('.jd-component') || sheet;
+          const labels = [...host.querySelectorAll('text[data-label-for]')].filter((t) => t.dataset.labelFor === key);
+          const rects = labels.map((t) => t.getBoundingClientRect());
+          const b = shape.getBoundingClientRect();
+          if (!rects.length) return { key, missing: true };
+          const top = Math.min(...rects.map((r) => r.top)),
+            bottom = Math.max(...rects.map((r) => r.bottom));
+          return { key, offset: (top + bottom - b.top - b.bottom) / 2, outside: top < b.top || bottom > b.bottom };
+        });
+        return { index, id: sheet.dataset.page || String(index + 1), nodes, strokes, centering };
       });
     },
     { scale, families },
@@ -109,6 +120,10 @@ export async function auditDeck(page, theme) {
         seen.get(node.size).push(sheet.id);
       }
     }
+    for (const group of sheet.centering) {
+      if (group.missing || group.outside || Math.abs(group.offset) > 1)
+        issues.push({ code: 'LAYOUT', page: sheet.id, message: '形状内部文字组未垂直居中或越界', ...group });
+    }
     const byRole = new Map();
     for (const stroke of sheet.strokes) {
       // 未标注语义的线不能假定属于同一角色；覆盖范围单独记录。
@@ -136,6 +151,7 @@ export async function auditDeck(page, theme) {
   }
   return {
     unclassifiedStrokes: raw.reduce((n, s) => n + s.strokes.filter((x) => !x.role).length, 0),
+    centeredTextGroups: raw.reduce((n, s) => n + s.centering.length, 0),
     pages: raw.length,
     nodes: raw.reduce((n, s) => n + s.nodes.length, 0),
     issues,

@@ -78,6 +78,18 @@ export function resolveTheme(theme, defaults, paletteName) {
     h.y > page.canvas.height
   )
     fail('invalid header rule');
+  if (page.footerRule) {
+    const f = page.footerRule;
+    if (
+      !['x', 'y', 'width'].every((k) => Number.isFinite(f[k])) ||
+      f.x < 0 ||
+      f.width <= 0 ||
+      f.x + f.width > page.canvas.width ||
+      f.y < page.content.y + page.content.height ||
+      f.y >= page.source.y
+    )
+      fail('invalid footer rule');
+  }
   const intersects = (a, b) =>
     a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
   for (const key of ['title', 'source', 'pageNo'])
