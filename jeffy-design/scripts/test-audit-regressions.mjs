@@ -5,6 +5,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { loadChromium, findChrome } from '../lib/browser.mjs';
+import { auditDeck } from '../lib/checks/page-checks.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'),
   work = join(root, 'build/audit-regressions');
 mkdirSync(work, { recursive: true });
@@ -143,6 +144,39 @@ try {
   const p = await browser.newPage();
   await p.goto(pathToFileURL(html).href);
   await p.waitForFunction(() => window.renderComplete);
+  const theme = await p.evaluate(() => window.compositionInput.theme);
+  await p.evaluate(() => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '300');
+    svg.setAttribute('height', '120');
+    svg.style.cssText = 'position:absolute;left:700px;top:200px';
+    document.querySelector('.sheet').append(svg);
+    const d = ThemeDrawing.create(svg, window.compositionInput.theme);
+    const shape = d.box('center-test', 0, 0, 300, 120, 'soft', {
+      'data-focus-key': 'center-test',
+      'data-text-center': 'true',
+    });
+    const text = d.text(150, 60, '居中检查', 'body', 'middle', { 'data-label-for': 'center-test' });
+    const b = text.getBBox();
+    text.setAttribute('y', 60 + 60 - b.y - b.height / 2);
+  });
+  const centered = await auditDeck(p, theme);
+  test('shape-text-center-pass', () => {
+    assert.equal(centered.centeredTextGroups, 1);
+    assert.equal(centered.issues.filter((i) => i.message.includes('垂直居中')).length, 0);
+  });
+  await p.evaluate(() => document.querySelector('[data-label-for="center-test"]').setAttribute('y', '25'));
+  const shifted = await auditDeck(p, theme);
+  test('shape-text-center-drift-fails', () => assert.ok(shifted.issues.some((i) => i.message.includes('垂直居中'))));
+  await p.evaluate(() => document.querySelector('[data-label-for="center-test"]').remove());
+  const missing = await auditDeck(p, theme);
+  test('shape-text-center-missing-fails', () => assert.ok(missing.issues.some((i) => i.missing)));
+  const footer = await p.evaluate(() => {
+    const a = document.querySelector('[data-block="header-rule"]'),
+      b = document.querySelector('[data-block="footer-rule"]');
+    return [a.style.left === b.style.left, a.style.width === b.style.width, a.style.borderTop === b.style.borderTop];
+  });
+  test('theme-header-footer-rules-match', () => assert.deepEqual(footer, [true, true, true]));
   const checks = await p.evaluate(() => {
     const theme = window.compositionInput.theme;
     const draw = (data) => {

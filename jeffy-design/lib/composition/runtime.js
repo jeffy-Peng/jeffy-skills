@@ -228,6 +228,7 @@
     const regions = typeSpec?.regions || {
       title: theme.page.title,
       rule: theme.page.headerRule,
+      footerRule: theme.page.footerRule,
       content: theme.page.content,
       source: theme.page.source,
       pageNo: theme.page.pageNo,
@@ -312,6 +313,7 @@
     if (!preview && typeSpec?.hasRule !== false) {
       const line = document.createElement('div');
       line.className = 'block';
+      line.dataset.block = 'header-rule';
       line.style.cssText = `left:${regions.rule.x}px;top:${regions.rule.y}px;width:${regions.rule.width}px;border-top:${theme.rules.headerWidthPx}px solid #${theme.colors.ink}`;
       sheet.append(line);
     }
@@ -417,7 +419,41 @@
       }
     }
     if (!preview && typeSpec?.hasFooter !== false) {
-      textBlock(sheet, 'source', withLabel(theme.labels?.source, page.source), regions.source, 'source');
+      const footerRule = regions.footerRule || theme.page.footerRule;
+      if (footerRule) {
+        const line = document.createElement('div');
+        line.className = 'block';
+        line.dataset.block = 'footer-rule';
+        line.style.cssText = `left:${footerRule.x}px;top:${footerRule.y}px;width:${footerRule.width}px;border-top:${theme.rules.headerWidthPx}px solid #${theme.colors.ink}`;
+        sheet.append(line);
+      }
+      const source = textBlock(sheet, 'source', withLabel(theme.labels?.source, page.source), regions.source, 'source');
+      for (const link of page.sourceLinks || []) {
+        if (!link.text || !/^https?:\/\//i.test(link.url || ''))
+          throw Error('CONTRACT: 来源链接需 text 和 http(s) URL');
+        const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT);
+        const matches = [];
+        while (walker.nextNode())
+          if (!walker.currentNode.parentElement.closest('a') && walker.currentNode.textContent.includes(link.text))
+            matches.push(walker.currentNode);
+        for (const node of matches) {
+          const parts = node.textContent.split(link.text);
+          const fragment = document.createDocumentFragment();
+          parts.forEach((part, index) => {
+            if (index) {
+              const a = document.createElement('a');
+              a.textContent = link.text;
+              a.href = link.url;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.style.cssText = 'color:inherit;font:inherit;letter-spacing:inherit;text-underline-offset:2px';
+              fragment.append(a);
+            }
+            fragment.append(document.createTextNode(part));
+          });
+          node.replaceWith(fragment);
+        }
+      }
       textBlock(
         sheet,
         'pageNo',
