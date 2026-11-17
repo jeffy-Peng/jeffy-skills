@@ -3,156 +3,240 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
-    "sampleSource": null
+    "defaultOptions": {
+      "direction": "vertical",
+      "sort": "given"
+    },
+    "sampleSource": "../lib/theming/renderers.js"
   },
   "BAR-002": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "vertical",
+      "widthRatio": 0.5
+    },
     "sampleSource": null
   },
   "BAR-003": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "vertical",
+      "mode": "absolute"
+    },
     "sampleSource": null
   },
   "BAR-005": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "vertical",
+      "sort": "given"
+    },
     "sampleSource": null
   },
   "BAR-006": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "vertical"
+    },
     "sampleSource": null
   },
   "BAR-007": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "vertical",
+      "sort": "given"
+    },
     "sampleSource": null
   },
   "BOX-001": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {},
     "sampleSource": null
   },
   "DIST-001": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "vertical",
+      "sort": "given"
+    },
     "sampleSource": null
   },
   "FLOW-001": {
     "archetype": "flow",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "horizontal",
+      "details": true,
+      "arrows": true,
+      "labels": true
+    },
     "sampleSource": null
   },
   "FUNNEL-001": {
     "archetype": "flow",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "conversion": true
+    },
     "sampleSource": null
   },
   "HEAT-001": {
     "archetype": "table",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "labels": true
+    },
     "sampleSource": null
   },
   "LINE-001": {
     "archetype": "trend",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "mode": "line",
+      "shape": "line",
+      "zero": true,
+      "area": false
+    },
     "sampleSource": null
   },
   "MATRIX-001": {
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "labels": true
+    },
     "sampleSource": null
   },
   "PIE-001": {
     "archetype": "share",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "donut": false,
+      "percent": true,
+      "sort": "given"
+    },
     "sampleSource": null
   },
   "PIE-002": {
     "archetype": "share",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "intensity": true,
+      "center": false,
+      "sort": "given"
+    },
     "sampleSource": null
   },
   "RADAR-001": {
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {},
     "sampleSource": null
   },
   "REL-001": {
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "vertical",
+      "details": true
+    },
     "sampleSource": null
   },
   "REL-003": {
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {},
     "sampleSource": null
   },
   "REL-004": {
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {},
     "sampleSource": null
   },
   "REL-006": {
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "horizontal",
+      "details": true,
+      "arrows": true,
+      "labels": true
+    },
     "sampleSource": null
   },
   "SANKEY-001": {
     "archetype": "flow",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {},
     "sampleSource": null
   },
   "SCATTER-001": {
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "labels": true
+    },
     "sampleSource": null
   },
   "TABLE-001": {
     "archetype": "table",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {},
     "sampleSource": null
   },
   "TABLE-002": {
     "archetype": "table",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {},
     "sampleSource": null
   },
   "TIME-001": {
     "archetype": "timeline",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {
+      "direction": "vertical",
+      "spacing": "equal",
+      "details": true
+    },
     "sampleSource": null
   },
   "TIME-002": {
     "archetype": "timeline",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "defaultOptions": {},
     "sampleSource": null
   }
 }

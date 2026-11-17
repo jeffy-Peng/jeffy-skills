@@ -1,0 +1,376 @@
+{
+  "scope": "单系列随机分节；横纵、零值、小数、六类、主题及数据/容量反例",
+  "results": [
+    {
+      "direction": "horizontal",
+      "values": [
+        86,
+        74,
+        60,
+        48
+      ],
+      "records": [
+        {
+          "value": 86,
+          "count": 45,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 74,
+          "count": 39,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 60,
+          "count": 32,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 48,
+          "count": 25,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        }
+      ],
+      "stable": true,
+      "ruler": true
+    },
+    {
+      "direction": "horizontal",
+      "values": [
+        0,
+        0
+      ],
+      "records": [
+        {
+          "value": 0,
+          "count": 0,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 0,
+          "count": 0,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        }
+      ],
+      "stable": true,
+      "ruler": true
+    },
+    {
+      "direction": "horizontal",
+      "values": [
+        0.001,
+        0.375,
+        12.7,
+        200
+      ],
+      "records": [
+        {
+          "value": 0.001,
+          "count": 1,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 0.375,
+          "count": 1,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 12.7,
+          "count": 4,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 200,
+          "count": 52,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        }
+      ],
+      "stable": true,
+      "ruler": true
+    },
+    {
+      "direction": "horizontal",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "records": [
+        {
+          "value": 1,
+          "count": 9,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 2,
+          "count": 18,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 3,
+          "count": 27,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 4,
+          "count": 36,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 5,
+          "count": 45,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 6,
+          "count": 53,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        }
+      ],
+      "stable": true,
+      "ruler": true
+    },
+    {
+      "direction": "vertical",
+      "values": [
+        86,
+        74,
+        60,
+        48
+      ],
+      "records": [
+        {
+          "value": 86,
+          "count": 25,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 74,
+          "count": 21,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 60,
+          "count": 17,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 48,
+          "count": 14,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        }
+      ],
+      "stable": true,
+      "ruler": true
+    },
+    {
+      "direction": "vertical",
+      "values": [
+        0,
+        0
+      ],
+      "records": [
+        {
+          "value": 0,
+          "count": 0,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 0,
+          "count": 0,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        }
+      ],
+      "stable": true,
+      "ruler": true
+    },
+    {
+      "direction": "vertical",
+      "values": [
+        0.001,
+        0.375,
+        12.7,
+        200
+      ],
+      "records": [
+        {
+          "value": 0.001,
+          "count": 1,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 0.375,
+          "count": 1,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 12.7,
+          "count": 2,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 200,
+          "count": 28,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        }
+      ],
+      "stable": true,
+      "ruler": true
+    },
+    {
+      "direction": "vertical",
+      "values": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "records": [
+        {
+          "value": 1,
+          "count": 5,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 2,
+          "count": 10,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 3,
+          "count": 14,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 4,
+          "count": 19,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 5,
+          "count": 24,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        },
+        {
+          "value": 6,
+          "count": 28,
+          "zero": true,
+          "exact": true,
+          "contained": true,
+          "labels": true
+        }
+      ],
+      "stable": true,
+      "ruler": true
+    },
+    {
+      "alternateTheme": true
+    },
+    {
+      "errors": {
+        "invalid": "DATA",
+        "negative": "DATA",
+        "capacity": "CAPACITY",
+        "grouped": "UNSUPPORTED"
+      }
+    }
+  ]
+}

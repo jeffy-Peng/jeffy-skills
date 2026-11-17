@@ -103,36 +103,20 @@ window.ThemeDrawing = {
       return ['accent', 'accent2', 'body', 'muted'][i % 4];
     }
     function legend(items, W, y) {
-      let sizes = items.map((x) => measure(x.name) + 34),
-        sum = sizes.reduce((a, b) => a + b, 0),
-        gap = items.length > 1 ? Math.min(50, (W - 32 - sum) / (items.length - 1)) : 0;
-      if (sum > W - 32) throw Object.assign(Error('图例区域不足'), { code: 'CAPACITY' });
-      let x = (W - sum - gap * (items.length - 1)) / 2;
-      const g = add('g', { 'data-unified-legend': 'true' });
-      for (let i = 0; i < items.length; i++) {
-        let item = items[i],
-          yy = y,
-          n =
-            item.type === 'bar'
-              ? box(
-                  'legend' + i,
-                  x,
-                  yy - tokens.legendSwatchH / 2,
-                  tokens.legendSwatchW,
-                  tokens.legendSwatchH,
-                  item.paint,
-                  {
-                    stroke: 'none',
-                  },
-                )
-              : line('legend' + i, `M${x} ${yy}h20`, item.paint, { 'stroke-dasharray': item.dash || '' });
-        g.append(n);
-        let t = text(x + 26, yy, item.name, 'pill', 'start');
-        g.append(t);
-        x += sizes[i] + gap;
-      }
-      return g;
+      const fail = (code, message) => {
+        throw Object.assign(Error(message), { code });
+      };
+      return window.KitLegend.draw({ add, text, measure, box, line, tokens, color }, items, {
+        left: tokens.padding,
+        right: W - tokens.padding,
+        y,
+        lineHeight: roles.pill.size * 1.6,
+        gap: tokens.gap * 2,
+        role: 'pill',
+        fail,
+      });
     }
+
     return { add, text, measure, wrap, block, line, box, color, contrast, series, legend, tokens, roles, theme };
   },
 };

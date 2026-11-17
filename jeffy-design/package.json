@@ -1,6 +1,6 @@
 {
   "name": "jeffy-design",
-  "version": "2.6.5",
+  "version": "2.6.6",
   "private": true,
   "type": "module",
   "description": "Content-first presentation design with reusable materials, themes, composition and validation.",
@@ -26,7 +26,7 @@
     "sync:check": "node scripts/sync.mjs --check",
     "doctor": "node scripts/doctor.mjs",
     "test:materials": "node scripts/test-material-contract.mjs",
-    "test:all": "npm run test && npm run test:composition && npm run test:adapters && npm run test:themes && npm run test:materials && npm run test:audit",
+    "test:all": "npm run test && npm run test:composition && npm run test:adapters && npm run test:themes && npm run test:materials && npm run test:audit && npm run test:rhythm && npm run test:selection && npm run test:review",
     "specimen": "node scripts/build-specimen.mjs",
     "baseline": "node scripts/visual-baseline.mjs",
     "baseline:update": "node scripts/visual-baseline.mjs --update",
@@ -35,7 +35,10 @@
     "select": "node scripts/select-material.mjs",
     "materials-doc": "python3 scripts/build-materials-doc.py build/materials.docx",
     "test:audit": "node scripts/test-audit-regressions.mjs",
-    "test:html": "node scripts/test-html-interaction.mjs"
+    "test:html": "node scripts/test-html-interaction.mjs",
+    "test:rhythm": "node scripts/test-rhythm.mjs",
+    "test:selection": "node scripts/test-material-selection.mjs",
+    "test:review": "node scripts/test-skill-review.mjs"
   },
   "devDependencies": {
     "playwright": "^1.65.0",

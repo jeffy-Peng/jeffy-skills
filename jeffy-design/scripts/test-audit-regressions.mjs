@@ -83,6 +83,8 @@ const isolatedSync = () =>
   spawnSync(process.execPath, [join(isolated, 'scripts/sync.mjs'), '--check'], { encoding: 'utf8' });
 try {
   const original = readFileSync(join(root, 'assets/materials/BAR-001.md'), 'utf8');
+  // Keep this fixture explicitly empty to exercise stale-reference clearing.
+  writeFileSync(join(isolated, 'assets/materials/BAR-001.md'), original.replace(/^sources:.*$/m, 'sources: []'));
   writeFileSync(md, original.replaceAll('BAR-001', 'AUDIT-NEW'));
   test('new-declaration-detected', () => assert.notEqual(isolatedSync().status, 0));
   const isolatedCatalog = join(isolated, 'assets/catalog.json');
@@ -214,9 +216,39 @@ try {
     });
     const rects = [...good.svg.querySelectorAll('rect[data-shape-role]')];
     const heights = rects.map((n) => Number(n.getAttribute('height')));
+    const flows = [...good.svg.querySelectorAll('path[data-link-from]')];
+    const associated = (svg) =>
+      [...svg.querySelectorAll('[data-focus-key]')]
+        .filter((n) => n.tagName.toLowerCase() === 'rect')
+        .every((n) =>
+          [...svg.querySelectorAll('text[data-label-for]')].some((t) => t.dataset.labelFor === n.dataset.focusKey),
+        );
+    const boxSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    document.body.append(boxSvg);
+    ThemeRenderers.render(
+      boxSvg,
+      {
+        groups: [
+          { label: 'A', min: 1, q1: 2, median: 3, q3: 4, max: 5, outliers: [9] },
+          { label: 'B', min: 0, q1: 1, median: 2, q3: 3, max: 4 },
+        ],
+      },
+      {},
+      theme,
+      { width: 800, height: 400 },
+      'BOX-001',
+    );
+    const boxGroups = [...boxSvg.querySelectorAll('g[data-focus-key]')];
     return {
       bad,
       conservation,
+      sourceColorConsistent: flows[0].getAttribute('fill') === flows[1].getAttribute('fill'),
+      nodeLabelsLinked: associated(good.svg),
+      boxPartsGrouped:
+        boxGroups.length === 2 && boxGroups[0].children.length === 4 && boxGroups[1].children.length === 3,
+      boxLabelsLinked: boxGroups.every((g) =>
+        [...boxSvg.querySelectorAll('text[data-label-for]')].some((t) => t.dataset.labelFor === g.dataset.focusKey),
+      ),
       flowCount: good.svg.querySelectorAll('path[data-link-from]').length,
       sharedScale: Math.abs(heights[0] - heights[1] - heights[2]) < 1e-7,
     };

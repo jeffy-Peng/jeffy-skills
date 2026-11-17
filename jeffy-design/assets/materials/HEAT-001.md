@@ -10,8 +10,8 @@ cost: medium
 alternates: [TABLE-002]
 tier: backup
 implementation: engine
-options: [direction, sort]
-defaults: { direction: vertical, sort: given }
+options: [labels]
+defaults: {labels: true}
 question: 比较两类维度交叉后的数值
 minimumInput: 行列标签与对应数值矩阵，缺失 null
 status: 已入库·自动组装
@@ -24,7 +24,7 @@ sheets: []
 
 ## 数据形状与分级
 
-交叉比较，数据形状是「heatmap」。分级后备，需要时按本规范由模型绘制，不进像素基线。
+交叉比较，数据形状是「heatmap」。分级后备，已接入统一绘制引擎；工具未覆盖的合法结构可按本规范重绘。
 
 ## 语义
 

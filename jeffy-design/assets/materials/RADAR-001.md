@@ -10,8 +10,8 @@ cost: medium
 alternates: [BAR-002]
 tier: backup
 implementation: engine
-options: [direction, sort]
-defaults: { direction: vertical, sort: given }
+options: []
+defaults: {}
 question: 比较对象的多维评分轮廓
 minimumInput: 至少三个同方向、可解释且可比的维度评分；需明确标准化口径
 status: 已入库·自动组装
@@ -24,7 +24,7 @@ sheets: []
 
 ## 数据形状与分级
 
-多维比较，数据形状是「radar」。分级后备，需要时按本规范由模型绘制，不进像素基线。
+多维比较，数据形状是「radar」。分级后备，已接入统一绘制引擎；工具未覆盖的合法结构可按本规范重绘。
 
 ## 语义
 

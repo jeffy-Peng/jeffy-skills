@@ -31,9 +31,21 @@ window.ThemeRenderers = (() => {
       step = [1, 2, 2.5, 5, 10].find((v) => v * p >= raw) * p;
     return { min: Math.floor(lo / step) * step, max: Math.ceil(hi / step) * step, step };
   }
-  function frame(p, W, H, labels, range, metric, unit, horizontal = false, legend = []) {
+  function frame(p, W, H, labels, range, metric, unit, horizontal = false, legend = [], axisStyle) {
     // 轴、单位、图例统一由 lib/kit 负责，几何只拿回可用区域与坐标换算。
-    return KitAxis.frame(p, { width: W, height: H, labels, range, metric, unit, horizontal, legend, fail, num });
+    return KitAxis.frame(p, {
+      width: W,
+      height: H,
+      labels,
+      range,
+      metric,
+      unit,
+      horizontal,
+      legend,
+      fail,
+      num,
+      axisStyle,
+    });
   }
   // 相对亮度：格子上的字取深还是取浅，按背景实际亮度定。
   function luminance(hex) {
@@ -91,9 +103,13 @@ window.ThemeRenderers = (() => {
                     ? 'waterfall'
                     : 'single',
       percent = kind === 'stacked' && opt.mode === 'percent';
-    if (opt.kind && opt.kind !== kind && !['capsule', 'rung'].includes(opt.kind))
+    if (opt.kind && opt.kind !== kind && !['solid', 'capsule', 'rung', 'rhythm'].includes(opt.kind))
       fail('UNSUPPORTED', 'kind与素材ID不一致');
-    const style = ['capsule', 'rung'].includes(opt.kind) ? opt.kind : theme.materials.barStyle || 'solid';
+    const style = ['solid', 'capsule', 'rung', 'rhythm'].includes(opt.kind)
+      ? opt.kind
+      : theme.materials.barStyle || 'solid';
+    if (style === 'rhythm' && kind !== 'single') fail('UNSUPPORTED', '随机分节当前仅支持单系列比较');
+    if (style === 'rung' && horizontal) fail('UNSUPPORTED', '刻度柱当前仅支持纵向；横向请按规范重绘');
     let labels, rows, series;
     if (kind === 'waterfall') {
       if (!input.data?.length || input.data.some((d) => !d.label || !Number.isFinite(d.value)))
@@ -127,12 +143,19 @@ window.ThemeRenderers = (() => {
       });
       labels = rows.map((d) => d.label);
     }
+    if (kind !== 'waterfall') {
+      if (['single', 'sign', 'distribution'].includes(kind) && rows.some((d) => d.values.length !== 1))
+        fail('DATA', '该素材每个类别只接受一个值');
+      if (kind === 'target' && series.length !== 2) fail('DATA', '目标对照需要实际与目标两个系列');
+      if (style === 'rung' && rows.some((d) => d.values.some((v) => !Number.isInteger(v))))
+        fail('UNSUPPORTED', '刻度柱当前仅支持整数，不能静默改为实心');
+    }
     let values =
         kind === 'waterfall'
           ? rows.flatMap((d) => [d.start, d.end])
           : kind === 'stacked'
             ? rows.map((d) => d.values.reduce((a, b) => a + b, 0))
-            : rows.flatMap((d) => (kind === 'target' ? d.values.slice(0, 1) : d.values)),
+            : rows.flatMap((d) => d.values),
       range = percent ? { min: 0, max: 100, step: 25 } : domain(values),
       legend =
         kind === 'target'
@@ -153,15 +176,9 @@ window.ThemeRenderers = (() => {
         percent ? '%' : input.unit || '单位',
         horizontal,
         legend,
+        style === 'rhythm' ? 'ruler' : undefined,
       ),
       slot = (horizontal ? f.bottom - f.top : f.right - f.left) / rows.length;
-    if (kind === 'target') {
-      const withTarget = rows.flatMap((d) => d.values);
-      const r2 = domain(withTarget);
-      range.max = Math.max(range.max, r2.max);
-      range.min = Math.min(range.min, r2.min);
-      f.finish && null;
-    }
     if (!horizontal && labels.some((x) => p.measure(x) > slot - p.tokens.clearPx))
       fail('CAPACITY', '类别名称无法在当前列宽容纳');
     // 契约：低于可读厚度的柱不该硬画，宁可报容量让人分页。
@@ -232,6 +249,46 @@ window.ThemeRenderers = (() => {
           'data-focus-key': 'bar' + i + '-' + j,
           'data-focus-label': d.label + (series && series.length > 1 ? ' · ' + series[j] : '') + ' ' + num(value),
         });
+        if (style === 'rhythm') {
+          // A shared, index-based sequence is stable across redraws, rows and directions.
+          // Only longitudinal length encodes value; cross-axis variation is decorative.
+          const length = horizontal ? w : h;
+          const axisLength = horizontal ? f.right - f.left : f.bottom - f.top;
+          const pitch = Math.max(p.tokens.clearPx * 2, 10);
+          const step = (range.max - range.min) / Math.max(1, Math.floor(axisLength / pitch));
+          const full = Math.abs(f.coord(step) - f.coord(0));
+          const group = p.add('g', {
+            'data-focus-key': 'bar' + i + '-' + j,
+            'data-focus-label': barNode.getAttribute('data-focus-label'),
+            'data-value': value,
+            'data-category': d.label,
+            'data-segment-step': step,
+            'data-encoded-length': length,
+          });
+          barNode.removeAttribute('data-focus-key');
+          barNode.removeAttribute('data-focus-label');
+          barNode.setAttribute('fill', p.color('paper'));
+          barNode.setAttribute('fill-opacity', '0.001');
+          barNode.setAttribute('stroke', 'none');
+          group.append(barNode);
+          for (let k = 0, pos = 0; pos < length - 1e-8; k++, pos = k * full) {
+            const cell = Math.min(full, length - pos);
+            // Keep the first and last endpoints exact, even for a fractional final cell.
+            const gap = Math.min(full * 0.22, cell * 0.22);
+            const markLength = cell - (pos + cell < length - 1e-8 ? gap : 0);
+            const hash = Math.imul(k + 1, 1597334677) >>> 0;
+            const crossSize = thickness * (0.35 + ((hash % 1000) / 999) * 0.65);
+            const mark = p.add('rect', {
+              x: horizontal ? x + pos : cross - crossSize / 2,
+              y: horizontal ? cross - crossSize / 2 : y + h - pos - markLength,
+              width: horizontal ? markLength : crossSize,
+              height: horizontal ? crossSize : markLength,
+              fill: fillHex || p.color(paint),
+              'data-rhythm-segment': k,
+            });
+            group.append(mark);
+          }
+        }
         void barNode;
         // 刻度柱：一根刻度等于一个单位，值必须是小整数，柱内画横线，柱子本身留纸色做命中区。
         // 刻度柱：一格代表多少单位由值决定，最多画 24 格，超了按 2/5/10/20 合并，避免糊成条纹。
@@ -384,7 +441,7 @@ window.ThemeRenderers = (() => {
         last = [x, y];
         if (opt.points) p.add('circle', { cx: x, cy: y, r: 3, fill: p.color('paper'), stroke: p.color(p.series(j)) });
         hits.push({ x, y, i, j, label: s.name + ' ' + input.labels[i] + ' ' + num(v) });
-        if (opt.labels) p.text(x, y - p.tokens.valueGapPx, num(v));
+        if (opt.labels) p.text(x, y - p.tokens.valueGapPx, num(v)).setAttribute('data-label-for', 'pt' + j + '-' + i);
       });
       p.line('series' + j, d, opt.focus !== undefined && opt.focus !== j ? 'muted' : p.series(j), {
         'stroke-dasharray': j ? '6 4' : '',
@@ -483,6 +540,18 @@ window.ThemeRenderers = (() => {
       start = vertical ? pad + 25 : pad + labelW / 2,
       end = vertical ? box.height - pad - 25 : box.width - pad - labelW / 2,
       axis = vertical ? labelW + 2 * pad : box.height * 0.38;
+    if (vertical && opt.details) {
+      const bodyHeight = Math.max(
+        0,
+        ...events.map((e) =>
+          e.body
+            ? p.wrap(e.body, box.width - axis - pad * 2, 'body').length * p.roles.body.size * p.roles.body.lineHeight
+            : 0,
+        ),
+      );
+      end = Math.min(end, box.height - pad - 30 - bodyHeight);
+      if (end < start) fail('CAPACITY', '时间线说明超出可用高度');
+    }
     p.line('time', vertical ? `M${axis} ${start}V${end}` : `M${start} ${axis}H${end}`, 'muted');
     events.forEach((e, i) => {
       let t = opt.spacing === 'equal' || span === 0 ? i / Math.max(1, events.length - 1) : (e.t - min) / span,
@@ -521,6 +590,7 @@ window.ThemeRenderers = (() => {
           vertical ? box.width - axis - pad * 2 : (end - start) / events.length - 10,
           'body',
           vertical ? 'start' : 'middle',
+          { 'data-label-for': 'node' + i },
         );
     });
     return { events: events.length };
@@ -1356,7 +1426,14 @@ window.ThemeRenderers = (() => {
   function boxplot(svg, input, opt, theme, box) {
     const p = setup(svg, theme, box);
     const groups = input.groups || [];
-    const okRow = (d) => d.label && ['min', 'q1', 'median', 'q3', 'max'].every((k) => Number.isFinite(d[k]));
+    const okRow = (d) =>
+      d.label &&
+      ['min', 'q1', 'median', 'q3', 'max'].every((k) => Number.isFinite(d[k])) &&
+      d.min <= d.q1 &&
+      d.q1 <= d.median &&
+      d.median <= d.q3 &&
+      d.q3 <= d.max &&
+      (d.outliers === undefined || (Array.isArray(d.outliers) && d.outliers.every(Number.isFinite)));
     if (!groups.length || groups.some((d) => !okRow(d))) fail('DATA', '箱线需要五数概括');
     const pad = p.tokens.padding * 2,
       left = pad + p.tokens.axisPadPx,
@@ -1381,7 +1458,8 @@ window.ThemeRenderers = (() => {
     groups.forEach((d, i) => {
       const cx = left + (i + 0.5) * slot,
         key = 'box' + i;
-      p.text(cx, bottom + p.roles.category.size, d.label, 'category', 'middle');
+      p.text(cx, bottom + p.roles.category.size, d.label, 'category', 'middle').setAttribute('data-label-for', key);
+      const before = new Set(svg.children);
       // 胡须
       p.add('path', {
         d: `M${cx} ${Y(d.max)}V${Y(d.q3)}M${cx} ${Y(d.q1)}V${Y(d.min)}M${cx - bw / 2} ${Y(d.max)}H${cx + bw / 2}M${cx - bw / 2} ${Y(d.min)}H${cx + bw / 2}`,
@@ -1395,8 +1473,6 @@ window.ThemeRenderers = (() => {
         stroke: p.color('ink'),
         'stroke-width': theme.rules.dividerWidthPx,
         'data-shape-role': key,
-        'data-focus-key': key,
-        'data-focus-label': d.label + ' 中位 ' + num(d.median),
       });
       // 中位线
       p.add('path', {
@@ -1416,6 +1492,12 @@ window.ThemeRenderers = (() => {
           'stroke-width': theme.rules.dividerWidthPx,
         }),
       );
+      const parts = [...svg.children].filter((n) => !before.has(n));
+      const group = p.add('g', {
+        'data-focus-key': key,
+        'data-focus-label': d.label + ' 中位 ' + num(d.median) + '，离群点 ' + (d.outliers || []).length + ' 个',
+      });
+      parts.forEach((n) => group.append(n));
     });
     return { groups: groups.length };
   }
@@ -1489,9 +1571,9 @@ window.ThemeRenderers = (() => {
         'data-focus-key': 'flow' + i,
         'data-link-from': 'nodel' + k.from,
         'data-link-to': 'noder' + k.to,
-        fill: rampColor(theme, theme.materials, 0.25 + (i % 3) * 0.18),
+        'data-focus-label': k.from + ' → ' + k.to + ' ' + num(k.value),
+        fill: rampColor(theme, theme.materials, 0.25 + (l.findIndex((n) => n.name === k.from) % 3) * 0.18),
         'fill-opacity': theme.materials.flowAlpha === undefined ? 0.55 : theme.materials.flowAlpha,
-        'data-shape-role': 'flow' + i,
       });
     });
     const drawNodes = (list, x, side) =>
@@ -1514,7 +1596,7 @@ window.ThemeRenderers = (() => {
           n.name + '(' + num(n.value) + ')',
           'category',
           side === 'l' ? 'end' : 'start',
-        );
+        ).setAttribute('data-label-for', 'node' + side + n.name);
       });
     drawNodes(l, leftX, 'l');
     drawNodes(r, rightX, 'r');
@@ -1522,6 +1604,26 @@ window.ThemeRenderers = (() => {
   }
   return {
     render(svgOrTable, data, opt, theme, box, id) {
+      if (opt.direction !== undefined && !['horizontal', 'vertical'].includes(opt.direction))
+        fail('UNSUPPORTED', '未知方向');
+      if (opt.sort !== undefined && !['given', 'asc', 'desc'].includes(opt.sort)) fail('UNSUPPORTED', '未知排序');
+      if (
+        opt.widthRatio !== undefined &&
+        (!Number.isFinite(opt.widthRatio) || opt.widthRatio < 0.2 || opt.widthRatio > 0.8)
+      )
+        fail('DATA', 'widthRatio 需在 0.2 到 0.8 之间');
+      if (id.startsWith('BAR-') || id === 'DIST-001') {
+        if (opt.mode !== undefined && !['absolute', 'value', 'percent'].includes(opt.mode))
+          fail('UNSUPPORTED', '未知数值模式');
+        if (opt.mode === 'percent' && id !== 'BAR-003') fail('UNSUPPORTED', '百分比构成请使用 BAR-003');
+        if (id === 'BAR-006' && opt.sort && opt.sort !== 'given') fail('UNSUPPORTED', '瀑布图必须保持业务顺序');
+      }
+      if (
+        id === 'LINE-001' &&
+        ((opt.mode !== undefined && !['line', 'raw', 'cumulative', 'index'].includes(opt.mode)) ||
+          (opt.shape !== undefined && !['line', 'step'].includes(opt.shape)))
+      )
+        fail('UNSUPPORTED', '折线 mode 控制数据变换，shape 控制普通或阶梯');
       const allowed =
         id.startsWith('BAR-') || id === 'DIST-001'
           ? ['direction', 'mode', 'kind', 'widthRatio', 'sort']
@@ -1535,7 +1637,13 @@ window.ThemeRenderers = (() => {
                   ? ['intensity', 'center', 'sort']
                   : id === 'TIME-001'
                     ? ['direction', 'spacing', 'details', 'focus']
-                    : ['direction', 'details', 'arrows', 'labels', 'focus'];
+                    : ['REL-001', 'REL-006', 'FLOW-001'].includes(id)
+                      ? ['direction', 'details', 'arrows', 'labels', 'focus']
+                      : id === 'FUNNEL-001'
+                        ? ['conversion']
+                        : ['HEAT-001', 'SCATTER-001', 'MATRIX-001'].includes(id)
+                          ? ['labels']
+                          : [];
       for (const k of Object.keys(opt)) if (!allowed.includes(k)) fail('UNSUPPORTED', '主题绘制尚未支持选项 ' + k);
       if (id.startsWith('BAR-') || id === 'DIST-001') return bars(svgOrTable, data, opt, theme, box, id);
       if (id === 'LINE-001') return lines(svgOrTable, data, opt, theme, box);

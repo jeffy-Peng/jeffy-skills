@@ -25,10 +25,16 @@ if (!wanted.length || wanted.some((id) => caps[id]?.capability !== 'assemble'))
   throw Error('基线只接受已登记的引擎素材，不能空跑或跳过未知 ID');
 // 每次从当前代码与受控样本重建，不能比较磁盘上的旧截图冒充回归。
 const currentDir = join(root, 'build/baseline-current', themeName);
+const baselineTheme = JSON.parse(readFileSync(join(root, 'themes', themeName + '.json'), 'utf8'));
 const rendered = spawnSync(process.execPath, [join(root, 'scripts/build-specimen.mjs'), ...wanted], {
   cwd: root,
   encoding: 'utf8',
-  env: { ...process.env, SPECIMEN_DIR: currentDir, SPECIMEN_THEME: themeName },
+  env: {
+    ...process.env,
+    SPECIMEN_DIR: currentDir,
+    SPECIMEN_THEME: themeName,
+    SPECIMEN_PALETTE: baselineTheme.defaultPalette || baselineTheme.palette || '',
+  },
 });
 if (rendered.status !== 0) throw Error('当前源码示意图构建或验收失败：' + rendered.stdout + rendered.stderr);
 const files = wanted.map((id) => ({ id, dir: currentDir }));

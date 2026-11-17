@@ -1,0 +1,74 @@
+{
+  "results": [
+    {
+      "name": "annotated-components",
+      "ok": true
+    },
+    {
+      "name": "0-initial-complete",
+      "ok": true
+    },
+    {
+      "name": "0-hover",
+      "ok": true
+    },
+    {
+      "name": "0-associated-labels-follow",
+      "ok": true
+    },
+    {
+      "name": "0-no-rescale",
+      "ok": true
+    },
+    {
+      "name": "0-reduced-motion",
+      "ok": true
+    },
+    {
+      "name": "0-leave-restores",
+      "ok": true
+    },
+    {
+      "name": "0-keyboard-lock",
+      "ok": true
+    },
+    {
+      "name": "0-escape-restores",
+      "ok": true
+    },
+    {
+      "name": "0-mouse-first-click-locks",
+      "ok": true
+    },
+    {
+      "name": "0-mouse-second-click-restores",
+      "ok": true
+    },
+    {
+      "name": "0-first-touch-locks",
+      "ok": true
+    },
+    {
+      "name": "0-second-touch-restores",
+      "ok": true
+    },
+    {
+      "name": "0-blank-touch-restores",
+      "ok": true
+    },
+    {
+      "name": "static-mode-no-binding",
+      "ok": true
+    },
+    {
+      "name": "static-mode-complete",
+      "ok": true
+    }
+  ],
+  "errors": [],
+  "coverage": {
+    "components": 1,
+    "interactiveComponents": 1
+  },
+  "boundary": "真实事件与几何检查；图形语义、全部关联标签及重叠命中仍需逐场景复核"
+}

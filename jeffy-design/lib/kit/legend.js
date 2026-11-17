@@ -1,43 +1,43 @@
-// 图例：全库唯一实现。规则见 docs/素材规则.md 的 R26 到 R30。
-// 位置底部居中，符号与图形一致，项数等于系列数，不截断，超两行报容量。
+// Shared legend layout for axes and free-standing charts.
 window.KitLegend = {
   draw(p, items, opts) {
     const { left, right, y, lineHeight, gap, fail } = opts;
-    const maxWidth = right - left;
-    const symbolW = 20;
-    const itemWidth = (item) => symbolW + 6 + p.measure(item.name, 'legend');
+    const role = opts.role || 'legend';
+    const sw = p.tokens.legendSwatchW,
+      sh = p.tokens.legendSwatchH;
+    const symbolW = Math.max(20, sw),
+      labelGap = 6;
     const rows = [[]];
-    let cursor = 0;
-    let rowWidth = 0;
+    let used = 0;
     for (const item of items) {
-      const w = itemWidth(item);
-      const space = rows.length > 1 ? gap : gap * 1.5;
-      if (cursor > 0 && rowWidth + space + w > maxWidth) {
+      const width = symbolW + labelGap + p.measure(item.name, role);
+      if (width > right - left) fail('CAPACITY', '单项图例名称超出可用宽度');
+      if (rows.at(-1).length && used + gap + width > right - left) {
         rows.push([]);
-        cursor = 0;
-        rowWidth = 0;
-        if (rows.length > 2) fail('CAPACITY', '图例超过两行，需减少系列或分页');
+        used = 0;
       }
-      rows.at(-1).push({ item, width: w });
-      rowWidth += (cursor > 0 ? space : 0) + w;
-      cursor += 1;
+      if (rows.length > 2) fail('CAPACITY', '图例超过两行，需调整区域或表达');
+      rows.at(-1).push({ item, width });
+      used += (used ? gap : 0) + width;
     }
-    const g = p.add('g', { 'data-unified-legend': 'true' });
-    rows.forEach((row, rowIndex) => {
-      const total = row.reduce((sum, cell, i) => sum + cell.width + (i ? gap : 0), 0);
-      let x = left + Math.max(0, (maxWidth - total) / 2);
-      const rowY = y + rowIndex * lineHeight;
-      for (const cell of row) {
-        const { item } = cell;
-        if (item.type === 'bar') {
-          p.box('legend' + item.name, x, rowY - lineHeight * 0.32, 16, 12, item.paint, { stroke: 'none' });
-        } else {
-          p.line('legend' + item.name, `M${x} ${rowY}h${symbolW}`, item.paint, { 'stroke-dasharray': item.dash || '' });
-        }
-        p.text(x + symbolW + 6, rowY, item.name, 'legend', 'start');
-        x += cell.width + gap;
+    const group = p.add('g', { 'data-unified-legend': 'true' });
+    rows.forEach((row, index) => {
+      const width = row.reduce((sum, c) => sum + c.width, 0) + gap * Math.max(0, row.length - 1);
+      let x = left + (right - left - width) / 2;
+      // Anchor the last row at y, keeping wrapped rows within the reserved bottom area.
+      const cy = y - (rows.length - 1 - index) * lineHeight;
+      for (const { item, width } of row) {
+        const mark =
+          item.type === 'bar'
+            ? p.box('legend' + item.name, x, cy - sh / 2, sw, sh, item.paint, { stroke: 'none' })
+            : p.line('legend' + item.name, `M${x} ${cy}h${symbolW}`, item.paint, {
+                'stroke-dasharray': item.dash || '',
+              });
+        group.append(mark);
+        group.append(p.text(x + symbolW + labelGap, cy, item.name, role, 'start'));
+        x += width + gap;
       }
     });
-    return g;
+    return group;
   },
 };

@@ -54,7 +54,7 @@ window.KitLayout = {
     const claimRole =
       (theme.scale || []).find((x) => x.role === 'claim') || (theme.scale || []).find((x) => x.role === 'body');
     const gap = theme.grid?.gutter || r.gap;
-    const tier = theme.density?.[page.density || 'normal'] || { maxComponents: 3, minHeight: 120, fill: 0.9 };
+    const tier = { minHeight: 120, ...theme.density?.[page.density || 'normal'] };
     let top = this.snap(r.content.y, theme);
     let claim = null;
     const text = typeof page.claim === 'string' ? page.claim.trim() : '';
@@ -81,7 +81,7 @@ window.KitLayout = {
       const box = { x: r.content.x, y: cursor, width: r.content.width, height };
       cursor += height + gap;
       if (cursor - gap > r.content.y + r.content.height)
-        issues.push({ code: 'CAPACITY', page: page.id, message: '组件总和超出内容区，降一档密度或减组件' });
+        issues.push({ code: 'CAPACITY', page: page.id, message: '组件总和超出内容区，请调整分区、重排或分页' });
       return { id: c.id, box };
     });
     return { regions: r, claim, boxes, fixed, issues, tier: page.density || 'normal' };

@@ -103,6 +103,11 @@ export function resolveTheme(theme, defaults, paletteName) {
     if (!Number.isFinite(materials[k]) || materials[k] < 0) fail('invalid material token ' + k);
   if (!['solid', 'outline'].includes(materials.barMode) || !theme.colors[materials.nodeFill])
     fail('invalid visual profile');
+  if (!['solid', 'capsule', 'rung', 'rhythm'].includes(materials.barStyle)) fail('unknown barStyle');
+  if (!['auto', 'none'].includes(materials.axisMode)) fail('unknown axisMode');
+  for (const profile of Object.values(theme.density || {}))
+    if (profile.minHeight !== undefined && (!Number.isFinite(profile.minHeight) || profile.minHeight <= 0))
+      fail('invalid density minHeight');
   // 笔触由主题选择，参数也归主题。校验名是否存在、族是否支持、参数是否登记。
   const brush = theme.brush || { default: 'line', byFamily: {}, params: {} };
   const names = Object.keys(REGISTRY).filter((k) => k !== 'note');

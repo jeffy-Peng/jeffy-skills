@@ -318,6 +318,7 @@ for (const id of wanted) {
   }
   const deck = {
     theme: themeName,
+    palette: process.env.SPECIMEN_PALETTE || 'mono',
     pages: [
       {
         id: id,

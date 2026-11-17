@@ -5,18 +5,31 @@
     {
       "aliases": [],
       "purpose": "数值比较",
-      "parameters": "横纵方向、类别数量",
+      "parameters": "横纵方向、类别数量、实心/胶囊/刻度/随机分节形态",
       "limits": "正负数据选BAR-005",
       "standardCoverage": "规则已整理；已接入 theme-v1，回归覆盖代表输入",
-      "sources": [],
-      "sheets": [],
+      "sources": [
+        "../lib/theming/renderers.js",
+        "../lib/kit/axis.js",
+        "../scripts/test-rhythm.mjs"
+      ],
+      "sheets": [
+        {
+          "name": "随机分节与刻尺轴",
+          "path": "materials/specimens/BAR-001-rhythm.html",
+          "rationale": "长度编码不变；分节高低形成固定随机节奏，刻尺轴呼应分节。四类及横向仅为样张，数量与方向按内容重算。",
+          "status": "用户确认入库"
+        }
+      ],
       "id": "BAR-001",
       "form": "单项比较",
       "question": "比较各对象的单项数量",
       "minimumInput": "类别名称与一组非负数值",
       "status": "已入库·自动组装",
       "evidence": [
-        "materials/specimens/BAR-001.png"
+        "materials/specimens/BAR-001.png",
+        "materials/specimens/BAR-001-rhythm.validation.json",
+        "materials/specimens/BAR-001-rhythm.interaction.json"
       ],
       "implementationRole": "engine",
       "standard": "materials/BAR-001.md",
@@ -24,7 +37,8 @@
       "options": [
         "direction",
         "sort",
-        "widthRatio"
+        "widthRatio",
+        "kind"
       ],
       "materialFile": "materials/BAR-001.md",
       "shape": "compare-items",
@@ -41,7 +55,38 @@
       "defaults": {
         "direction": "vertical",
         "sort": "given"
-      }
+      },
+      "approval": {
+        "scope": "2026-11-17 用户确认随机长短分节形态入库；不替换其他画法。"
+      },
+      "variants": [
+        {
+          "key": "solid",
+          "name": "标准实心",
+          "optionKind": "solid",
+          "default": true,
+          "presentations": [
+            "research"
+          ],
+          "space": "any",
+          "useWhen": "严谨比较、读数优先、区域紧凑或用途未明确；默认形态。",
+          "avoidWhen": "用户明确要求其他合法形态时不覆盖用户选择。",
+          "sample": "materials/specimens/BAR-001.png"
+        },
+        {
+          "key": "rhythm",
+          "name": "随机分节与刻尺轴",
+          "optionKind": "rhythm",
+          "default": false,
+          "presentations": [
+            "creative"
+          ],
+          "space": "ample",
+          "useWhen": "创意展示或强调视觉节奏，区域充裕且仍能清楚比较总长度。",
+          "avoidWhen": "区域紧凑、精确读数优先，或容易把高低误读为波动、分布、第二指标。",
+          "sample": "materials/specimens/BAR-001-rhythm.html"
+        }
+      ]
     },
     {
       "aliases": [],
@@ -64,7 +109,7 @@
       "archetype": "compare",
       "options": [
         "direction",
-        "mode",
+        "sort",
         "widthRatio"
       ],
       "shape": "compare-groups",
@@ -139,7 +184,7 @@
       "form": "正负向比较",
       "question": "比较各对象的正向或负向变化",
       "minimumInput": "类别与一组有限数值，可含负数",
-      "status": "仅规范·模型绘制",
+      "status": "已入库·自动组装",
       "evidence": [
         "materials/specimens/BAR-005.png"
       ],
@@ -259,7 +304,7 @@
       "id": "BOX-001",
       "form": "分布比较",
       "question": "比较多组样本分布及离群值",
-      "minimumInput": "每组有限数值原始样本",
+      "minimumInput": "每组原始样本与分位口径；参考实现接收五数概括",
       "status": "已入库·自动组装",
       "evidence": [
         "materials/specimens/BOX-001.png"
@@ -267,10 +312,7 @@
       "implementationRole": "engine",
       "standard": "materials/BOX-001.md",
       "archetype": "compare",
-      "options": [
-        "direction",
-        "sort"
-      ],
+      "options": [],
       "shape": "box",
       "tier": "backup",
       "implementation": "engine",
@@ -282,10 +324,7 @@
         "DIST-001"
       ],
       "name": "箱线图",
-      "defaults": {
-        "direction": "vertical",
-        "sort": "given"
-      }
+      "defaults": {}
     },
     {
       "aliases": [],
@@ -298,7 +337,7 @@
       "id": "DIST-001",
       "form": "分布形态",
       "question": "查看原始样本的区间分布",
-      "minimumInput": "有限数值的原始样本数组",
+      "minimumInput": "有限原始样本；调用参考实现前按明确区间预分箱",
       "status": "已入库·自动组装",
       "evidence": [
         "materials/specimens/DIST-001.png"
@@ -432,8 +471,7 @@
       "standard": "materials/FUNNEL-001.md",
       "archetype": "flow",
       "options": [
-        "direction",
-        "sort"
+        "conversion"
       ],
       "shape": "funnel",
       "tier": "backup",
@@ -447,8 +485,7 @@
       ],
       "name": "漏斗图",
       "defaults": {
-        "direction": "vertical",
-        "sort": "given"
+        "conversion": true
       }
     },
     {
@@ -471,8 +508,7 @@
       "standard": "materials/HEAT-001.md",
       "archetype": "table",
       "options": [
-        "direction",
-        "sort"
+        "labels"
       ],
       "shape": "heatmap",
       "tier": "backup",
@@ -486,8 +522,7 @@
       ],
       "name": "热力矩阵",
       "defaults": {
-        "direction": "vertical",
-        "sort": "given"
+        "labels": true
       }
     },
     {
@@ -511,9 +546,13 @@
       "archetype": "trend",
       "options": [
         "mode",
+        "shape",
+        "zero",
+        "points",
+        "labels",
+        "focus",
         "area",
-        "cumulative",
-        "index"
+        "single"
       ],
       "shape": "time-series",
       "tier": "primary",
@@ -528,9 +567,9 @@
       "name": "折线图",
       "defaults": {
         "mode": "line",
-        "area": false,
-        "cumulative": false,
-        "index": false
+        "shape": "line",
+        "zero": true,
+        "area": false
       }
     },
     {
@@ -590,8 +629,7 @@
       "standard": "materials/MATRIX-001.md",
       "archetype": "relation",
       "options": [
-        "direction",
-        "sort"
+        "labels"
       ],
       "shape": "quadrant",
       "tier": "backup",
@@ -605,8 +643,7 @@
       ],
       "name": "四象限矩阵",
       "defaults": {
-        "direction": "vertical",
-        "sort": "given"
+        "labels": true
       }
     },
     {
@@ -630,9 +667,8 @@
       "archetype": "share",
       "options": [
         "donut",
-        "startAngle",
-        "sort",
-        "labels"
+        "percent",
+        "sort"
       ],
       "shape": "parts-of-whole",
       "tier": "primary",
@@ -647,9 +683,8 @@
       "name": "饼图",
       "defaults": {
         "donut": false,
-        "startAngle": 0,
-        "sort": "given",
-        "percent": true
+        "percent": true,
+        "sort": "given"
       }
     },
     {
@@ -711,10 +746,7 @@
       "implementationRole": "engine",
       "standard": "materials/RADAR-001.md",
       "archetype": "compare",
-      "options": [
-        "direction",
-        "sort"
-      ],
+      "options": [],
       "shape": "radar",
       "tier": "backup",
       "implementation": "engine",
@@ -726,10 +758,7 @@
         "BAR-002"
       ],
       "name": "雷达图",
-      "defaults": {
-        "direction": "vertical",
-        "sort": "given"
-      }
+      "defaults": {}
     },
     {
       "aliases": [
@@ -834,10 +863,7 @@
       "implementationRole": "engine",
       "standard": "materials/REL-003.md",
       "archetype": "relation",
-      "options": [
-        "direction",
-        "sort"
-      ],
+      "options": [],
       "shape": "containment",
       "tier": "backup",
       "implementation": "engine",
@@ -849,10 +875,7 @@
         "REL-004"
       ],
       "name": "包含关系",
-      "defaults": {
-        "direction": "vertical",
-        "sort": "given"
-      }
+      "defaults": {}
     },
     {
       "aliases": [],
@@ -880,10 +903,7 @@
         "technicalBoundary": "登记与视觉认可不等于已适配克莱因蓝区域引擎；参考实现仍按规范使用。"
       },
       "archetype": "relation",
-      "options": [
-        "direction",
-        "sort"
-      ],
+      "options": [],
       "shape": "layers",
       "tier": "backup",
       "implementation": "engine",
@@ -896,10 +916,7 @@
         "REL-001"
       ],
       "name": "分层架构",
-      "defaults": {
-        "direction": "vertical",
-        "sort": "given"
-      }
+      "defaults": {}
     },
     {
       "aliases": [],
@@ -1006,11 +1023,7 @@
       "implementationRole": "engine",
       "standard": "materials/SANKEY-001.md",
       "archetype": "flow",
-      "options": [
-        "unit",
-        "sort",
-        "nodeGap"
-      ],
+      "options": [],
       "shape": "flow-matrix",
       "tier": "backup",
       "materialFile": "materials/SANKEY-001.md",
@@ -1022,10 +1035,7 @@
         "FLOW-001"
       ],
       "name": "桑基图",
-      "defaults": {
-        "sort": "given",
-        "nodeGap": 24
-      },
+      "defaults": {},
       "rationale": "样张只画两端，中间转运不表达，避免读者把画布宽度当成时间。"
     },
     {
@@ -1048,8 +1058,7 @@
       "standard": "materials/SCATTER-001.md",
       "archetype": "relation",
       "options": [
-        "direction",
-        "sort"
+        "labels"
       ],
       "shape": "scatter",
       "tier": "backup",
@@ -1063,8 +1072,7 @@
       ],
       "name": "散点图",
       "defaults": {
-        "direction": "vertical",
-        "sort": "given"
+        "labels": true
       }
     },
     {
@@ -1178,9 +1186,7 @@
         "TABLE-002"
       ],
       "name": "明细表",
-      "defaults": {
-        "focus": 0
-      }
+      "defaults": {}
     },
     {
       "aliases": [],
@@ -1215,9 +1221,7 @@
         "TABLE-001"
       ],
       "name": "比较矩阵",
-      "defaults": {
-        "focus": 0
-      }
+      "defaults": {}
     },
     {
       "aliases": [],
@@ -1280,10 +1284,7 @@
       "implementationRole": "engine",
       "standard": "materials/TIME-002.md",
       "archetype": "timeline",
-      "options": [
-        "direction",
-        "sort"
-      ],
+      "options": [],
       "shape": "time-span",
       "tier": "backup",
       "implementation": "engine",
@@ -1295,10 +1296,7 @@
         "TIME-001"
       ],
       "name": "甘特条",
-      "defaults": {
-        "direction": "vertical",
-        "sort": "given"
-      }
+      "defaults": {}
     }
   ],
   "policy": "每项为表达规范、带理由的样张与参考实现；规范覆盖不等于行为验收，生成器能力不等于结构边界。"

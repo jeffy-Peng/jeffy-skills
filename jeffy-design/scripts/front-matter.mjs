@@ -1,6 +1,7 @@
 // 素材文件的 front matter 解析。只支持这个文件格式用得到的写法：
 // key: value、key: [a, b]、key: {a: 1}、以及 - 开头的对象列表。
 export function parseFrontMatter(text) {
+  text = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
   const match = /^---\n([\s\S]*?)\n---\n?/.exec(text);
   if (!match) return { data: {}, body: text };
   const lines = match[1].split('\n');

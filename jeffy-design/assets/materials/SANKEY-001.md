@@ -10,15 +10,14 @@ cost: large
 alternates: [FLOW-001]
 tier: backup
 implementation: engine
-options: [unit, sort, nodeGap]
-defaults: { sort: given, nodeGap: 24 }
+options: []
+defaults: {}
 question: 总量从哪里来、分到哪里去
 minimumInput: 两列节点与一张流量表，每行一个来源到一个去向及其数值
 status: 已入库·自动组装
 standard: materials/SANKEY-001.md
 sources: []
 sheets: []
-    rationale: 样张只画两端，中间转运不表达，避免读者把画布宽度当成时间。
 ---
 
 # SANKEY-001 桑基图
@@ -63,4 +62,4 @@ sheets: []
 
 ![两端流向示意](./specimens/SANKEY-001.png)
 
-模型绘制，不进像素基线。示意图由模型出一版存这里，只作风格参照，不作为回归基准。
+已接入统一引擎与当前源码像素基线；示意图只作表达参考，不限制节点数量与布局。

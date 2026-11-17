@@ -424,13 +424,13 @@
   },
   "density": {
     "sparse": {
-      "maxComponents": 1
+      "minHeight": 160
     },
     "normal": {
-      "maxComponents": 2
+      "minHeight": 120
     },
     "dense": {
-      "maxComponents": 3
+      "minHeight": 96
     }
   }
 }

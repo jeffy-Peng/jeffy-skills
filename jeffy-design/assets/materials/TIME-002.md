@@ -10,8 +10,8 @@ cost: medium
 alternates: [TIME-001]
 tier: backup
 implementation: engine
-options: [direction, sort]
-defaults: { direction: vertical, sort: given }
+options: []
+defaults: {}
 question: 表示一段工作的持续范围
 minimumInput: 段名称、开始与结束位置、可选说明
 status: 已入库·自动组装
@@ -24,7 +24,7 @@ sheets: []
 
 ## 数据形状与分级
 
-时间区间，数据形状是「time-span」。分级后备，需要时按本规范由模型绘制，不进像素基线。
+时间区间，数据形状是「time-span」。分级后备，已接入统一绘制引擎；工具未覆盖的合法结构可按本规范重绘。
 
 ## 语义
 

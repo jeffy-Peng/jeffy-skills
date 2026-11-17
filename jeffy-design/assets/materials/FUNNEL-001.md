@@ -10,8 +10,8 @@ cost: medium
 alternates: [BAR-001]
 tier: backup
 implementation: engine
-options: [direction, sort]
-defaults: { direction: vertical, sort: given }
+options: [conversion]
+defaults: {conversion: true}
 question: 说明逐阶段筛选和转化
 minimumInput: 同一批对象各阶段非递增数量
 status: 已入库·自动组装
@@ -24,7 +24,7 @@ sheets: []
 
 ## 数据形状与分级
 
-阶段转化，数据形状是「funnel」。分级后备，需要时按本规范由模型绘制，不进像素基线。
+阶段转化，数据形状是「funnel」。分级后备，已接入统一绘制引擎；工具未覆盖的合法结构可按本规范重绘。
 
 ## 语义
 
