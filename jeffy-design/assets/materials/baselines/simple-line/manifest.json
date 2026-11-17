@@ -1,0 +1,16 @@
+{
+  "theme": "simple-line",
+  "sourceHash": "e04bca5967a0e974671a17e91aa5b5e691b2418f3e69408bf5917c3cd7942a64",
+  "browser": "145.0.7632.6",
+  "threshold": 0.003,
+  "results": [
+    {
+      "id": "TIME-001",
+      "status": "updated"
+    },
+    {
+      "id": "REL-001",
+      "status": "updated"
+    }
+  ]
+}

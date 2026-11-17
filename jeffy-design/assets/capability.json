@@ -20,7 +20,7 @@
   "BAR-005": {
     "capability": "assemble",
     "archetype": "compare",
-    "status": "仅规范·模型绘制",
+    "status": "已入库·自动组装",
     "standard": "materials/BAR-005.md"
   },
   "BAR-006": {

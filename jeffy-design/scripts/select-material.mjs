@@ -92,6 +92,86 @@ if (intent && INTENT[intent]) for (const c of candidates) if (INTENT[intent].inc
 
 candidates.sort((a, b) => b.score - a.score);
 const top = candidates[0];
+// Context comes from page planning, not inferred from palette names or row counts.
+const selection = input.selection || {};
+for (const [key, allowed] of Object.entries({
+  presentation: ['research', 'creative'],
+  space: ['compact', 'ample'],
+  priority: ['precision', 'visual', 'balanced'],
+}))
+  if (selection[key] !== undefined && !allowed.includes(selection[key])) throw Error('SELECTION: invalid ' + key);
+function chooseForm(candidate) {
+  if (!candidate) return null;
+  const forms = candidate.meta.variants || [];
+  if (!forms.length)
+    return selection.form
+      ? {
+          status: 'review',
+          selected: null,
+          options: null,
+          why: '该素材未登记指定形态，读取规范判断，不静默套用。',
+          candidates: [],
+        }
+      : {
+          status: 'standard',
+          selected: null,
+          options: {},
+          why: '该素材没有独立形态列表，沿用表达规范。',
+          candidates: [],
+        };
+  const candidates = forms.map((f) => ({
+    key: f.key,
+    name: f.name,
+    useWhen: f.useWhen,
+    avoidWhen: f.avoidWhen,
+    sample: f.sample,
+  }));
+  const review = (why) => ({ status: 'review', selected: null, options: null, why, candidates });
+  if (
+    candidate.id === 'BAR-001' &&
+    (!Array.isArray(d.data) ||
+      !d.data.length ||
+      !d.data.every((row) => {
+        const vals = Array.isArray(row.values) ? row.values : [row.value];
+        return vals.length === 1 && vals.every((v) => isNum(v) && v >= 0);
+      }))
+  )
+    return review('数据不满足单系列非负有限数值要求，先修正数据或更换素材。');
+  const fallback = forms.find((f) => f.default);
+  let form;
+  let why;
+  if (selection.form) {
+    form = forms.find((f) => f.key === selection.form);
+    if (!form) return review('指定形态未登记在当前素材中，不能静默替换。');
+    why = '用户明确指定，优先于用途的软性偏好。';
+  } else {
+    form =
+      selection.priority !== 'precision' && selection.presentation
+        ? forms.find(
+            (f) =>
+              f.presentations.includes(selection.presentation) && (f.space === 'any' || selection.space === f.space),
+          )
+        : null;
+    form ||= fallback;
+    why =
+      form === fallback
+        ? '未满足其他形态的适用条件，采用默认形态保证读数。'
+        : '用途与可用空间匹配该形态，且未要求精确读数优先。';
+  }
+  if (form.space !== 'any' && selection.space !== form.space)
+    return review('该形态需要充裕空间；请先判断或调整本页区域，再作选择。');
+  if (!form.default && selection.priority === 'precision')
+    return review('指定形态与精确读数优先存在冲突，需结合实际画面判断或调整表达。');
+  return {
+    status: 'selected',
+    selected: form.key,
+    name: form.name,
+    options: { kind: form.optionKind },
+    why,
+    candidates,
+  };
+}
+const formChoice = chooseForm(top);
 const out = {
   intent: intent || '(未指定)',
   boundary: '字段只用于召回候选，不证明互斥、连续、因果或可加性；最终依据内容与口径判断。',
@@ -121,6 +201,7 @@ const out = {
       }
     : null,
   其余候选: candidates.slice(1, 4).map((c) => ({ id: c.id, why: c.why })),
+  形态选择: formChoice,
   替代: top ? top.meta?.alternates || [] : [],
 };
 console.log(JSON.stringify(out, null, 2));

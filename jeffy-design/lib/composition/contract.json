@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "note": "素材共用规则。规则正文见 docs/素材规则.md，这里只留机器可读的编号、分组、错误码与落地状态。哪些规则所有素材共用，以这份为准。",
+  "version": 7,
+  "note": "共同语义与验收目标；checked 仅指现有代表测试，不表示任意输入均自动覆盖。视觉数值以主题为准，具体接口见素材规范。",
   "principles": [
     "宁可报错，不许悄悄改数据",
     "不缩字号、不补零、不去重、不截断、不省标签"
@@ -9,17 +9,13 @@
     "minBarThicknessPx": 8,
     "minRowHeightPx": 22,
     "minPointGapPx": 16,
-    "minTableRowPx": 24,
-    "maxCategories": 12,
-    "maxPoints": 24,
-    "maxTableRows": 12,
-    "maxNodes": 40
+    "minTableRowPx": 24
   },
   "rules": [
     {
       "id": "R1",
       "group": "input",
-      "rule": "条目必须有 label 与 value 或 values",
+      "rule": "数值类条目按所选素材提供类别及数值；其他素材按其输入契约",
       "code": "DATA",
       "checked": true
     },
@@ -46,7 +42,7 @@
     {
       "id": "R5",
       "group": "input",
-      "rule": "负值允许，百分比模式禁止负值",
+      "rule": "负值仅用于允许负数的素材；占比和非负量禁止负值",
       "code": "DATA",
       "checked": true
     },
@@ -60,7 +56,7 @@
     {
       "id": "R7",
       "group": "input",
-      "rule": "单条数据允许并保留轴与刻度",
+      "rule": "单条数据允许；轴是否显示由主题和形态决定",
       "code": "none"
     },
     {
@@ -72,7 +68,7 @@
     {
       "id": "R9",
       "group": "input",
-      "rule": "数字显示：一万用万、一亿用亿，单位已含时不换算",
+      "rule": "按明确单位显示数值；不自动改成万或亿；必要换算须说明且同步修改单位",
       "code": "none"
     },
     {
@@ -85,7 +81,7 @@
     {
       "id": "R11",
       "group": "input",
-      "rule": "超过数量上限报容量并建议分页",
+      "rule": "按实际区域、主题字号与数据量检查容量，不设全库固定数量上限",
       "code": "CAPACITY"
     },
     {
@@ -121,13 +117,13 @@
     {
       "id": "R17",
       "group": "visual",
-      "rule": "间距圆角线宽柱形来自主题参数",
+      "rule": "视觉数值来自主题；素材形态由选材步骤显式选择",
       "code": "THEME"
     },
     {
       "id": "R18",
       "group": "visual",
-      "rule": "笔触由主题按族指定",
+      "rule": "笔触声明由主题选择，当前实现能力以绘制层为准",
       "code": "THEME"
     },
     {
@@ -139,7 +135,7 @@
     {
       "id": "R20",
       "group": "output",
-      "rule": "放不下报容量并附 required 与 actual",
+      "rule": "放不下明确返回 CAPACITY；required 是可用时的估计，不冒称精确最小区域",
       "code": "CAPACITY"
     },
     {
@@ -216,13 +212,13 @@
     {
       "id": "R32",
       "group": "structure",
-      "rule": "提纲必须声明交付形式（chart、deck、report），未声明按 chart 处理",
+      "rule": "默认交付 deck 式 HTML 与讲稿；明确要求单图时用 chart；report 非独立报告渲染器",
       "code": "CONTENT"
     },
     {
       "id": "R33",
       "group": "structure",
-      "rule": "组件必须写明选型理由；用后备或仅规范素材时必须点名主力为何不适配",
+      "rule": "组件用 purpose 写明区域任务与选型理由，兼容旧 reason；不强制寻找固定主力替代",
       "code": "CONTENT"
     },
     {
@@ -234,13 +230,13 @@
     {
       "id": "R35",
       "group": "visual",
-      "rule": "线宽按角色分：轴 1.3px，网格 1px，不互相比较",
+      "rule": "轴、网格等线宽分别读取主题角色，不固定通用像素值",
       "code": "THEME"
     },
     {
       "id": "R36",
       "group": "input",
-      "rule": "单位用数据真实单位，不换算、不省略",
+      "rule": "数值与单位保持一致，换算须显式说明，不丢口径",
       "code": "none"
     },
     {
@@ -252,7 +248,7 @@
     {
       "id": "R38",
       "group": "layout",
-      "rule": "纵向位置与高度取 8px 基线；横向 4 栏、栏距 24，组件默认占满，可声明 span 1 到 4",
+      "rule": "自动布局按主题基线和网格；显式区域允许自由分配，但须在可用区内并通过容量检查",
       "code": "CONTRACT",
       "checked": true
     },
@@ -279,7 +275,7 @@
     {
       "id": "R42",
       "group": "visual",
-      "rule": "柱宽取槽位比例，默认 0.5，夹取 8px 到槽位八成，不设固定像素上限",
+      "rule": "柱宽取槽位比例与主题可读下限，不设固定像素上限；槽位不足报容量",
       "code": "CAPACITY",
       "checked": true
     }
@@ -308,5 +304,6 @@
       16,
       24
     ]
-  }
+  },
+  "gridNote": "grid 仅为历史默认参考，执行时读取所选主题 grid。"
 }

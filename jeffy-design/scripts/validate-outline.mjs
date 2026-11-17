@@ -1,4 +1,4 @@
-// 提纲前置校验：每页必须有可回答的问题与结论，素材必须能自动组装。
+// 提纲前置校验：每页必须有可回答的问题与结论，素材须有实现或可按规范绘制。
 // 用法 node scripts/validate-outline.mjs outline.json [capability.json]
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -29,7 +29,8 @@ if (!DELIVERABLES.includes(deliverable))
 if (!Array.isArray(deck.pages) || !deck.pages.length) problems.push({ code: 'CONTENT', message: '没有页面' });
 for (const [index, page] of (deck.pages || []).entries()) {
   const label = page.id || `第${index + 1}页`;
-  for (const key of required) {
+  const structural = ['cover', 'section', 'toc', 'closing'].includes(page.type);
+  for (const key of structural ? ['id', 'title'] : required) {
     const value = page[key];
     const empty =
       value === undefined ||
@@ -43,6 +44,11 @@ for (const [index, page] of (deck.pages || []).entries()) {
         message: `缺少 ${key}`,
       });
   }
+  const ids = [...(page.components || []), ...(page.text || [])].map((c) => c.id);
+  if (new Set(ids).size !== ids.length) problems.push({ code: 'CONTRACT', page: label, message: '页面内区域 ID 重复' });
+  for (const ref of page.readingOrder || [])
+    if (!ids.includes(ref))
+      problems.push({ code: 'CONTRACT', page: label, message: '阅读顺序引用不存在的区域 ' + ref });
   for (const component of page.components || []) {
     const entry = capability[component.material];
     if (!entry && !component.artifact)
@@ -55,9 +61,14 @@ for (const [index, page] of (deck.pages || []).entries()) {
         message: '仅规范，无自动适配器，需要按规范手绘或换素材',
       });
     // 选型理由必填；用后备时还要说明主力为何不适配。
-    const reason = String(component.reason || '').trim();
+    const reason = String(component.purpose || component.reason || '').trim();
     if (!reason)
-      problems.push({ code: 'CONTENT', page: label, material: component.material, message: '缺少选型理由（reason）' });
+      problems.push({
+        code: 'CONTENT',
+        page: label,
+        material: component.material,
+        message: '缺少区域任务与选型理由（purpose，兼容 reason）',
+      });
     // 区域声明了数据形状时，素材形状必须对得上。
     if (component.shape && entry && entry.shape && entry.shape !== component.shape)
       problems.push({

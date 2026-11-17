@@ -2,7 +2,7 @@
   "standardContract": {
     "entries": 32,
     "standards": 32,
-    "sampleRationales": 0
+    "sampleRationales": 1
   },
   "updated": "2026-11-12",
   "counts": {
@@ -11,7 +11,7 @@
     "composition": 26,
     "draftComposition": 0
   },
-  "referencesChecked": 58,
+  "referencesChecked": 64,
   "missing": [],
   "dependencies": [],
   "legacyPreviews": [],

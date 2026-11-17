@@ -64,7 +64,8 @@ window.KitAxis = {
       horizontal
         ? left + ((v - range.min) / (range.max - range.min)) * (right - left)
         : bottom - ((v - range.min) / (range.max - range.min)) * (bottom - top);
-    const showGrid = !bare && p.tokens.grid !== false;
+    const ruler = opts.axisStyle === 'ruler';
+    const showGrid = !bare && !ruler && p.tokens.grid !== false;
     for (let v = range.min, i = 0; v <= range.max + range.step * 0.01; v += range.step, i++) {
       const a = coord(v);
       // 网格可整体关闭；竖向柱只画横线，横向柱只画竖线，另一条由轴线承担。
@@ -83,6 +84,27 @@ window.KitAxis = {
       if (bare) {
         // 无轴：单位挪到右下角，不画轴线与刻度。
         window.KitUnit.label(p, { metric, unit, horizontal, right, bottom, top, pad, labelSize, bare: true });
+        return;
+      }
+      if (ruler) {
+        const span = range.max - range.min;
+        const axisLength = horizontal ? right - left : bottom - top;
+        const subdivisions = Math.max(1, Math.min(5, Math.floor((axisLength * range.step) / span / 7)));
+        let d = horizontal ? `M${left} ${bottom}H${right}` : `M${left} ${top}V${bottom}`;
+        const count = Math.round((span / range.step) * subdivisions);
+        for (let i = 0; i <= count; i++) {
+          const a = coord(range.min + (i * range.step) / subdivisions);
+          const size = i % subdivisions === 0 ? 9 : 4;
+          d += horizontal ? `M${a} ${bottom}v${size}` : `M${left} ${a}h-${size}`;
+        }
+        p.add('path', {
+          d,
+          fill: 'none',
+          stroke: p.color('ink'),
+          'stroke-width': p.theme?.rules?.axisWidthPx || 1.3,
+          'data-axis-style': 'ruler',
+        });
+        window.KitUnit.label(p, { metric, unit, horizontal, right, bottom, top, pad, labelSize });
         return;
       }
       // 轴线形状取自素材原画法 bar.js：横轴右端小箭头，纵轴顶端小箭头。

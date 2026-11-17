@@ -13,7 +13,7 @@ implementation: engine
 options: [direction, sort]
 defaults: { direction: vertical, sort: given }
 question: 查看原始样本的区间分布
-minimumInput: 有限数值的原始样本数组
+minimumInput: 有限原始样本；调用参考实现前按明确区间预分箱
 status: 已入库·自动组装
 standard: materials/DIST-001.md
 sources: []
@@ -24,7 +24,7 @@ sheets: []
 
 ## 数据形状与分级
 
-数据分布，数据形状是「distribution」。分级后备，需要时按本规范由模型绘制，不进像素基线。
+数据分布，数据形状是「distribution」。分级后备，已接入统一绘制引擎；工具未覆盖的合法结构可按本规范重绘。
 
 ## 语义
 
@@ -47,3 +47,7 @@ sheets: []
 ## 验收
 
 箱数与区间一致；计数与样本总数一致。
+
+## 当前参考接口
+
+参考实现接收已分箱的 `data:[{label,values:[频数]}]` 与 `series:["频数"]`，不自动从原始样本分箱。先明确箱宽、区间与边界归属，核对频数合计等于样本数。按区间顺序绘制，不能按频数排序伪装成分布。

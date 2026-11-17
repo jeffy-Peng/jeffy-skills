@@ -11,7 +11,7 @@ alternates: [TABLE-002]
 tier: primary
 implementation: engine
 options: [focus]
-defaults: {focus: 0}
+defaults: {}
 question: 查阅多对象的详细字段
 minimumInput: 表头及等列数记录
 status: 已入库·自动组装
@@ -32,7 +32,7 @@ sheets: []
 
 ## 绘制
 
-表头一行，居中；正文左对齐或居中，数字右对齐。行高固定，超出行数报容量并建议分页。隔行底色由主题决定，没有主题开关时不加。
+表头、正文和数字一律水平居中、垂直居中。行高按内容与主题计算，超出可用高度报容量。隔行底色由主题决定，没有主题开关时不加。
 
 ## 可调整
 

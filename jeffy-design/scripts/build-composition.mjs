@@ -17,6 +17,8 @@ if (!/^[a-z0-9-]+$/.test(deck.theme)) throw Error('主题标识无效');
 
 if (!Array.isArray(deck.pages) || !deck.pages.length) throw Error('CONTRACT: 需要 pages');
 for (const p of deck.pages) {
+  for (const component of p.components || [])
+    if (!component.purpose && component.reason) component.purpose = component.reason;
   // 骨架页、封面、转折页、附录允许没有组件，它们只画固定部分。
   const structural = p.skeleton === true || ['cover', 'section', 'appendix', 'toc', 'closing'].includes(p.type);
   if (!structural && !(p.components || []).length && !(p.text || []).length)

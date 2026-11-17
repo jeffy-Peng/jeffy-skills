@@ -39,7 +39,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 - 笔触 `lib/styles/registry.json`：登记有哪些笔触、支持哪些原型、可接受哪些参数。当前落笔质感由主题量（圆角、线宽、填充、明度阶梯）决定，笔触层只做声明与校验。
 - 素材 `assets/materials/<ID>.md`：一条素材一个文件，写语义、画法、可调参数、规则和验收。
 
-几何在 `lib/theming/renderers.js`，七族各一份，属于引擎。素材和笔触都不复制它，所以新增一条同族素材常常零代码。
+几何集中在 `lib/theming/renderers.js`，共用轴、图例等在 `lib/kit/`。素材和主题不复制引擎；已有能力可配置复用，未实现的新形态需补代码。
 
 ## 六种页面
 
@@ -62,13 +62,13 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 
 ## 主题与素材维护
 
-两条数据入口，都不需要改脚本。
+已有绘制能力可通过以下数据入口维护；新增几何能力仍需扩展共用绘制层并验证。
 
 - 加主题：`themes/` 下放一个 JSON，跑 `npm run sync`，测试自动覆盖。只换配色时在 `palettes` 里加一项，不动字号与版面。
-- 加素材：写 `assets/materials/<ID>.md`，跑 `npm run sync`，登记表、能力表与目录一起生成。
+- 加素材：写 `assets/materials/<ID>.md`，跑 `npm run sync`，生成登记表与能力表，再运行 npm run catalog 更新展示目录。
 - 生成物是 `lib/composition/adapters.json`、`assets/capability.json` 与 `build/generated/`，不要手改。`npm run sync:check` 只检查不写。
 
-条目机器声明源为 assets/materials/*.md，sync 合并到 catalog.json 并保留审批、证据与展示补充字段；运行 `npm run catalog` 更新目录及资源记录。32 项素材每条一个 md 文件：26 条有代码实现，进基线；6 条只写规范，由模型按规范绘制，不进像素基线。素材库只保留规范与示意图。
+条目机器声明源为 assets/materials/*.md，sync 合并到 catalog.json 并保留审批、证据与展示补充字段；运行 `npm run catalog` 更新目录及资源记录。32 项素材每条一个 md 文件：26 条有代码实现，进基线；6 条只写规范，由模型按规范绘制，不进像素基线。素材库保留规范、样张及其行为证据；同一 ID 可包含已审核的视觉形态。
 
 默认仅保证 HTML 路径，没有原生可编辑 PPTX 导出。
 
@@ -81,6 +81,8 @@ npm run test:composition           # 组装回归
 npm run test:adapters              # 参数回归
 npm run test:themes                # 主题与区域检查
 npm run test:materials             # 素材契约用例
+npm run test:selection             # 类型与视觉形态选材
+npm run test:review                # 规则冲突和实际绘制反例
 npm run specimen BAR-001           # 生成素材示意图（只有图表，26 条引擎素材）
 npm run baseline                   # 从当前源码重绘引擎素材后比较已批准基线
 ```

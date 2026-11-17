@@ -11,7 +11,7 @@ alternates: [TABLE-001]
 tier: backup
 implementation: engine
 options: [focus]
-defaults: {focus: 0}
+defaults: {}
 question: 按相同维度逐项比较对象
 minimumInput: 对象×维度的状态或数值
 status: 已入库·自动组装
@@ -32,7 +32,7 @@ sheets: []
 
 ## 绘制
 
-表头写维度名，第一列写对象名。状态类单元格居中，数值类右对齐。重点列可加底色。
+表头写维度名，第一列写对象名。状态类与数值类单元格均水平居中、垂直居中。重点列可加底色。
 
 ## 可调整
 

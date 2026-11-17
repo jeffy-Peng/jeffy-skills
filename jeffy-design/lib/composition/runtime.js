@@ -44,21 +44,10 @@
     const a = adapters[spec.material],
       r = roles[spec.labelRole || 'pill'];
     if (!r) return { ok: false, issues: [issue('THEME', '标签角色不存在')] };
-    // 不再用 iframe：玻璃的模糊要透到页面背景，iframe 会把它切断。
+    // 在当前文档挂载，沿用主题字体与统一交互。
     const frame = document.createElement('div');
     frame.className = 'component jd-component';
     frame.style.cssText = `position:relative;width:${spec.box.width}px;height:${spec.box.height}px;font-size:${roles.body.size}px`;
-    const surf = null;
-    if (surf) {
-      // 液态玻璃面：半透明 + 背景模糊 + 亮边 + 柔和投影，图形画在这层之上。
-      frame.style.background = `rgba(255,255,255,${surf.tintAlpha})`;
-      frame.style.backdropFilter = `blur(${surf.blurPx}px) saturate(180%)`;
-      frame.style.webkitBackdropFilter = `blur(${surf.blurPx}px) saturate(180%)`;
-      frame.style.border = `1px solid rgba(255,255,255,${surf.borderAlpha})`;
-      frame.style.borderRadius = surf.radiusPx + 'px';
-      frame.style.boxShadow = surf.shadow;
-      frame.style.overflow = 'hidden';
-    }
     frame.innerHTML = '<svg></svg><div id="table"></div>';
     host.append(frame);
     const doc = frame;
@@ -67,7 +56,7 @@
     if (a.renderer === 'theme-v1')
       return await mountNative(
         { contentWindow: window, contentDocument: document, container: frame },
-        { ...spec, archetype: a.archetype },
+        { ...spec, options: { ...a.defaultOptions, ...spec.options }, archetype: a.archetype },
       );
     // 历史静态路径已移除：只保留 theme-v1 一套装配，旧图例实现不再参与生产流程。
     return { ok: false, material: spec.material, issues: [issue('UNSUPPORTED', '仅 theme-v1 适配器可装配')] };
@@ -245,21 +234,7 @@
     const sheet = document.createElement('section');
     sheet.className = 'sheet';
     sheet.dataset.page = page.id;
-    // 玻璃需要透视和折射，页面先铺一层柔光舞台。
-    if (theme.stage?.mode === 'aurora') {
-      const st = theme.stage;
-      const blooms = (st.blooms || [])
-        .map(
-          (b) =>
-            `radial-gradient(circle at ${b.cx * 100}% ${b.cy * 100}%, #${b.color}${Math.round(b.alpha * 255)
-              .toString(16)
-              .padStart(2, '0')} 0%, #${b.color}00 ${b.r * 100}%)`,
-        )
-        .join(',');
-      sheet.style.background = `${blooms}${blooms ? ',' : ''}#${st.base || theme.colors.paper}`;
-    } else {
-      sheet.style.background = '#' + theme.colors.paper;
-    }
+    sheet.style.background = '#' + theme.colors.paper;
     sheet.style.fontFamily = `"${theme.fonts.latin}","${theme.fonts.ea}",serif`;
     // 画布基准字号取主题正文，避免容器继承浏览器默认 16px 而报阶梯外字号。
     sheet.style.fontSize = roles.body.size + 'px';
@@ -386,13 +361,13 @@
         : deck.pages
             .map((pg, idx) => ({ ...pg, number: idx + 1 }))
             .filter((pg) => pg.type === 'section')
-            .map((pg) => ({ title: String(pg.title || '').replace(/^[^：:]*[：:]/, ''), page: pg.number }));
+            .map((pg) => ({ title: String(pg.title || ''), page: pg.number }));
       const box = regions.content;
       const rowH = (theme.grid?.baseline || 8) * 7;
       const list = document.createElement('div');
       list.dataset.block = 'toc';
       list.style.cssText = `position:absolute;left:${box.x}px;top:${box.y}px;width:${box.width}px`;
-      const role = roles[theme.scale.find((r) => r.role === 'claim') ? 'claim' : 'claim'];
+      const role = roles.claim || roles.body;
       items.forEach((it, k) => {
         const row = document.createElement('div');
         row.style.cssText = `display:flex;align-items:baseline;gap:16px;height:${rowH}px;border-bottom:1px solid #${theme.colors.rule};font-size:${role.size}px;color:#${theme.colors[role.color]}`;
