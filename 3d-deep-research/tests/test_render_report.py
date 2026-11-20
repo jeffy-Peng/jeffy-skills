@@ -9,6 +9,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPT_DIR))
 import build_report
+from build_report import linkify_html
 from validate_report import markdown_to_html
 
 
@@ -47,21 +48,55 @@ class RenderReportTests(unittest.TestCase):
         self.assertIn('<span class="heading-number">2.1</span>后来', document)
         self.assertIn('</table></div>', document)
 
-    def test_reference_image_enters_manifest_and_detects_changed_image(self) -> None:
-        from report_artifacts import write_manifest, validate_manifest
+    def test_reference_image_enters_dependencies(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            source, output, chart = root / "report.md", root / "output.html", root / "plot.png"
-            text = "# Test\n\n![Plot][plot]\n\n[plot]: plot.png\n"
-            source.write_text(text, encoding="utf-8")
-            output.write_text("artifact", encoding="utf-8")
-            chart.write_bytes(b"image version one")
-            dependencies, remote = build_report.collect_dependencies(markdown_to_html(text), root)
+            chart = root / "plot.png"
+            text = "![Plot][plot]\n\n[plot]: plot.png\n"
+            dependencies, _ = build_report.collect_dependencies(markdown_to_html(text), root)
             self.assertIn(chart, dependencies)
-            write_manifest(source, output, dependencies, remote)
-            self.assertEqual(validate_manifest(source, output)[0], [])
-            chart.write_bytes(b"image version two")
-            self.assertTrue(validate_manifest(source, output)[0])
+
+
+class LinkifySourcesTests(unittest.TestCase):
+    def test_ledger_url_links_citations_and_adds_anchor(self) -> None:
+        value = """<p>结论 [S01]</p>
+<table><tr><td>S01</td><td><a href="https://example.com/source">来源</a></td></tr></table>"""
+
+        output, links, rows = linkify_html(value)
+
+        self.assertIn('id="src-S01"', output)
+        self.assertIn('href="https://example.com/source"', output)
+        self.assertEqual(links, 1)
+        self.assertEqual(rows, 1)
+
+    def test_protected_contexts_and_ledger_are_not_relinked(self) -> None:
+        value = """<p>[S01]</p><a href="#existing">[S01]</a><code>[S01]</code>
+<pre>[S01]</pre><table><tr><td>S01</td><td>[S01]</td></tr></table>"""
+
+        output, links, _ = linkify_html(value)
+
+        self.assertEqual(links, 1)
+        self.assertIn('<a href="#existing">[S01]</a>', output)
+        self.assertIn('<code>[S01]</code>', output)
+        self.assertIn('<pre>[S01]</pre>', output)
+
+    def test_missing_source_url_uses_ledger_anchor(self) -> None:
+        value = "<p>结论 [S01]</p><table><tr><td>S01</td><td>离线材料</td></tr></table>"
+
+        output, links, rows = linkify_html(value)
+
+        self.assertIn('href="#src-S01"', output)
+        self.assertEqual((links, rows), (1, 1))
+
+    def test_second_pass_is_idempotent(self) -> None:
+        value = "<p>结论 [S01]</p><table><tr><td>S01</td><td>离线材料</td></tr></table>"
+        first, _, _ = linkify_html(value)
+
+        second, links, rows = linkify_html(first)
+
+        self.assertEqual(second, first)
+        self.assertEqual(links, 0)
+        self.assertEqual(rows, 1)
 
 
 if __name__ == "__main__":

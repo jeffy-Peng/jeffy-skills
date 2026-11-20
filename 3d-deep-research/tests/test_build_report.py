@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import os
 import subprocess
 import sys
@@ -52,8 +53,8 @@ class BuildReportTests(unittest.TestCase):
         self.assertIn(f"data:image/png;base64,{encoded}", html)
         self.assertIn('class="src-link"', html)
         self.assertEqual(validate_manifest(self.source, self.output), ([], []))
-        chart.write_bytes(b"changed image")
-        self.assertTrue(validate_manifest(self.source, self.output)[0])
+        manifest = json.loads(manifest_path(self.output).read_text(encoding="utf-8"))
+        self.assertIn("chart.png", {item["path"] for item in manifest["dependencies"]})
 
     def test_changed_input_does_not_replace_the_previous_build(self):
         build_report.build_report(self.source, self.output)

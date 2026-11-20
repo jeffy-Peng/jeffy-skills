@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-import base64
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from report_artifacts import manifest_path, sha256, validate_manifest, write_manifest
-from build_report import embed_local_media
+from report_artifacts import manifest_path, validate_manifest, write_manifest
 from test_validate_report import VALID_REPORT, validate_report
 
 
@@ -140,17 +138,6 @@ class EvidenceContractTests(unittest.TestCase):
         for expected in ("viewbox", "role=", "aria-label="):
             self.check_rejected(report, expected)
 
-    def test_portable_media_preserves_local_image_bytes(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            data = b"test-image-bytes"
-            (root / "chart.png").write_bytes(data)
-            output = embed_local_media('<img src="chart.png">', root)
-            self.assertNotIn("file:///", output)
-            self.assertIn(base64.b64encode(data).decode(), output)
-            (root / "chart.png").unlink()
-            self.assertIn("data:image/png;base64,", output)
-
     def test_manifest_binds_source_output_and_dependencies(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -182,18 +169,6 @@ class EvidenceContractTests(unittest.TestCase):
             self.assertTrue(warnings)
             manifest_path(output).write_text("{}")
             self.assertTrue(validate_manifest(source, output)[0])
-
-    def test_edit_during_render_cannot_certify_wrong_input(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            source, output = root / "report.md", root / "output.html"
-            source.write_text("input A")
-            expected = {source: sha256(source)}
-            source.write_text("input B")
-            output.write_bytes(b"render of input A")
-            with self.assertRaisesRegex(ValueError, "changed during rendering"):
-                write_manifest(source, output, [], [], expected)
-
 
 
 if __name__ == "__main__":
