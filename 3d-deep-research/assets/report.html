@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$title</title>
+  <style>$css</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+<a class="brand" href="#hero"><span class="brand-mark" aria-hidden="true">研</span>深度研究</a>
+<button type="button" class="print-button">打印 / PDF</button>
+</div></header>
+<div class="layout">
+<aside class="sidebar" aria-label="报告目录"><p class="sidebar-title">目录</p><nav class="toc" aria-label="章节跳转">$toc</nav></aside>
+<main><details class="mobile-toc"><summary>报告目录</summary><nav class="toc" aria-label="章节跳转">$toc</nav></details>
+<article class="report"><header class="cover" id="hero">$cover</header><div id="reading" class="reading">$body</div></article></main>
+</div>
+<script>
+document.querySelector('.print-button').addEventListener('click',()=>window.print());
+const navLinks=[...document.querySelectorAll('.toc a')];
+const headings=[...document.querySelectorAll('#reading [data-outline]')];
+function mark(id){
+ for(const a of navLinks){
+   if(a.hash==='#'+id){a.setAttribute('aria-current','location');a.closest('details').open=true;}
+   else a.removeAttribute('aria-current');
+ }
+}
+function current(){
+ let selected=headings[0];
+ for(const h of headings){if(h.getBoundingClientRect().top<=155)selected=h;else break;}
+ if(selected)mark(selected.id);
+}
+for(const a of navLinks)a.addEventListener('click',()=>{
+ mark(a.hash.slice(1));
+ const menu=a.closest('.mobile-toc');if(menu)menu.open=false;
+});
+let pending=false;
+window.addEventListener('scroll',()=>{if(!pending){pending=true;requestAnimationFrame(()=>{current();pending=false;});}},{passive:true});
+current();
+</script>
+</body>
+</html>

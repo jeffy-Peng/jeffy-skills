@@ -12,7 +12,7 @@ import sys
 import time
 
 from report_artifacts import manifest_path, sha256, validate_manifest
-from render_report import FONT_FILES, REQUIRED_WEASYPRINT_VERSION
+from render_report import DEFAULT_CSS, REPORT_FONT, REPORT_FRAME, REQUIRED_WEASYPRINT_VERSION
 from validate_report import _configure_utf8_console, validate_markdown
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -26,9 +26,9 @@ def reusable(source: Path, artifact: Path, fonts: Path | None) -> bool:
     data = json.loads(manifest_path(artifact).read_text(encoding="utf-8"))
     paths = {(source.parent / item["path"]).resolve() for item in data["dependencies"]}
     required = {SCRIPTS / name for name in ("render_report.py", "linkify_sources.py", "report_artifacts.py")}
-    required.add(SCRIPTS.parent / "assets" / "report.css")
+    required.update(SCRIPTS.parent / "assets" / asset.name for asset in (DEFAULT_CSS, REPORT_FRAME))
     if fonts is not None:
-        required.update(fonts / name for name in FONT_FILES.values())
+        required.add(fonts / REPORT_FONT)
     # External SVGs may have nested dependencies beyond the manifest's scope.
     return required <= paths and not any(path.suffix.lower() == ".svg" for path in paths)
 
@@ -64,6 +64,7 @@ def main() -> int:
     parser.add_argument("--output-dir", help="Default: Markdown directory")
     parser.add_argument("--runtime-config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--formats", nargs="+", choices=("html", "pdf"), default=["html", "pdf"])
+    parser.add_argument("--require-xyz", action="store_true", help="Require the three analysis chapters in template order")
     args = parser.parse_args()
     source = Path(args.input).expanduser().resolve()
     output_dir = Path(args.output_dir).expanduser().resolve() if args.output_dir else source.parent
@@ -83,7 +84,11 @@ def main() -> int:
         if config.get("fontconfig_file"):
             env["FONTCONFIG_FILE"] = config["fontconfig_file"]
             env["FONTCONFIG_PATH"] = str(Path(config["fontconfig_file"]).parent)
-        errors, warnings = validate_markdown(source.read_text(encoding="utf-8"), source.parent)
+        source_bytes = source.read_bytes()
+        source_hash = hashlib.sha256(source_bytes).hexdigest()
+        source_text = source_bytes.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+        errors, warnings = validate_markdown(source_text, source.parent,
+                                             require_xyz=args.require_xyz)
         if errors:
             raise RuntimeError("\n".join(errors))
         for warning in warnings:
@@ -93,11 +98,12 @@ def main() -> int:
         except (OSError, ValueError):
             state = {}
         for fmt in (fmt for fmt in ("html", "pdf") if fmt in args.formats):
+            if sha256(source) != source_hash:
+                raise RuntimeError("Markdown changed during build; build again from one revision.")
             probe = "import sys, markdown; print(sys.version); print(markdown.__version__)"
             if fmt == "pdf":
-                missing = [str(fonts / name) for name in FONT_FILES.values() if not (fonts / name).is_file()]
-                if missing:
-                    raise RuntimeError("Missing PDF fonts: " + ", ".join(missing))
+                if not (fonts / REPORT_FONT).is_file():
+                    raise RuntimeError(f"Missing PDF font: {fonts / REPORT_FONT}")
                 probe += f"; import weasyprint, pypdf; print(weasyprint.__version__); assert weasyprint.__version__ == {REQUIRED_WEASYPRINT_VERSION!r}, 'WeasyPrint version mismatch'"
             runtime = run_step(f"preflight-{fmt}", [python, "-c", probe], env, log_dir)
             render_config = {"python": python}
@@ -116,7 +122,10 @@ def main() -> int:
                 if fmt == "pdf":
                     command += ["--font-dir", str(fonts)]
                 run_step(f"render-{fmt}", command, env, log_dir)
-            run_step(f"validate-{fmt}", [python, str(SCRIPTS / "validate_report.py"), str(source), f"--{fmt}", str(artifact)], env, log_dir)
+            validation = [python, str(SCRIPTS / "validate_report.py"), str(source), f"--{fmt}", str(artifact)]
+            if args.require_xyz:
+                validation.append("--require-xyz")
+            run_step(f"validate-{fmt}", validation, env, log_dir)
             state[fmt] = signature
             state_path.write_text(json.dumps(state, indent=2), encoding="utf-8")
             summary["artifacts"][fmt] = {"path": str(artifact), "status": "reused" if cached else "built", "sha256": sha256(artifact)}
@@ -128,10 +137,25 @@ def main() -> int:
                 str(output_dir / "output.pdf"), str(output_dir / "preview"), "--pdftoppm", poppler], env, log_dir)
             print(preview_output)
             summary["preview"] = str(output_dir / "preview")
+        for item in summary["artifacts"].values():
+            artifact = Path(item["path"])
+            identity_errors, _ = validate_manifest(source, artifact)
+            if identity_errors or sha256(artifact) != item["sha256"]:
+                raise RuntimeError(f"{artifact.name} changed during build or no longer matches its inputs; build again.")
+        if sha256(source) != source_hash:
+            raise RuntimeError("Markdown changed during build; build again from one revision.")
         print("[OK] Structure and artifact consistency checks passed. Content and visual review must be completed separately.")
         summary["status"] = "checks_passed"
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as exc:
+        # Retain valid partial output when, for example, PDF fonts are missing.
+        for fmt, item in list(summary["artifacts"].items()):
+            artifact = Path(item["path"])
+            identity_errors, _ = validate_manifest(source, artifact)
+            if identity_errors or not artifact.is_file() or sha256(artifact) != item["sha256"]:
+                del summary["artifacts"][fmt]
+        if "pdf" not in summary["artifacts"]:
+            summary.pop("preview", None)
         summary["status"] = "blocked"
         summary["error"] = str(exc)
         print(f"[FAIL] {exc}\nRuntime configuration: {args.runtime_config}\nAlready validated artifacts, if any, are listed in build-summary.json; this is not complete delivery.")

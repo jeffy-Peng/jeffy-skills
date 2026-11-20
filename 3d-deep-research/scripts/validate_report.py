@@ -10,6 +10,7 @@ from datetime import date
 from html.parser import HTMLParser
 from math import isfinite
 from pathlib import Path
+from urllib.parse import unquote
 
 from report_artifacts import MediaReferences, local_path, validate_manifest
 
@@ -142,12 +143,11 @@ def _validate_pdf_data(
         errors.append(
             f"PDF producer is {producer or '<missing>'}; expected {REQUIRED_PDF_PRODUCER}."
         )
-    missing_fonts = REQUIRED_PDF_FONTS - font_names
-    if missing_fonts:
+    serif_embedded = any(name.replace("-", "").startswith("NotoSerifSC") for name in font_names)
+    if not serif_embedded and not REQUIRED_PDF_FONTS <= font_names:
         errors.append(
             "PDF does not embed required Noto CJK fonts: "
-            + ", ".join(sorted(missing_fonts))
-            + "."
+            "Noto Serif SC or the legacy Noto Sans CJK SC regular and bold pair."
         )
     for page_number, (width, height) in enumerate(page_sizes, start=1):
         if width > height:
@@ -228,9 +228,7 @@ def _extract_table(
     table_lines: list[str] = []
     for line in lines[start:]:
         if not line.strip().startswith("|"):
-            if table_lines:
-                break
-            continue
+            break
         table_lines.append(line)
     if len(table_lines) < 2:
         return [], [], 0
@@ -241,7 +239,8 @@ def _extract_table(
         return [], [], 0
 
     rows: list[list[str]] = []
-    malformed = 0
+    # A blank line closes the rendered table. Reject rows detached from the ledger.
+    malformed = sum(line.lstrip().startswith("|") for line in lines[start + len(table_lines):])
     for line in table_lines[2:]:
         cells = _split_row(line)
         if len(cells) == len(header):
@@ -266,14 +265,14 @@ def _contains_enum(value: str, markers: set[str]) -> bool:
     return False
 
 
-def _validate_metadata(md_text: str) -> list[str]:
+def _validate_metadata(md_text: str) -> tuple[date | None, date | None, list[str]]:
     lines = md_text.splitlines()
     first_content = next(
         (index for index, line in enumerate(lines) if line.strip()),
         None,
     )
     if first_content is None:
-        return ["The report metadata line is missing or malformed."]
+        return None, None, ["The report metadata line is missing or malformed."]
 
     next_content = next(
         (line.strip() for line in lines[first_content + 1 :] if line.strip()),
@@ -286,16 +285,16 @@ def _validate_metadata(md_text: str) -> list[str]:
         next_content,
     )
     if not match or not _is_filled(match.group("question") if match else ""):
-        return ["The report metadata line is missing or malformed."]
+        return None, None, ["The report metadata line is missing or malformed."]
 
     try:
         cutoff = date.fromisoformat(match.group("cutoff"))
         completed = date.fromisoformat(match.group("completed"))
     except ValueError:
-        return ["The report metadata contains an invalid ISO date."]
+        return None, None, ["The report metadata contains an invalid ISO date."]
     if completed < cutoff:
-        return ["The report completion date cannot precede the source cutoff date."]
-    return []
+        return cutoff, completed, ["The report completion date cannot precede the source cutoff date."]
+    return cutoff, completed, []
 
 
 def _is_filled(value: str) -> bool:
@@ -305,6 +304,9 @@ def _is_filled(value: str) -> bool:
 def _validate_sources(
     rows: list[list[str]],
     legacy_schema: bool = False,
+    *,
+    cutoff: date | None = None,
+    completed: date | None = None,
 ) -> tuple[list[str], set[str]]:
     errors: list[str] = []
     source_ids: set[str] = set()
@@ -331,22 +333,39 @@ def _validate_sources(
             errors.append(f"Source {source_id} has no source details.")
         if not location_pattern.search(details + " " + limits):
             errors.append(f"Source {source_id} has no URL or file location.")
-        if legacy_schema and not re.search(r"\b\d{4}-\d{2}-\d{2}\b", details):
-            errors.append(f"Source {source_id} has no ISO date.")
-        for value in re.findall(r"\b\d{4}-\d{2}-\d{2}\b", details):
-            try:
-                date.fromisoformat(value)
-            except ValueError:
-                errors.append(f"Source {source_id} has an invalid ISO date: {value}.")
-        if not legacy_schema:
+        if legacy_schema:
+            dates = re.findall(r"\b\d{4}-\d{2}-\d{2}\b", details)
+            if not dates:
+                errors.append(f"Source {source_id} has no ISO date.")
+            for value in dates:
+                try:
+                    date.fromisoformat(value)
+                except ValueError:
+                    errors.append(f"Source {source_id} has an invalid ISO date: {value}.")
+        else:
             fields = _labeled_fields(details)
-            for label in ("发布者", "发布", "访问"):
-                if not _is_filled(fields.get(label, "")):
-                    errors.append(f"Source {source_id} is missing {label}.")
+            if not _is_filled(fields.get("发布者", "")):
+                errors.append(f"Source {source_id} is missing 发布者.")
+            dated = {}
             for label, unknown in (("发布", "未知"), ("访问", "不适用")):
                 value = fields.get(label, "")
-                if value != unknown and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+                if value == unknown:
+                    continue
+                if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
                     errors.append(f"Source {source_id} {label} must be an ISO date or {unknown}.")
+                    continue
+                try:
+                    dated[label] = date.fromisoformat(value)
+                except ValueError:
+                    errors.append(f"Source {source_id} has an invalid ISO date: {value}.")
+            published = dated.get("发布")
+            accessed = dated.get("访问")
+            if published and cutoff and published > cutoff:
+                errors.append(f"Source {source_id} was published after the source cutoff.")
+            if accessed and completed and accessed > completed:
+                errors.append(f"Source {source_id} was accessed after report completion.")
+            if published and accessed and accessed < published:
+                errors.append(f"Source {source_id} was accessed before publication.")
         if not _is_filled(role):
             errors.append(f"Source {source_id} has no evidence role.")
         elif not _contains_enum(role, INDEPENDENCE_MARKERS):
@@ -448,7 +467,7 @@ def _validate_claims(
                 )
 
         supporting_sources = set(re.findall(r"S\d{2,}", support_part))
-        claim_sources = set(re.findall(r"S\d{2,}", evidence))
+        claim_sources = set(re.findall(r"S\d{2,}", evidence + " " + claim_type + " " + row[5]))
         used_sources.update(claim_sources)
         if not supporting_sources:
             errors.append(f"Claim {claim_id} has no supporting Source ID.")
@@ -475,10 +494,6 @@ def _validate_claims(
     return errors, used_sources
 
 
-def _inside(position: int, ranges: list[tuple[int, int]]) -> bool:
-    return any(start <= position < end for start, end in ranges)
-
-
 class _SVGAttributes(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -489,13 +504,22 @@ class _SVGAttributes(HTMLParser):
             self.items.append(dict(attrs))
 
 
-class _RenderedImages(MediaReferences):
+class _RenderedReport(MediaReferences):
     def __init__(self) -> None:
         super().__init__()
         self.figure_depth = 0
         self.outside = False
+        self.anchors: set[str] = set()
+        self.fragment_links: set[str] = set()
 
     def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        anchor = attributes.get("id") or (attributes.get("name") if tag == "a" else None)
+        if anchor:
+            self.anchors.add(anchor)
+        href = attributes.get("href") or ""
+        if tag == "a" and href.startswith("#") and len(href) > 1:
+            self.fragment_links.add(unquote(href[1:]))
         if tag == "figure":
             self.figure_depth += 1
         if tag in {"img", "image", "svg"} and self.figure_depth == 0:
@@ -507,12 +531,26 @@ class _RenderedImages(MediaReferences):
             self.figure_depth = max(0, self.figure_depth - 1)
 
 
-def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
+def _validate_rendered_markup(md_text: str, base_dir: Path | None) -> list[str]:
+    if not re.search(r'<(?:figure|img|svg|image|a)\b|!\[|\]\(#|\]:\s*#', md_text, re.I):
+        return []
+
+    from render_report import markdown_to_html
+
+    try:
+        rendered, _ = markdown_to_html(md_text)
+    except RuntimeError as exc:
+        return [f"Cannot validate rendered Markdown: {exc}"]
+
     errors: list[str] = []
-    figures = list(
-        re.finditer(r"<figure\b.*?</figure>", md_text, flags=re.IGNORECASE | re.DOTALL)
-    )
-    ranges = [(figure.start(), figure.end()) for figure in figures]
+    markup = _RenderedReport()
+    markup.feed(rendered)
+    if markup.outside:
+        errors.append("An image or SVG appears outside a <figure> element.")
+    for target in sorted(markup.fragment_links - markup.anchors):
+        errors.append(f"Internal link has no rendered target: #{target}")
+
+    figures = re.finditer(r"<figure\b.*?</figure>", rendered, flags=re.I | re.S)
 
     for index, match in enumerate(figures, start=1):
         figure = match.group(0)
@@ -522,6 +560,10 @@ def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
             errors.append(f"Figure {index} has no Source ID.")
         parser = _SVGAttributes()
         parser.feed(figure)
+        image = MediaReferences()
+        image.feed(figure)
+        if not parser.items and not image.refs:
+            errors.append(f"Figure {index} has no rendered image or SVG.")
         for attributes in parser.items:
             try:
                 box = [float(x) for x in re.split(r"[\s,]+", attributes.get("viewbox", "").strip())]
@@ -535,32 +577,8 @@ def _validate_figures(md_text: str, base_dir: Path | None) -> list[str]:
             if not (attributes.get("aria-label") or "").strip():
                 errors.append(f"Figure {index} SVG requires a non-empty aria-label= value.")
 
-    media = list(re.finditer(r"<(?:img|image)\b[^>]*>", md_text, flags=re.IGNORECASE))
-    media += list(re.finditer(r"!\[[^\]]*\]\([^)]+\)", md_text))
-    media += list(re.finditer(r"<svg\b[^>]*>", md_text, flags=re.IGNORECASE))
-    for match in media:
-        if not _inside(match.start(), ranges):
-            errors.append("An image or SVG appears outside a <figure> element.")
-
-    reference_refs = []
-    if re.search(r"!\[[^\]\n]*\](?!\()", md_text):
-        from render_report import markdown_to_html
-        try:
-            rendered, _ = markdown_to_html(md_text)
-            reference_media = _RenderedImages()
-            reference_media.feed(rendered)
-            reference_refs = reference_media.refs
-            if reference_media.outside:
-                errors.append("A rendered Markdown image appears outside a <figure> element.")
-        except RuntimeError as exc:
-            errors.append(f"Cannot validate reference-style images: {exc}")
-
     if base_dir is not None:
-        media_parser = MediaReferences()
-        media_parser.feed(md_text)
-        refs = media_parser.refs + reference_refs
-        refs += re.findall(r"!\[[^\]]*\]\(([^)\s]+)", md_text)
-        for ref in sorted(set(refs)):
+        for ref in sorted(set(markup.refs)):
             candidate = local_path(ref, base_dir)
             if candidate is not None and not candidate.is_file():
                 errors.append(f"Image file not found: {ref}")
@@ -572,31 +590,23 @@ def validate_markdown(
     md_text: str,
     base_dir: Path | None = None,
     legacy_schema: bool = False,
+    *,
+    require_xyz: bool = False,
 ) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
+    md_text = re.sub(r"<!--.*?-->", lambda match: "\n" * match[0].count("\n"), md_text, flags=re.S)
 
     first_content = next((line for line in md_text.splitlines() if line.strip()), "")
     h1 = re.findall(r"^#\s+.+$", md_text, flags=re.MULTILINE)
     if len(h1) != 1 or first_content != h1[0]:
         errors.append("The report must start with exactly one H1 title.")
-    errors.extend(_validate_metadata(md_text))
+    cutoff, completed, metadata_errors = _validate_metadata(md_text)
+    errors.extend(metadata_errors)
     if legacy_schema:
         warnings.append("Legacy schema mode: evidence contract 3 is not enforced.")
     elif not re.search(r"^>\s*证据契约：3\s*$", md_text, re.M):
         errors.append("New reports require > 证据契约：3; use --legacy-schema only for historical reports.")
-
-    main_sections = re.findall(
-        r"^##\s+([一二三四五六七八九十]+)、.+$",
-        md_text,
-        flags=re.MULTILINE,
-    )
-    valid_sequences = [REQUIRED_MAIN_SECTIONS, [*REQUIRED_MAIN_SECTIONS, "五"]]
-    if legacy_schema and main_sections not in valid_sequences:
-        errors.append(
-            "Main sections must be 一 through 四, with 五 optional. "
-            f"Found: {main_sections or 'none'}."
-        )
 
     placeholders: set[tuple[int, str]] = set()
     for pattern in PLACEHOLDER_PATTERNS:
@@ -623,16 +633,26 @@ def validate_markdown(
     if a2_malformed:
         errors.append(f"A2 has {a2_malformed} malformed data row(s).")
 
-    source_errors, source_ids = _validate_sources(a1_rows, legacy_schema)
+    source_errors, source_ids = _validate_sources(a1_rows, legacy_schema, cutoff=cutoff, completed=completed)
     claim_errors, claim_source_ids = _validate_claims(a2_rows, source_ids, a2_header, legacy_schema)
     errors.extend(source_errors)
     errors.extend(claim_errors)
 
-    body_source_ids = set(re.findall(r"\[(S\d{2,})\]", body_text))
+    # Fenced examples do not count as chapter content or source citations.
+    analysis = re.sub(r"^ {0,3}(\x60{3,}|~{3,})[^\n]*\n.*?^ {0,3}\1[ \t]*$",
+                      "", body_text, flags=re.M | re.S)
+    if require_xyz or legacy_schema:
+        chapters = re.findall(r"^##[ \t]+([一二三四五六七八九十]+)、[ \t]*\S", analysis, flags=re.M)
+        if chapters not in (REQUIRED_MAIN_SECTIONS, [*REQUIRED_MAIN_SECTIONS, "五"]):
+            errors.append(
+                "Expected the conclusion and X, Y, Z chapters numbered 一 through 四 "
+                f"in template order, with 五 optional. Found: {chapters or 'none'}."
+            )
+    body_source_ids = set(re.findall(r"\[(S\d{2,})\]", analysis))
     all_sources = set(re.findall(r"\[(S\d{2,})\]", md_text))
     if all_sources - source_ids:
         errors.append("Report references undefined Source IDs: " + ", ".join(sorted(all_sources - source_ids)))
-    for heading, content in re.findall(r"^(##\s+[^\n]+)\n(.*?)(?=^##\s+|\Z)", body_text, re.M | re.S):
+    for heading, content in re.findall(r"^(##\s+[^\n]+)\n(.*?)(?=^##\s+|\Z)", analysis, re.M | re.S):
         content = re.sub(r"^#{3,6}\s+.*$", "", content, flags=re.M)
         if not _is_filled(content):
             errors.append(f"Empty analysis section: {heading}")
@@ -655,7 +675,7 @@ def validate_markdown(
     if a3_text is None or not _is_filled(a3_text):
         errors.append("A3 must describe evidence boundaries.")
 
-    errors.extend(_validate_figures(md_text, base_dir))
+    errors.extend(_validate_rendered_markup(md_text, base_dir))
     return errors, warnings
 
 
@@ -665,6 +685,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pdf", help="Optional rendered PDF path")
     parser.add_argument("--html", help="Optional rendered HTML path")
     parser.add_argument("--legacy-schema", action="store_true", help="Read historical evidence ledgers; does not certify current contract")
+    parser.add_argument("--require-xyz", action="store_true", help="Require the three analysis chapters in template order")
     return parser.parse_args()
 
 
@@ -676,7 +697,8 @@ def main() -> None:
         raise SystemExit(f"Markdown report not found: {markdown_path}")
 
     md_text = markdown_path.read_text(encoding="utf-8")
-    errors, warnings = validate_markdown(md_text, base_dir=markdown_path.parent, legacy_schema=args.legacy_schema)
+    errors, warnings = validate_markdown(md_text, base_dir=markdown_path.parent,
+                                         legacy_schema=args.legacy_schema, require_xyz=args.require_xyz)
     if args.pdf:
         pdf_errors, pdf_warnings = validate_pdf(Path(args.pdf).expanduser().resolve())
         errors.extend(pdf_errors)

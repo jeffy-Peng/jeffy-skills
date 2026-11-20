@@ -73,6 +73,62 @@ class EvidenceContractTests(unittest.TestCase):
         report = metadata + "## 哪种观测更可靠\n\n比较口径与测量。[S01]\n\n## 误差如何产生\n\n误差边界。[S01]\n\n" + appendix
         self.assertEqual(validate_report.validate_markdown(report)[0], [])
 
+    def test_xyz_layout_accepts_natural_headings_and_requires_numbered_order(self):
+        named = VALID_REPORT.replace("二、为什么会走到今天", "二、观测工具如何改变测量")
+        self.assertEqual(validate_report.validate_markdown(named, require_xyz=True)[0], [])
+
+        missing = named.replace("## 四、它为什么这样运转", "<!-- ## 四、它为什么这样运转 -->")
+        reordered = named.replace("## 三、", "## 四、", 1).replace("## 四、它为什么", "## 三、它为什么", 1)
+        for report in (missing, reordered):
+            with self.subTest(report=report):
+                errors, _ = validate_report.validate_markdown(report, require_xyz=True)
+                self.assertTrue(any("template order" in error for error in errors))
+                self.assertEqual(validate_report.validate_markdown(report)[0], [])
+
+    def test_detached_claim_row_is_rejected(self):
+        row = next(line for line in VALID_REPORT.splitlines() if line.startswith("| C01"))
+        detached = row.replace("| C01", "| C02", 1)
+        report = VALID_REPORT.replace(row, row + "\n\n" + detached)
+        self.check_rejected(report, "A2 has 1 malformed data row")
+
+    def test_hidden_text_does_not_satisfy_chapter_or_citation_checks(self):
+        report = VALID_REPORT.replace("早期观测推动了后续直接测量。[S01]", "<!-- 只有注释 -->")
+        self.check_rejected(report, "Empty analysis section")
+        before, appendix = VALID_REPORT.split("## 附录", 1)
+        metadata, _ = before.split("## 一", 1)
+        report = metadata + "<!-- [S01] -->\n\n## 附录" + appendix
+        self.check_rejected(report, "no [Sxx] citations")
+
+    def test_source_dates_follow_report_and_publication_order(self):
+        for old, new, expected in (
+            ("发布：2026-08-01", "发布：2026-08-29", "after the source cutoff"),
+            ("访问：2026-08-29", "访问：2026-07-31", "before publication"),
+            ("访问：2026-08-29", "访问：2026-08-30", "after report completion"),
+        ):
+            with self.subTest(expected=expected):
+                self.check_rejected(VALID_REPORT.replace(old, new), expected)
+
+    def test_claim_source_ids_in_mechanism_and_revision_fields_must_resolve(self):
+        report = VALID_REPORT.replace("| fact |", "| mechanism；过程：见S99；归因：见S98 |")
+        report = report.replace("修订条件：若后续", "修订条件：参考 S97；若后续")
+        self.check_rejected(report, "undefined Source IDs: S97, S98, S99")
+
+    def test_internal_link_needs_a_rendered_anchor(self):
+        report = VALID_REPORT.replace("早期观测推动了后续直接测量。[S01]",
+                                      "[见观测](#node-observation) 的时间。[S01]")
+        self.check_rejected(report, "Internal link has no rendered target")
+        anchored = report.replace("## 三、", '<a id="node-observation"></a>\n\n## 三、', 1)
+        self.assertEqual(validate_report.validate_markdown(anchored)[0], [])
+
+    def test_figure_needs_rendered_media_not_only_a_caption(self):
+        broken = VALID_REPORT + (
+            "<figure>\n\n![图示](test.png)\n\n"
+            "<figcaption>图 1 [S01]</figcaption>\n</figure>"
+        )
+        self.check_rejected(broken, "no rendered image or SVG")
+        working = broken.replace("![图示](test.png)", '<img src="test.png" alt="图示">')
+        self.assertEqual(validate_report.validate_markdown(working)[0], [])
+
     def test_missing_svg_image_is_rejected(self):
         figure = '<figure><svg viewBox="0 0 10 10" role="img" aria-label="test"><image href="absent.png"/></svg><figcaption>图 1 [S01]</figcaption></figure>'
         with tempfile.TemporaryDirectory() as directory:

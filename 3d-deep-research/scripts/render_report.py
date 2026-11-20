@@ -12,7 +12,9 @@ import re
 import shutil
 import subprocess
 import sys
+from html.parser import HTMLParser
 from pathlib import Path
+from string import Template
 from urllib.parse import unquote, urlsplit, urlunsplit
 
 from linkify_sources import linkify_html
@@ -21,11 +23,9 @@ from report_artifacts import MediaReferences, local_path, sha256, write_manifest
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CSS = SKILL_DIR / "assets" / "report.css"
+REPORT_FRAME = SKILL_DIR / "assets" / "report.html"
 REQUIRED_WEASYPRINT_VERSION = "69.0"
-FONT_FILES = {
-    400: "NotoSansCJKsc-Regular.otf",
-    700: "NotoSansCJKsc-Bold.otf",
-}
+REPORT_FONT = "NotoSerifSC-VF.ttf"
 
 
 def _configure_utf8_console() -> None:
@@ -151,24 +151,117 @@ def _resolve_local_media(html_body: str, base_dir: Path | None, embed: bool = Fa
 
 
 def _font_face_css(font_dir: Path) -> str:
-    missing = [name for name in FONT_FILES.values() if not (font_dir / name).is_file()]
-    if missing:
-        raise RuntimeError(
-            f"Missing required Noto CJK font(s) in {font_dir}: "
-            + ", ".join(missing)
-        )
-    rules = []
-    for weight, filename in FONT_FILES.items():
-        font_uri = (font_dir / filename).resolve().as_uri()
-        rules.append(
-            '@font-face {\n'
-            '  font-family: "Noto Sans CJK SC";\n'
-            f'  src: url("{font_uri}") format("opentype");\n'
-            '  font-style: normal;\n'
-            f'  font-weight: {weight};\n'
-            '}'
-        )
-    return "\n".join(rules)
+    font = font_dir / REPORT_FONT
+    if not font.is_file():
+        raise RuntimeError(f"Missing required Noto Serif SC font: {font}")
+    return (
+        '@font-face {\n'
+        '  font-family: "Noto Serif SC";\n'
+        f'  src: url("{font.resolve().as_uri()}") format("truetype");\n'
+        '  font-style: normal;\n'
+        '  font-weight: 200 900;\n'
+        '}'
+    )
+
+
+class ReadingOutline(HTMLParser):
+    """Number report headings and build a shared desktop/mobile navigation."""
+
+    VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input",
+                 "link", "meta", "param", "source", "track", "wbr"}
+    HEADINGS = {"h2": 0, "h3": 1, "h4": 2}
+    CHAPTER_PREFIX = re.compile(r"^\s*[一二三四五六七八九十]+、\s*")
+
+    def __init__(self, fragment: str) -> None:
+        super().__init__(convert_charrefs=True)
+        self.fragment = fragment
+        self.lines = [0, *(match.end() for match in re.finditer("\n", fragment))]
+        self.stack: list[str] = []
+        self.edits: list[tuple[int, int, str]] = []
+        self.counts = [0, 0, 0]
+        self.chapters: list[list[str]] = []
+        self.heading: tuple[int, int, str | None] | None = None
+        self.label: list[str] = []
+        self.table_start: int | None = None
+        self.feed(fragment)
+        self.close()
+
+    def source_offset(self) -> int:
+        row, column = self.getpos()
+        return self.lines[row - 1] + column
+
+    def handle_starttag(self, tag, attrs) -> None:
+        if not self.stack:
+            if tag in self.HEADINGS:
+                start = self.source_offset()
+                end = start + len(self.get_starttag_text())
+                self.heading = (start, end, dict(attrs).get("id"))
+                self.label = []
+            if tag == "table":
+                self.table_start = self.source_offset()
+        if tag not in self.VOID_TAGS:
+            self.stack.append(tag)
+
+    def handle_data(self, data) -> None:
+        if self.heading is not None:
+            self.label.append(data)
+
+    def handle_endtag(self, tag) -> None:
+        if self.stack == [tag] and self.heading is not None:
+            self.number_heading(tag)
+            self.heading = None
+        if self.stack == ["table"] and tag == "table" and self.table_start is not None:
+            start = self.table_start
+            end = self.fragment.index(">", self.source_offset()) + 1
+            ledger = re.search(r"<th(?:\s[^>]*)?>\s*(?:Source|Claim) ID\s*</th>",
+                               self.fragment[start:end], re.IGNORECASE)
+            css_class = "table-wrap ledger-table" if ledger else "table-wrap"
+            self.edits.append((start, start, f'<div class="{css_class}" tabindex="0" aria-label="可横向滚动的表格">'))
+            self.edits.append((end, end, "</div>"))
+            self.table_start = None
+        if tag in self.stack:
+            index = len(self.stack) - 1 - self.stack[::-1].index(tag)
+            del self.stack[index:]
+
+    def number_heading(self, tag: str) -> None:
+        depth = self.HEADINGS[tag]
+        if depth and not self.counts[depth - 1]:
+            return
+        self.counts[depth] += 1
+        self.counts[depth+1:] = [0] * (2 - depth)
+        number = ".".join(map(str, self.counts[:depth+1]))
+        start, end, existing_id = self.heading
+        anchor = html.escape(existing_id or "heading-" + number.replace(".", "-"), quote=True)
+        original_tag = self.fragment[start:end]
+        marker = " data-outline"
+        if not existing_id:
+            marker += f' id="{anchor}"'
+        open_tag = original_tag[:-1] + marker + ">"
+        label = "".join(self.label).strip()
+        if depth == 0:
+            end_of_prefix = self.CHAPTER_PREFIX.match(self.fragment[end:self.source_offset()])
+            if end_of_prefix:
+                end += end_of_prefix.end()
+                label = self.CHAPTER_PREFIX.sub("", label)
+        self.edits.append((start, end, f'{open_tag}<span class="heading-number">{number}</span>'))
+        link = f'<a href="#{anchor}" data-depth="{depth+1}"><span class="toc-num">{number}</span>{html.escape(label)}</a>'
+        if depth == 0:
+            self.chapters.append([])
+        self.chapters[-1].append(link)
+
+    def body(self) -> str:
+        fragment = self.fragment
+        for start, end, replacement in reversed(self.edits):
+            fragment = fragment[:start] + replacement + fragment[end:]
+        return fragment
+
+    def toc(self) -> str:
+        groups = []
+        for index, (chapter, *children) in enumerate(self.chapters):
+            opened = " open" if index == 0 else ""
+            nested = f'<div class="toc-sub">{"".join(children)}</div>' if children else ""
+            groups.append(f"<details{opened}><summary>{chapter}</summary>{nested}</details>")
+        return "\n".join(groups)
 
 
 def build_html(
@@ -188,34 +281,23 @@ def build_html(
     if font_dir is not None:
         css = _font_face_css(font_dir) + "\n" + css
 
-    safe_title = html.escape(report_title, quote=True)
-    meta_html = (
-        f'<div class="meta">{html.escape(meta_line, quote=True)}</div>'
-        if meta_line
-        else ""
+    subject, separator, headline = report_title.partition("：")
+    cover = []
+    if separator and headline.strip() and "研究" in subject:
+        cover.append(f'<p class="subject">{html.escape(subject)}</p>')
+    else:
+        headline = report_title
+    cover.append(f"<h1>{html.escape(headline.strip())}</h1>")
+    if meta_line:
+        question, _, dates = meta_line.partition("|")
+        cover.append(f'<p class="question">{html.escape(question.strip())}</p>')
+        if dates.strip():
+            cover.append(f'<p class="date">{html.escape(dates.strip())}</p>')
+    outline = ReadingOutline(html_body)
+    document = Template(REPORT_FRAME.read_text(encoding="utf-8")).substitute(
+        title=html.escape(report_title), css=css, cover="\n".join(cover),
+        toc=outline.toc(), body=outline.body(),
     )
-    cover = f"""
-<div class="cover">
-  <h1 style="page-break-before: avoid; border: none;">{safe_title}</h1>
-  {meta_html}
-  <hr class="divider">
-</div>
-""".strip()
-
-    document = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{safe_title}</title>
-  <style>{css}</style>
-</head>
-<body>
-{cover}
-{html_body}
-</body>
-</html>
-"""
     return document, report_title, converter
 
 
@@ -250,7 +332,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--font-dir",
         default="fonts",
-        help="Directory containing NotoSansCJKsc-Regular.otf and Bold.otf; "
+        help=f"Directory containing {REPORT_FONT}; "
         "relative paths resolve from the Markdown directory",
     )
     return parser.parse_args()
@@ -261,7 +343,7 @@ def collect_dependencies(md_text: str, base: Path, font_dir: Path | None) -> tup
     converted, _ = markdown_to_html(md_text)
     media = MediaReferences()
     media.feed(converted)
-    dependencies = [DEFAULT_CSS, Path(__file__).resolve(),
+    dependencies = [DEFAULT_CSS, REPORT_FRAME, Path(__file__).resolve(),
                     SKILL_DIR / "scripts" / "linkify_sources.py",
                     SKILL_DIR / "scripts" / "report_artifacts.py"]
     remote = []
@@ -272,7 +354,7 @@ def collect_dependencies(md_text: str, base: Path, font_dir: Path | None) -> tup
         elif ref.startswith(("https://", "http://", "//")):
             remote.append(ref)
     if font_dir is not None:
-        dependencies.extend(font_dir / name for name in FONT_FILES.values())
+        dependencies.append(font_dir / REPORT_FONT)
     return dependencies, remote
 
 

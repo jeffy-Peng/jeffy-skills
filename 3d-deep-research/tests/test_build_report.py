@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import subprocess
@@ -10,6 +11,7 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import build_report
 from report_artifacts import write_manifest
+from test_validate_report import VALID_REPORT
 
 
 class BuildReportTests(unittest.TestCase):
@@ -21,7 +23,7 @@ class BuildReportTests(unittest.TestCase):
         self.scripts.mkdir()
         self.dependencies = [self.scripts / name for name in ("render_report.py", "linkify_sources.py", "report_artifacts.py")]
         (self.root / "assets").mkdir()
-        self.dependencies.append(self.root / "assets/report.css")
+        self.dependencies.extend(self.root / "assets" / name for name in ("report.css", "report.html"))
         for path in self.dependencies:
             path.write_text("original", encoding="utf-8")
         self.source = self.root / "report.md"
@@ -56,14 +58,31 @@ class BuildReportTests(unittest.TestCase):
     def test_font_switch_and_font_edits_invalidate(self):
         fonts = self.root / "fonts"
         fonts.mkdir()
-        paths = [fonts / name for name in build_report.FONT_FILES.values()]
-        for path in paths:
-            path.write_bytes(b"font")
-        write_manifest(self.source, self.output, [*self.dependencies, *paths], [])
+        font = fonts / build_report.REPORT_FONT
+        font.write_bytes(b"font")
+        write_manifest(self.source, self.output, [*self.dependencies, font], [])
         self.assertTrue(build_report.reusable(self.source, self.output, fonts))
         self.assertFalse(build_report.reusable(self.source, self.output, self.root / "other-fonts"))
-        paths[0].write_bytes(b"changed font")
+        font.write_bytes(b"changed font")
         self.assertFalse(build_report.reusable(self.source, self.output, fonts))
+
+    def test_source_edit_between_formats_blocks_build_and_removes_stale_html(self):
+        self.source.write_text(VALID_REPORT, encoding="utf-8")
+        config = self.root / "runtime.json"
+
+        def run_step(name, *args):
+            if name == "render-html":
+                write_manifest(self.source, self.output, self.dependencies, [])
+            if name == "validate-html":
+                self.source.write_text(VALID_REPORT + "\n改动。", encoding="utf-8")
+            return ""
+
+        args = ["build_report", str(self.source), "--runtime-config", str(config)]
+        with mock.patch.object(sys, "argv", args), mock.patch.object(build_report, "run_step", side_effect=run_step):
+            self.assertEqual(build_report.main(), 1)
+        summary = json.loads((self.root / "build-summary.json").read_text(encoding="utf-8"))
+        self.assertIn("Markdown changed during build", summary["error"])
+        self.assertEqual(summary["artifacts"], {})
 
     def test_timeout_replaces_stale_log_and_retains_output(self):
         log = self.root / "probe.log"

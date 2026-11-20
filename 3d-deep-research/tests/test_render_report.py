@@ -58,20 +58,37 @@ class RenderReportTests(unittest.TestCase):
     def test_pdf_fonts_are_explicitly_embedded(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             font_dir = Path(directory)
-            for filename in render_report.FONT_FILES.values():
-                (font_dir / filename).write_bytes(b"font")
+            (font_dir / render_report.REPORT_FONT).write_bytes(b"font")
 
             css = render_report._font_face_css(font_dir)
 
-        self.assertIn("NotoSansCJKsc-Regular.otf", css)
-        self.assertIn("NotoSansCJKsc-Bold.otf", css)
-        self.assertIn("font-weight: 400", css)
-        self.assertIn("font-weight: 700", css)
+        self.assertIn("NotoSerifSC-VF.ttf", css)
+        self.assertIn('font-family: "Noto Serif SC"', css)
+        self.assertIn("font-weight: 200 900", css)
 
     def test_missing_pdf_font_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            with self.assertRaisesRegex(RuntimeError, "Missing required Noto CJK font"):
+            with self.assertRaisesRegex(RuntimeError, "Missing required Noto Serif SC font"):
                 render_report._font_face_css(Path(directory))
+
+    def test_graphite_reading_layout_preserves_headings_and_links_without_javascript(self) -> None:
+        fragment = (
+            '<p>前言</p><h2>一、结论</h2><h3>2026 年的 <em>变化</em></h3>'
+            '<h4 id="details">细节</h4><blockquote><h3>引用内标题</h3></blockquote>'
+            '<h2>二、路径</h2><h3>后来</h3><table><tbody></tbody></table>'
+        )
+        with mock.patch.object(render_report, "markdown_to_html", return_value=(fragment, "test")):
+            document, _, _ = render_report.build_html("# 测试报告")
+
+        self.assertIn('class="print-button"', document)
+        self.assertEqual(document.count("<button "), 1)
+        self.assertIn('<p>前言</p>', document)
+        self.assertIn('<span class="heading-number">1.1</span>2026 年的 <em>变化</em>', document)
+        self.assertIn('<span class="heading-number">1.1.1</span>细节', document)
+        self.assertIn('href="#details" data-depth="3"', document)
+        self.assertIn('<blockquote><h3>引用内标题</h3></blockquote>', document)
+        self.assertIn('<span class="heading-number">2.1</span>后来', document)
+        self.assertIn('</table></div>', document)
 
     def test_reference_image_enters_manifest_and_invalidates_cache(self) -> None:
         from report_artifacts import write_manifest, validate_manifest

@@ -47,11 +47,11 @@
 
 数据图还要标明单位、时间范围和统计口径。结构图的节点和箭头必须有证据支持；没有反馈闭环时不要称为“飞轮”，没有方向证据时不要强行添加箭头。
 
-所有 inline SVG 和已渲染图片都必须放在 `figure` 中，并用 `figcaption` 标明图号和问题。最终报告不能保留 Mermaid 源码。
+所有 inline SVG 和已渲染图片都必须放在 `figure` 中，并用 `figcaption` 标明图号和问题。最终报告不能保留 Mermaid 源码。在原生 HTML 的 `figure` 内直接使用 `<img src="图文件.png" alt="图意">` 或内联 SVG，Markdown 图片写法在该容器内会保留为文本。
 
 ## HTML/PDF
 
-使用 [../assets/report.css](../assets/report.css)。SVG 文本和数据标签在 A4 页面上应保持可读。
+由构建入口加载 [报告页面](../assets/report.html) 与 [样式表](../assets/report.css)。石墨杂志版使用暖白纸面、石墨灰文字、细分隔线和杂志式封面，中文用 Noto Serif SC，英文与数字用 Georgia。HTML 提供折叠目录和打印入口。三级编号由源稿的 `##`、`###`、`####` 自动生成，只有内容需要时才细分到第三级。PDF 沿用配色、字体和编号，按 A4 适配表格、图注和页码。SVG 文本和数据标签在 A4 页面上应保持可读。
 
 尽量避免图形和单行表格跨页；超长表格允许自然分页。
 
