@@ -1,97 +1,75 @@
 from __future__ import annotations
 
-import json
+import base64
+import os
+import subprocess
 import sys
 import tempfile
-import subprocess
 import unittest
 from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import build_report
-from report_artifacts import write_manifest
+from report_artifacts import manifest_path, validate_manifest
 from test_validate_report import VALID_REPORT
 
 
 class BuildReportTests(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name)
-        self.scripts = self.root / "scripts"
-        self.scripts.mkdir()
-        self.dependencies = [self.scripts / name for name in ("render_report.py", "linkify_sources.py", "report_artifacts.py")]
-        (self.root / "assets").mkdir()
-        self.dependencies.extend(self.root / "assets" / name for name in ("report.css", "report.html"))
-        for path in self.dependencies:
-            path.write_text("original", encoding="utf-8")
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.root = Path(directory.name)
         self.source = self.root / "report.md"
-        self.output = self.root / "output.html"
-        self.source.write_text("source", encoding="utf-8")
-        self.output.write_text("artifact", encoding="utf-8")
-        self.patch = mock.patch.object(build_report, "SCRIPTS", self.scripts)
-        self.patch.start()
-        self.addCleanup(self.patch.stop)
-
-    def test_unchanged_artifact_reuses_but_inputs_and_code_invalidate(self):
-        write_manifest(self.source, self.output, self.dependencies, [])
-        self.assertTrue(build_report.reusable(self.source, self.output, None))
-        for path in [self.source, self.output, *self.dependencies]:
-            original = path.read_text(encoding="utf-8")
-            path.write_text("changed", encoding="utf-8")
-            self.assertFalse(build_report.reusable(self.source, self.output, None), path)
-            path.write_text(original, encoding="utf-8")
-
-    def test_legacy_manifest_and_remote_media_do_not_reuse(self):
-        write_manifest(self.source, self.output, [], [])
-        self.assertFalse(build_report.reusable(self.source, self.output, None))
-        write_manifest(self.source, self.output, self.dependencies, ["https://example.com/image.png"])
-        self.assertFalse(build_report.reusable(self.source, self.output, None))
-
-    def test_external_svg_does_not_reuse_untracked_nested_resources(self):
-        svg = self.root / "nested.svg"
-        svg.write_text('<svg><image href="nested.png"/></svg>', encoding="utf-8")
-        write_manifest(self.source, self.output, [*self.dependencies, svg], [])
-        self.assertFalse(build_report.reusable(self.source, self.output, None))
-
-    def test_font_switch_and_font_edits_invalidate(self):
-        fonts = self.root / "fonts"
-        fonts.mkdir()
-        font = fonts / build_report.REPORT_FONT
-        font.write_bytes(b"font")
-        write_manifest(self.source, self.output, [*self.dependencies, font], [])
-        self.assertTrue(build_report.reusable(self.source, self.output, fonts))
-        self.assertFalse(build_report.reusable(self.source, self.output, self.root / "other-fonts"))
-        font.write_bytes(b"changed font")
-        self.assertFalse(build_report.reusable(self.source, self.output, fonts))
-
-    def test_source_edit_between_formats_blocks_build_and_removes_stale_html(self):
         self.source.write_text(VALID_REPORT, encoding="utf-8")
-        config = self.root / "runtime.json"
+        self.output = self.root / "output.html"
 
-        def run_step(name, *args):
-            if name == "render-html":
-                write_manifest(self.source, self.output, self.dependencies, [])
-            if name == "validate-html":
-                self.source.write_text(VALID_REPORT + "\n改动。", encoding="utf-8")
-            return ""
+    def test_cli_defaults_to_html(self):
+        process = subprocess.run(
+            [sys.executable, "-B", build_report.__file__, str(self.source), "--require-xyz"],
+            env=dict(os.environ, PYTHONIOENCODING="utf-8"), capture_output=True,
+            text=True, encoding="utf-8", check=True,
+        )
+        self.assertIn("[OK] HTML built and validated", process.stdout)
+        self.assertEqual(validate_manifest(self.source, self.output), ([], []))
+        self.assertEqual(
+            {path.name for path in self.root.iterdir()},
+            {"report.md", "output.html", "output.html.manifest.json"},
+        )
 
-        args = ["build_report", str(self.source), "--runtime-config", str(config)]
-        with mock.patch.object(sys, "argv", args), mock.patch.object(build_report, "run_step", side_effect=run_step):
-            self.assertEqual(build_report.main(), 1)
-        summary = json.loads((self.root / "build-summary.json").read_text(encoding="utf-8"))
-        self.assertIn("Markdown changed during build", summary["error"])
-        self.assertEqual(summary["artifacts"], {})
+    def test_one_conversion_keeps_figure_sources_and_dependencies(self):
+        chart = self.root / "chart.png"
+        chart.write_bytes(b"example image")
+        figure = '<figure><img src="chart.png" alt="Chart"><figcaption>Figure 1 [S01]</figcaption></figure>'
+        self.source.write_text(VALID_REPORT.replace("\n## ", f"\n\n{figure}\n\n## ", 1), encoding="utf-8")
 
-    def test_timeout_replaces_stale_log_and_retains_output(self):
-        log = self.root / "probe.log"
-        log.write_text("stale success", encoding="utf-8")
-        error = subprocess.TimeoutExpired(["probe"], 300, output=b"partial output", stderr=b"partial error")
-        with mock.patch.object(build_report.subprocess, "run", side_effect=error):
-            with self.assertRaisesRegex(RuntimeError, "probe timed out"):
-                build_report.run_step("probe", ["probe"], {}, self.root)
-        self.assertEqual(log.read_text(encoding="utf-8"), "partial outputpartial error\n[TIMEOUT]\n")
+        with mock.patch.object(build_report, "markdown_to_html", wraps=build_report.markdown_to_html) as convert:
+            build_report.build_report(self.source, self.output, require_xyz=True)
+
+        self.assertEqual(convert.call_count, 1)
+        html = self.output.read_text(encoding="utf-8")
+        encoded = base64.b64encode(chart.read_bytes()).decode("ascii")
+        self.assertIn(f"data:image/png;base64,{encoded}", html)
+        self.assertIn('class="src-link"', html)
+        self.assertEqual(validate_manifest(self.source, self.output), ([], []))
+        chart.write_bytes(b"changed image")
+        self.assertTrue(validate_manifest(self.source, self.output)[0])
+
+    def test_changed_input_does_not_replace_the_previous_build(self):
+        build_report.build_report(self.source, self.output)
+        manifest = manifest_path(self.output)
+        before = self.output.read_bytes(), manifest.read_bytes()
+        original = build_report.build_html
+
+        def render_after_edit(*args):
+            self.source.write_text(VALID_REPORT + "\nEdit.\n", encoding="utf-8")
+            return original(*args)
+
+        with mock.patch.object(build_report, "build_html", side_effect=render_after_edit):
+            with self.assertRaisesRegex(ValueError, "changed during rendering"):
+                build_report.build_report(self.source, self.output)
+
+        self.assertEqual((self.output.read_bytes(), manifest.read_bytes()), before)
 
 
 if __name__ == "__main__":

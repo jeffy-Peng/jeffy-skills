@@ -61,20 +61,6 @@ PLACEHOLDER_PATTERNS = (
     r"^\s*(?:#{1,6}\s*)?\[[^\]\n]+\]\s*$",
     r"\|\s*\[[^|\n]+\]\s*(?=\|)",
 )
-A4_WIDTH_POINTS = 595.28
-A4_HEIGHT_POINTS = 841.89
-PAGE_SIZE_TOLERANCE_POINTS = 5.0
-REQUIRED_PDF_PRODUCER = "WeasyPrint 69.0"
-REQUIRED_PDF_FONTS = {
-    "Noto-Sans-CJK-SC",
-    "Noto-Sans-CJK-SC-Bold",
-}
-LITERAL_HTML_PATTERN = re.compile(
-    r"</?(?:br|figure|figcaption|svg|div|span|table|thead|tbody|tr|td|th)\b[^>]*>",
-    flags=re.IGNORECASE,
-)
-
-
 def _configure_utf8_console() -> None:
     for stream in (sys.stdout, sys.stderr):
         reconfigure = getattr(stream, "reconfigure", None)
@@ -82,103 +68,17 @@ def _configure_utf8_console() -> None:
             reconfigure(encoding="utf-8", errors="replace")
 
 
-def _read_pdf(
-    pdf_path: Path,
-) -> tuple[str, list[tuple[float, float]], str, set[str]]:
+def markdown_to_html(md_text: str) -> str:
     try:
-        from pypdf import PdfReader  # type: ignore
-    except ModuleNotFoundError:
-        try:
-            from PyPDF2 import PdfReader  # type: ignore
-        except ModuleNotFoundError as exc:
-            raise RuntimeError("Install pypdf or PyPDF2 to validate PDF output.") from exc
+        import markdown
+    except ModuleNotFoundError as exc:
+        raise RuntimeError("Install Python-Markdown: python -m pip install Markdown") from exc
 
-    reader = PdfReader(str(pdf_path))
-    text_parts: list[str] = []
-    page_sizes: list[tuple[float, float]] = []
-    font_names: set[str] = set()
-    for page in reader.pages:
-        text_parts.append(page.extract_text() or "")
-        width = float(page.mediabox.width)
-        height = float(page.mediabox.height)
-        rotation = int(page.get("/Rotate", 0) or 0) % 360
-        if rotation in (90, 270):
-            width, height = height, width
-        page_sizes.append((width, height))
-        resources = page.get("/Resources")
-        resources = resources.get_object() if resources else None
-        fonts = resources.get("/Font") if resources else None
-        fonts = fonts.get_object() if fonts else {}
-        for font_ref in fonts.values():
-            font = font_ref.get_object()
-            base_font = str(font.get("/BaseFont", ""))
-            descendants = font.get("/DescendantFonts", [])
-            candidates = [font, *(item.get_object() for item in descendants)]
-            embedded = False
-            for candidate in candidates:
-                descriptor = candidate.get("/FontDescriptor")
-                descriptor = descriptor.get_object() if descriptor else {}
-                for key in ("/FontFile", "/FontFile2", "/FontFile3"):
-                    stream = descriptor.get(key)
-                    if stream and stream.get_object().get_data():
-                        embedded = True
-            if base_font and embedded:
-                font_names.add(base_font.lstrip("/").split("+")[-1])
-    metadata = reader.metadata or {}
-    producer = str(metadata.get("/Producer", ""))
-    return "\n".join(text_parts), page_sizes, producer, font_names
-
-
-def _validate_pdf_data(
-    pdf_text: str,
-    page_sizes: list[tuple[float, float]],
-    producer: str,
-    font_names: set[str],
-) -> tuple[list[str], list[str]]:
-    errors: list[str] = []
-    warnings: list[str] = []
-    if not page_sizes:
-        errors.append("PDF has no pages.")
-    if producer != REQUIRED_PDF_PRODUCER:
-        errors.append(
-            f"PDF producer is {producer or '<missing>'}; expected {REQUIRED_PDF_PRODUCER}."
-        )
-    serif_embedded = any(name.replace("-", "").startswith("NotoSerifSC") for name in font_names)
-    if not serif_embedded and not REQUIRED_PDF_FONTS <= font_names:
-        errors.append(
-            "PDF does not embed required Noto CJK fonts: "
-            "Noto Serif SC or the legacy Noto Sans CJK SC regular and bold pair."
-        )
-    for page_number, (width, height) in enumerate(page_sizes, start=1):
-        if width > height:
-            errors.append(f"PDF page {page_number} is landscape; expected A4 portrait.")
-            continue
-        if (
-            abs(width - A4_WIDTH_POINTS) > PAGE_SIZE_TOLERANCE_POINTS
-            or abs(height - A4_HEIGHT_POINTS) > PAGE_SIZE_TOLERANCE_POINTS
-        ):
-            errors.append(
-                f"PDF page {page_number} is {width:.1f} x {height:.1f} pt; "
-                "expected A4 portrait."
-            )
-    literal_tag = LITERAL_HTML_PATTERN.search(pdf_text)
-    if literal_tag:
-        errors.append(f"PDF contains a literal HTML tag: {literal_tag.group(0)!r}.")
-    if len(pdf_text.strip()) < 100:
-        warnings.append("PDF text extraction returned very little text.")
-    if "\ufffd" in pdf_text:
-        warnings.append("PDF text contains Unicode replacement characters.")
-    return errors, warnings
-
-
-def validate_pdf(pdf_path: Path) -> tuple[list[str], list[str]]:
-    if not pdf_path.is_file() or pdf_path.stat().st_size < 1024:
-        return [f"PDF is missing or too small: {pdf_path}"], []
-    try:
-        pdf_text, page_sizes, producer, font_names = _read_pdf(pdf_path)
-    except Exception as exc:
-        return [f"PDF validation failed: {exc}"], []
-    return _validate_pdf_data(pdf_text, page_sizes, producer, font_names)
+    return markdown.markdown(
+        md_text,
+        extensions=["tables", "fenced_code", "sane_lists"],
+        output_format="html5",
+    )
 
 
 def _split_body_and_appendix(md_text: str) -> tuple[str, str]:
@@ -531,26 +431,40 @@ class _RenderedReport(MediaReferences):
             self.figure_depth = max(0, self.figure_depth - 1)
 
 
-def _validate_rendered_markup(md_text: str, base_dir: Path | None) -> list[str]:
+def _internal_link_errors(markup: _RenderedReport) -> list[str]:
+    return [
+        f"Internal link has no rendered target: #{target}"
+        for target in sorted(markup.fragment_links - markup.anchors)
+    ]
+
+
+def validate_html_links(html_text: str) -> list[str]:
+    markup = _RenderedReport()
+    markup.feed(html_text)
+    markup.close()
+    return _internal_link_errors(markup)
+
+
+def _validate_rendered_markup(
+    md_text: str, base_dir: Path | None, rendered_body: str | None
+) -> list[str]:
     if not re.search(r'<(?:figure|img|svg|image|a)\b|!\[|\]\(#|\]:\s*#', md_text, re.I):
         return []
 
-    from render_report import markdown_to_html
+    if rendered_body is None:
+        try:
+            rendered_body = markdown_to_html(md_text)
+        except RuntimeError as exc:
+            return [f"Cannot validate rendered Markdown: {exc}"]
 
-    try:
-        rendered, _ = markdown_to_html(md_text)
-    except RuntimeError as exc:
-        return [f"Cannot validate rendered Markdown: {exc}"]
-
-    errors: list[str] = []
     markup = _RenderedReport()
-    markup.feed(rendered)
+    markup.feed(rendered_body)
+    markup.close()
+    errors = _internal_link_errors(markup)
     if markup.outside:
         errors.append("An image or SVG appears outside a <figure> element.")
-    for target in sorted(markup.fragment_links - markup.anchors):
-        errors.append(f"Internal link has no rendered target: #{target}")
 
-    figures = re.finditer(r"<figure\b.*?</figure>", rendered, flags=re.I | re.S)
+    figures = re.finditer(r"<figure\b.*?</figure>", rendered_body, flags=re.I | re.S)
 
     for index, match in enumerate(figures, start=1):
         figure = match.group(0)
@@ -592,6 +506,7 @@ def validate_markdown(
     legacy_schema: bool = False,
     *,
     require_xyz: bool = False,
+    rendered_body: str | None = None,
 ) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -650,21 +565,18 @@ def validate_markdown(
             )
     body_source_ids = set(re.findall(r"\[(S\d{2,})\]", analysis))
     all_sources = set(re.findall(r"\[(S\d{2,})\]", md_text))
-    if all_sources - source_ids:
-        errors.append("Report references undefined Source IDs: " + ", ".join(sorted(all_sources - source_ids)))
+    missing_body_sources = body_source_ids - source_ids
+    if missing_body_sources:
+        errors.append("Report body references undefined Source IDs: " + ", ".join(sorted(missing_body_sources)) + ".")
+    missing_other_sources = all_sources - source_ids - body_source_ids
+    if missing_other_sources:
+        errors.append("Report references undefined Source IDs: " + ", ".join(sorted(missing_other_sources)))
     for heading, content in re.findall(r"^(##\s+[^\n]+)\n(.*?)(?=^##\s+|\Z)", analysis, re.M | re.S):
         content = re.sub(r"^#{3,6}\s+.*$", "", content, flags=re.M)
         if not _is_filled(content):
             errors.append(f"Empty analysis section: {heading}")
     if not body_source_ids:
         errors.append("The report body has no [Sxx] citations.")
-    undefined_body_sources = body_source_ids - source_ids
-    if undefined_body_sources:
-        errors.append(
-            "Report body references undefined Source IDs: "
-            + ", ".join(sorted(undefined_body_sources))
-            + "."
-        )
     unused_sources = source_ids - body_source_ids - claim_source_ids
     if unused_sources:
         warnings.append(
@@ -675,14 +587,13 @@ def validate_markdown(
     if a3_text is None or not _is_filled(a3_text):
         errors.append("A3 must describe evidence boundaries.")
 
-    errors.extend(_validate_rendered_markup(md_text, base_dir))
+    errors.extend(_validate_rendered_markup(md_text, base_dir, rendered_body))
     return errors, warnings
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a 3d-deep-research report.")
     parser.add_argument("markdown", help="Markdown report path")
-    parser.add_argument("--pdf", help="Optional rendered PDF path")
     parser.add_argument("--html", help="Optional rendered HTML path")
     parser.add_argument("--legacy-schema", action="store_true", help="Read historical evidence ledgers; does not certify current contract")
     parser.add_argument("--require-xyz", action="store_true", help="Require the three analysis chapters in template order")
@@ -699,18 +610,18 @@ def main() -> None:
     md_text = markdown_path.read_text(encoding="utf-8")
     errors, warnings = validate_markdown(md_text, base_dir=markdown_path.parent,
                                          legacy_schema=args.legacy_schema, require_xyz=args.require_xyz)
-    if args.pdf:
-        pdf_errors, pdf_warnings = validate_pdf(Path(args.pdf).expanduser().resolve())
-        errors.extend(pdf_errors)
-        warnings.extend(pdf_warnings)
-    for artifact in (args.pdf, args.html):
-        if artifact:
-            if args.legacy_schema:
-                warnings.append("Legacy artifact identity is not verified; render again for current-contract delivery.")
-            else:
-                identity_errors, identity_warnings = validate_manifest(markdown_path, Path(artifact).expanduser().resolve())
-                errors.extend(identity_errors)
-                warnings.extend(identity_warnings)
+    if args.html:
+        artifact = Path(args.html).expanduser().resolve()
+        try:
+            errors.extend(validate_html_links(artifact.read_text(encoding="utf-8")))
+        except (OSError, UnicodeError) as exc:
+            errors.append(f"Cannot read HTML artifact: {exc}")
+        if args.legacy_schema:
+            warnings.append("Legacy artifact identity is not verified; render again for current-contract delivery.")
+        else:
+            identity_errors, identity_warnings = validate_manifest(markdown_path, artifact)
+            errors.extend(identity_errors)
+            warnings.extend(identity_warnings)
     for error in errors:
         print(f"[ERROR] {error}")
     for warning in warnings:

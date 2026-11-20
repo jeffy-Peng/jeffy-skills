@@ -299,38 +299,12 @@ class ValidateReportTests(unittest.TestCase):
                 errors, _ = validate_report.validate_markdown(add_figure(broken_figure))
                 self.assertTrue(any(expected in error for error in errors), errors)
 
-    def test_pdf_layout_accepts_a4_portrait(self) -> None:
-        errors, warnings = validate_report._validate_pdf_data(
-            "可提取的正文" * 20,
-            [(595.28, 841.89), (595.28, 841.89)],
-            "WeasyPrint 69.0",
-            {"Noto-Sans-CJK-SC", "Noto-Sans-CJK-SC-Bold"},
+    def test_html_check_finds_a_missing_navigation_target(self) -> None:
+        markup = '<a href="#missing">Jump</a><a href="#section">Section</a><h2 id="section">Title</h2>'
+        self.assertEqual(
+            validate_report.validate_html_links(markup),
+            ["Internal link has no rendered target: #missing"],
         )
-
-        self.assertEqual(errors, [])
-        self.assertEqual(warnings, [])
-
-    def test_pdf_layout_rejects_landscape_and_literal_html(self) -> None:
-        errors, _ = validate_report._validate_pdf_data(
-            "研究时间<br/>资料截止" + "正文" * 50,
-            [(595.28, 841.89), (841.89, 595.28)],
-            "WeasyPrint 69.0",
-            {"Noto-Sans-CJK-SC", "Noto-Sans-CJK-SC-Bold"},
-        )
-
-        self.assertTrue(any("page 2 is landscape" in error for error in errors), errors)
-        self.assertTrue(any("literal HTML tag" in error for error in errors), errors)
-
-    def test_pdf_layout_rejects_wrong_engine_and_fonts(self) -> None:
-        errors, _ = validate_report._validate_pdf_data(
-            "可提取的正文" * 20,
-            [(595.28, 841.89)],
-            "ReportLab PDF Library",
-            {"Helvetica"},
-        )
-
-        self.assertTrue(any("expected WeasyPrint 69.0" in error for error in errors), errors)
-        self.assertTrue(any("required Noto CJK fonts" in error for error in errors), errors)
 
 
 if __name__ == "__main__":

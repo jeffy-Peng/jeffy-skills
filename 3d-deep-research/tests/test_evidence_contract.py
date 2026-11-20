@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from report_artifacts import manifest_path, sha256, validate_manifest, write_manifest
-from render_report import _resolve_local_media
+from build_report import embed_local_media
 from test_validate_report import VALID_REPORT, validate_report
 
 
@@ -145,7 +145,7 @@ class EvidenceContractTests(unittest.TestCase):
             root = Path(directory)
             data = b"test-image-bytes"
             (root / "chart.png").write_bytes(data)
-            output = _resolve_local_media('<img src="chart.png">', root, embed=True)
+            output = embed_local_media('<img src="chart.png">', root)
             self.assertNotIn("file:///", output)
             self.assertIn(base64.b64encode(data).decode(), output)
             (root / "chart.png").unlink()
@@ -154,7 +154,7 @@ class EvidenceContractTests(unittest.TestCase):
     def test_manifest_binds_source_output_and_dependencies(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            source, output, resource = [root / name for name in ("report.md", "output.pdf", "figure.svg")]
+            source, output, resource = [root / name for name in ("report.md", "output.html", "figure.svg")]
             source.write_text("version A")
             output.write_bytes(b"artifact A")
             resource.write_text("figure A")
@@ -186,7 +186,7 @@ class EvidenceContractTests(unittest.TestCase):
     def test_edit_during_render_cannot_certify_wrong_input(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            source, output = root / "report.md", root / "output.pdf"
+            source, output = root / "report.md", root / "output.html"
             source.write_text("input A")
             expected = {source: sha256(source)}
             source.write_text("input B")
@@ -194,26 +194,6 @@ class EvidenceContractTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "changed during rendering"):
                 write_manifest(source, output, [], [], expected)
 
-    def test_pdf_font_names_alone_do_not_prove_embedding(self):
-        try:
-            from pypdf import PdfWriter
-            from pypdf.generic import DictionaryObject, NameObject
-        except ImportError:
-            self.skipTest("pypdf is needed for the PDF resource regression")
-        with tempfile.TemporaryDirectory() as directory:
-            writer = PdfWriter()
-            page = writer.add_blank_page(width=595.28, height=841.89)
-            fonts = DictionaryObject()
-            for index, name in enumerate(validate_report.REQUIRED_PDF_FONTS):
-                fonts[NameObject(f"/F{index}")] = DictionaryObject({
-                    NameObject("/Type"): NameObject("/Font"),
-                    NameObject("/Subtype"): NameObject("/Type1"),
-                    NameObject("/BaseFont"): NameObject("/" + name),
-                })
-            page[NameObject("/Resources")] = DictionaryObject({NameObject("/Font"): fonts})
-            path = Path(directory) / "names-only.pdf"
-            writer.write(path)
-            self.assertEqual(validate_report._read_pdf(path)[3], set())
 
 
 if __name__ == "__main__":
