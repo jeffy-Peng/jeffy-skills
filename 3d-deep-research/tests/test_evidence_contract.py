@@ -43,9 +43,44 @@ class EvidenceContractTests(unittest.TestCase):
     def test_unknown_publication_is_explicitly_allowed(self):
         self.assertEqual(validate_report.validate_markdown(VALID_REPORT.replace("发布：2026-08-01", "发布：未知"))[0], [])
 
-    def test_offline_unknown_date_does_not_need_invented_date(self):
-        report = VALID_REPORT.replace("发布：2026-08-01；访问：2026-08-29", "发布：未知；访问：不适用")
-        self.assertEqual(validate_report.validate_markdown(report)[0], [])
+    def test_offline_unknown_date_requires_an_available_file(self):
+        report = VALID_REPORT.replace("https://example.com/moon", "<record 01.pdf>")
+        report = report.replace("发布：2026-08-01；访问：2026-08-29", "发布：未知；访问：不适用")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            errors, _ = validate_report.validate_markdown(report, root)
+            self.assertTrue(any("local evidence file not found" in error for error in errors), errors)
+            (root / "record 01.pdf").touch()
+            self.assertEqual(validate_report.validate_markdown(report, root)[0], [])
+
+    def test_online_source_requires_access_date(self):
+        report = VALID_REPORT.replace("访问：2026-08-29", "访问：不适用")
+        self.check_rejected(report, "requires an actual access date")
+
+    def test_A1_cannot_reference_a_missing_A2_claim(self):
+        report = VALID_REPORT.replace("支持 C01；原始材料", "支持 C99；原始材料")
+        self.check_rejected(report, "undefined Claim IDs: C99")
+
+    def test_body_citations_cannot_point_elsewhere(self):
+        for citation, extra in (
+            ("[S01](https://example.org/unrelated)", ""),
+            ("[S01][other]", "\n[other]: https://example.org/unrelated\n"),
+            ("[S01]", "\n[S01]: https://example.org/unrelated\n"),
+        ):
+            with self.subTest(citation=citation, extra=extra):
+                report = VALID_REPORT.replace("[S01]", citation, 1) + extra
+                self.check_rejected(report, "not custom URLs: S01")
+
+    def test_a_citation_alone_cannot_satisfy_the_body_requirement(self):
+        before, appendix = VALID_REPORT.split("## 附录", 1)
+        metadata = before.split("## 一、", 1)[0]
+        for body, message in (
+            ("[S01]。", "must contain an analysis section"),
+            ("## 结论\n\n[S01]。", "Empty analysis section"),
+        ):
+            with self.subTest(body=body):
+                report = f"{metadata}{body}\n\n## 附录{appendix}"
+                self.check_rejected(report, message)
 
     def test_missing_contract_requires_explicit_legacy_mode(self):
         report = VALID_REPORT.replace("> 证据契约：3\n", "")

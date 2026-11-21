@@ -9,10 +9,12 @@ import html
 import mimetypes
 import re
 from html.parser import HTMLParser
+from os.path import relpath
 from pathlib import Path
 from string import Template
 from tempfile import TemporaryDirectory
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit, urlunsplit
+from xml.etree import ElementTree
 
 from report_artifacts import MediaReferences, local_path, manifest_path, sha256, write_manifest
 from validate_report import (
@@ -34,7 +36,9 @@ SOURCE_ROW = re.compile(
 )
 
 
-def linkify_html(html: str) -> tuple[str, int, int]:
+def linkify_html(
+    html_text: str, *, source_dir: Path | None = None, output_dir: Path | None = None
+) -> tuple[str, int, int]:
     """Link ``[Sxx]`` citations and return HTML, links added, and ledger rows."""
 
     row_pattern = re.compile(
@@ -43,46 +47,52 @@ def linkify_html(html: str) -> tuple[str, int, int]:
         flags=re.IGNORECASE | re.DOTALL,
     )
 
+    def rebase_link(match: re.Match[str]) -> str:
+        ref = html.unescape(match.group(3))
+        path = local_path(ref, source_dir)
+        if path is None:
+            return match.group(0)
+        try:
+            destination = quote(Path(relpath(path, output_dir)).as_posix())
+        except ValueError:  # Different Windows drives have no relative path.
+            destination = path.as_uri()
+        parsed = urlsplit(ref)
+        resolved = urlsplit(destination)
+        href = urlunsplit((resolved.scheme, resolved.netloc, resolved.path, parsed.query, parsed.fragment))
+        return f"{match.group(1)}{match.group(2)}{html.escape(href, quote=True)}{match.group(2)}"
+
     def add_anchor(match: re.Match[str]) -> str:
         attrs = match.group("attrs")
-        if re.search(r"\bid\s*=", attrs, flags=re.IGNORECASE):
-            return match.group(0)
-        return f'<tr{attrs} id="src-{match.group("sid")}">{match.group("cells")}'
+        cells = match.group("cells")
+        if source_dir is not None and output_dir is not None and source_dir != output_dir:
+            cells = re.sub(r"(<a\b[^>]*?\bhref\s*=\s*)(['\"])(.*?)\2", rebase_link, cells, flags=re.I | re.S)
+        if not re.search(r"\bid\s*=", attrs, flags=re.IGNORECASE):
+            attrs += f' id="src-{match.group("sid")}"'
+        return f"<tr{attrs}>{cells}"
 
-    html = row_pattern.sub(add_anchor, html)
-    url_map: dict[str, str] = {}
-    for row in re.finditer(r"<tr\b([^>]*)>(.*?)</tr>", html, re.IGNORECASE | re.DOTALL):
-        anchor = re.search(
-            rf"\bid\s*=\s*['\"]src-({SOURCE_ID})['\"]",
-            row.group(1),
-            flags=re.IGNORECASE,
-        )
-        if not anchor:
-            continue
-        href = re.search(
-            r"href\s*=\s*(['\"])(https?://.*?)\1",
-            row.group(2),
-            flags=re.IGNORECASE | re.DOTALL,
-        )
-        bare = re.search(r'(?<!["\'=])(https?://[^\s<)"\']+)', row.group(2))
-        url = href.group(2) if href else bare.group(1) if bare else ""
-        if url:
-            url_map[anchor.group(1)] = url.rstrip(".,;。")
+    # Limit source anchors to A1 so other report tables can also list Source IDs.
+    heading = re.search(
+        r'<h3\b[^>]*>(?:<span class="heading-number">[^<]*</span>)?\s*A1\b[^<]*</h3>',
+        html_text, flags=re.I,
+    )
+    if heading:
+        tail = html_text[heading.end():]
+        table = re.search(r"<table\b[^>]*>.*?</table>", tail, flags=re.I | re.S)
+        if table:
+            start, end = heading.end() + table.start(), heading.end() + table.end()
+            html_text = html_text[:start] + row_pattern.sub(add_anchor, table.group(0)) + html_text[end:]
+    else:
+        html_text = row_pattern.sub(add_anchor, html_text)
 
     def citation(match: re.Match[str]) -> str:
         sid = match.group(1)
-        if sid in url_map:
-            return (
-                f'<a href="{url_map[sid]}" target="_blank" '
-                f'rel="noopener noreferrer" class="src-link">[{sid}]</a>'
-            )
         return f'<a href="#src-{sid}" class="src-link">[{sid}]</a>'
 
     output: list[str] = []
     in_ledger_row = False
     skip_depth = 0
     n_links = 0
-    for part in re.split(r"(<[^>]+>)", html):
+    for part in re.split(r"(<[^>]+>)", html_text):
         if not part.startswith("<"):
             if in_ledger_row or skip_depth:
                 output.append(part)
@@ -104,7 +114,7 @@ def linkify_html(html: str) -> tuple[str, int, int]:
                     skip_depth += 1
         output.append(part)
 
-    return "".join(output), n_links, len(SOURCE_ROW.findall(html))
+    return "".join(output), n_links, len(SOURCE_ROW.findall(html_text))
 
 
 def _split_report(md_text: str) -> tuple[str, str, str]:
@@ -135,6 +145,32 @@ def _split_report(md_text: str) -> tuple[str, str, str]:
     return title, meta_line, body
 
 
+def _check_svg_dependencies(path: Path, content: bytes) -> None:
+    try:
+        root = ElementTree.fromstring(content)
+    except ElementTree.ParseError as exc:
+        raise ValueError(f"Cannot embed invalid SVG {path.name}: {exc}") from exc
+
+    references = set()
+    for element in root.iter():
+        tag = element.tag.rsplit("}", 1)[-1]
+        for attr, value in element.attrib.items():
+            if tag != "a" and attr.rsplit("}", 1)[-1] == "href" and value.strip():
+                references.add(value.strip())
+            references.update(re.findall(r"""url\(\s*['"]?([^'")\s]+)""", value, flags=re.I))
+        if tag == "style" and element.text:
+            references.update(re.findall(r"""url\(\s*['"]?([^'")\s]+)""", element.text, flags=re.I))
+            if "@import" in element.text.lower():
+                raise ValueError(f"SVG image {path.name} imports CSS. Inline the CSS or export the figure as PNG.")
+
+    external = sorted(ref for ref in references if not ref.lower().startswith(("#", "data:")))
+    if external:
+        raise ValueError(
+            f"SVG image {path.name} is not self-contained: {', '.join(external)}. "
+            "Embed those resources in the SVG or export the figure as PNG."
+        )
+
+
 def embed_local_media(html_body: str, base_dir: Path) -> str:
     """Embed images referenced by the HTML using the Markdown directory."""
     attribute = re.compile(
@@ -148,7 +184,10 @@ def embed_local_media(html_body: str, base_dir: Path) -> str:
         if path is None:
             return match.group(0)
         mime = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
-        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+        content = path.read_bytes()
+        if path.suffix.lower() == ".svg":
+            _check_svg_dependencies(path, content)
+        encoded = base64.b64encode(content).decode("ascii")
         fragment = urlsplit(value).fragment
         uri = f"data:{mime};base64,{encoded}" + (f"#{fragment}" if fragment else "")
         return f"{match.group(1)}{match.group(2)}{uri}{match.group(2)}"
@@ -323,7 +362,9 @@ def build_report(source: Path, output: Path, *, require_xyz: bool = False) -> No
     expected_inputs = {path: sha256(path) for path in dependencies}
     expected_inputs[source] = source_hash
     html_body = embed_local_media(html_body, source.parent)
-    document, _, _ = linkify_html(build_html(title, metadata, html_body))
+    document, _, _ = linkify_html(
+        build_html(title, metadata, html_body), source_dir=source.parent, output_dir=output.parent
+    )
     errors = validate_html_links(document)
     if errors:
         raise ValueError("\n".join(errors))

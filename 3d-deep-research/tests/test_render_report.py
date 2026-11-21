@@ -58,13 +58,14 @@ class RenderReportTests(unittest.TestCase):
 
 
 class LinkifySourcesTests(unittest.TestCase):
-    def test_ledger_url_links_citations_and_adds_anchor(self) -> None:
+    def test_citations_open_the_ledger_and_preserve_its_original_url(self) -> None:
         value = """<p>结论 [S01]</p>
 <table><tr><td>S01</td><td><a href="https://example.com/source">来源</a></td></tr></table>"""
 
         output, links, rows = linkify_html(value)
 
         self.assertIn('id="src-S01"', output)
+        self.assertIn('<a href="#src-S01" class="src-link">[S01]</a>', output)
         self.assertIn('href="https://example.com/source"', output)
         self.assertEqual(links, 1)
         self.assertEqual(rows, 1)

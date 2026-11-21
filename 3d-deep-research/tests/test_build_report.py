@@ -56,6 +56,38 @@ class BuildReportTests(unittest.TestCase):
         manifest = json.loads(manifest_path(self.output).read_text(encoding="utf-8"))
         self.assertIn("chart.png", {item["path"] for item in manifest["dependencies"]})
 
+    def test_source_links_target_A1_in_another_output_directory(self):
+        evidence = self.root / "source note.txt"
+        evidence.write_text("Synthetic source", encoding="utf-8")
+        report = VALID_REPORT.replace("https://example.com/moon", "<source%20note.txt#page=3>")
+        extra_table = "| ID | 内容 |\n|---|---|\n| S01 | 摘要 |\n\n"
+        self.source.write_text(report.replace("## 二、", extra_table + "## 二、", 1), encoding="utf-8")
+        output = self.root / "published" / "output.html"
+        build_report.build_report(self.source, output)
+        html = output.read_text(encoding="utf-8")
+        self.assertEqual(html.count('id="src-S01"'), 1)
+        self.assertIn('href="#src-S01" class="src-link"', html)
+        self.assertIn('href="../source%20note.txt#page=3"', html)
+
+    def test_svg_must_embed_its_own_dependencies(self):
+        svg = self.root / "chart.svg"
+        start = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
+        svg.write_text(f'{start}<image href="tile.png"/></svg>', encoding="utf-8")
+        figure = '<figure><img src="chart.svg" alt="Chart"><figcaption>Figure 1 [S01]</figcaption></figure>'
+        self.source.write_text(VALID_REPORT.replace("\n## ", f"\n\n{figure}\n\n## ", 1), encoding="utf-8")
+
+        with self.assertRaisesRegex(ValueError, r"not self-contained: tile\.png"):
+            build_report.build_report(self.source, self.output)
+        self.assertFalse(self.output.exists())
+
+        svg.write_text(
+            f'{start}<defs><path id="chart" d="M1 1L5 5"/></defs><use href="#chart"/></svg>',
+            encoding="utf-8",
+        )
+        build_report.build_report(self.source, self.output)
+        self.assertIn("data:image/svg+xml;base64,", self.output.read_text(encoding="utf-8"))
+        self.assertEqual(validate_manifest(self.source, self.output), ([], []))
+
     def test_changed_input_does_not_replace_the_previous_build(self):
         build_report.build_report(self.source, self.output)
         manifest = manifest_path(self.output)

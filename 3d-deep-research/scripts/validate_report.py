@@ -7,6 +7,7 @@ import argparse
 import re
 import sys
 from datetime import date
+from html import unescape
 from html.parser import HTMLParser
 from math import isfinite
 from pathlib import Path
@@ -207,12 +208,13 @@ def _validate_sources(
     *,
     cutoff: date | None = None,
     completed: date | None = None,
+    base_dir: Path | None = None,
 ) -> tuple[list[str], set[str]]:
     errors: list[str] = []
     source_ids: set[str] = set()
     location_pattern = re.compile(
-        r"https?://|(?:^|[\s(])[^\s)]+\."
-        r"(?:pdf|html?|md|txt|csv|xlsx?|docx?)\b",
+        r"https?://[^\s)<>]+|(?:^|[\s(])(?P<file>[^\s)]+\."
+        r"(?:pdf|html?|md|txt|csv|xlsx?|docx?))(?=$|[\s)#？?；;。])",
         flags=re.IGNORECASE,
     )
 
@@ -231,8 +233,21 @@ def _validate_sources(
         details, role, limits = row[1:4]
         if not _is_filled(details):
             errors.append(f"Source {source_id} has no source details.")
-        if not location_pattern.search(details + " " + limits):
+        link = re.search(r"\]\(\s*(?:<([^>\n]+)>|([^\s)]+))", details)
+        if link:
+            location = link.group(1) or link.group(2)
+        else:
+            match = location_pattern.search(f"{details} {limits}")
+            location = (match.group("file") or match.group(0)) if match else ""
+        online = bool(re.match(r"https?://|//", location, flags=re.I))
+        try:
+            path = local_path(unescape(location), base_dir or Path.cwd()) if location and not online else None
+        except ValueError:
+            path = None
+        if not online and path is None:
             errors.append(f"Source {source_id} has no URL or file location.")
+        elif path is not None and base_dir is not None and not path.is_file():
+            errors.append(f"Source {source_id} local evidence file not found: {location}.")
         if legacy_schema:
             dates = re.findall(r"\b\d{4}-\d{2}-\d{2}\b", details)
             if not dates:
@@ -246,6 +261,8 @@ def _validate_sources(
             fields = _labeled_fields(details)
             if not _is_filled(fields.get("发布者", "")):
                 errors.append(f"Source {source_id} is missing 发布者.")
+            if online and fields.get("访问") == "不适用":
+                errors.append(f"Online source {source_id} requires an actual access date.")
             dated = {}
             for label, unknown in (("发布", "未知"), ("访问", "不适用")):
                 value = fields.get(label, "")
@@ -290,7 +307,7 @@ def _validate_claims(
     source_ids: set[str],
     header: list[str] | None = None,
     legacy_schema: bool = False,
-) -> tuple[list[str], set[str]]:
+) -> tuple[list[str], set[str], set[str]]:
     errors: list[str] = []
     claim_ids: set[str] = set()
     used_sources: set[str] = set()
@@ -391,7 +408,7 @@ def _validate_claims(
         if not _is_filled(gap):
             errors.append(f"Claim {claim_id} has no evidence gap or disconfirmation condition.")
 
-    return errors, used_sources
+    return errors, used_sources, claim_ids
 
 
 class _SVGAttributes(HTMLParser):
@@ -411,6 +428,10 @@ class _RenderedReport(MediaReferences):
         self.outside = False
         self.anchors: set[str] = set()
         self.fragment_links: set[str] = set()
+        self.mislinked_citations: set[str] = set()
+        self.link: tuple[str, list[str]] | None = None
+        self.heading: list[str] | None = None
+        self.in_appendix = False
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
@@ -418,15 +439,38 @@ class _RenderedReport(MediaReferences):
         if anchor:
             self.anchors.add(anchor)
         href = attributes.get("href") or ""
-        if tag == "a" and href.startswith("#") and len(href) > 1:
-            self.fragment_links.add(unquote(href[1:]))
+        if tag == "a" and href:
+            if href.startswith("#") and len(href) > 1:
+                self.fragment_links.add(unquote(href[1:]))
+            if not self.in_appendix:
+                self.link = (href, [])
+        if tag == "h2":
+            self.heading = []
         if tag == "figure":
             self.figure_depth += 1
         if tag in {"img", "image", "svg"} and self.figure_depth == 0:
             self.outside = True
         super().handle_starttag(tag, attrs)
 
+    def handle_data(self, data: str) -> None:
+        if self.link is not None:
+            self.link[1].append(data)
+        if self.heading is not None:
+            self.heading.append(data)
+
     def handle_endtag(self, tag):
+        if tag == "a" and self.link is not None:
+            href, parts = self.link
+            match = re.fullmatch(r"\[(S\d{2,})\]|(S\d{2,})", "".join(parts).strip())
+            if match:
+                source_id = match.group(1) or match.group(2)
+                if href != f"#src-{source_id}":
+                    self.mislinked_citations.add(source_id)
+            self.link = None
+        if tag == "h2" and self.heading is not None:
+            if "".join(self.heading).lstrip().startswith("附录"):
+                self.in_appendix = True
+            self.heading = None
         if tag == "figure":
             self.figure_depth = max(0, self.figure_depth - 1)
 
@@ -446,9 +490,11 @@ def validate_html_links(html_text: str) -> list[str]:
 
 
 def _validate_rendered_markup(
-    md_text: str, base_dir: Path | None, rendered_body: str | None
+    md_text: str, base_dir: Path | None, rendered_body: str | None, *, check_citations: bool
 ) -> list[str]:
-    if not re.search(r'<(?:figure|img|svg|image|a)\b|!\[|\]\(#|\]:\s*#', md_text, re.I):
+    markup_hint = r'<(?:figure|img|svg|image|a)\b|!\[|\]\(#|\]:\s*#'
+    citation_hint = r'\[S\d{2,}\]\s*(?:\(|\[|:)'
+    if rendered_body is None and not re.search(f"{markup_hint}|{citation_hint}", md_text, re.I):
         return []
 
     if rendered_body is None:
@@ -461,6 +507,9 @@ def _validate_rendered_markup(
     markup.feed(rendered_body)
     markup.close()
     errors = _internal_link_errors(markup)
+    if check_citations and markup.mislinked_citations:
+        ids = ", ".join(sorted(markup.mislinked_citations))
+        errors.append(f"Use plain [Sxx] citations linked to the A1 ledger, not custom URLs: {ids}.")
     if markup.outside:
         errors.append("An image or SVG appears outside a <figure> element.")
 
@@ -548,10 +597,19 @@ def validate_markdown(
     if a2_malformed:
         errors.append(f"A2 has {a2_malformed} malformed data row(s).")
 
-    source_errors, source_ids = _validate_sources(a1_rows, legacy_schema, cutoff=cutoff, completed=completed)
-    claim_errors, claim_source_ids = _validate_claims(a2_rows, source_ids, a2_header, legacy_schema)
+    source_errors, source_ids = _validate_sources(
+        a1_rows, legacy_schema, cutoff=cutoff, completed=completed, base_dir=base_dir
+    )
+    claim_errors, claim_source_ids, claim_ids = _validate_claims(a2_rows, source_ids, a2_header, legacy_schema)
     errors.extend(source_errors)
     errors.extend(claim_errors)
+    if not legacy_schema:
+        for row in a1_rows:
+            if len(row) == 4:
+                undefined_claims = set(re.findall(r"(?<![A-Za-z0-9])C\d{2,}(?![A-Za-z0-9])", row[2])) - claim_ids
+                if undefined_claims:
+                    ids = ", ".join(sorted(undefined_claims))
+                    errors.append(f"Source {row[0]} references undefined Claim IDs: {ids}.")
 
     # Fenced examples do not count as chapter content or source citations.
     analysis = re.sub(r"^ {0,3}(\x60{3,}|~{3,})[^\n]*\n.*?^ {0,3}\1[ \t]*$",
@@ -571,8 +629,12 @@ def validate_markdown(
     missing_other_sources = all_sources - source_ids - body_source_ids
     if missing_other_sources:
         errors.append("Report references undefined Source IDs: " + ", ".join(sorted(missing_other_sources)))
-    for heading, content in re.findall(r"^(##\s+[^\n]+)\n(.*?)(?=^##\s+|\Z)", analysis, re.M | re.S):
-        content = re.sub(r"^#{3,6}\s+.*$", "", content, flags=re.M)
+    sections = re.findall(r"^(##[ \t]+[^\n]+)\n(.*?)(?=^##[ \t]+|\Z)", analysis, re.M | re.S)
+    if not sections:
+        errors.append("The report body must contain an analysis section.")
+    for heading, content in sections:
+        content = re.sub(r"^#{3,6}[ \t]+.*$", "", content, flags=re.M)
+        content = re.sub(r"\[S\d{2,}\]", "", content)
         if not _is_filled(content):
             errors.append(f"Empty analysis section: {heading}")
     if not body_source_ids:
@@ -587,7 +649,7 @@ def validate_markdown(
     if a3_text is None or not _is_filled(a3_text):
         errors.append("A3 must describe evidence boundaries.")
 
-    errors.extend(_validate_rendered_markup(md_text, base_dir, rendered_body))
+    errors.extend(_validate_rendered_markup(md_text, base_dir, rendered_body, check_citations=not legacy_schema))
     return errors, warnings
 
 

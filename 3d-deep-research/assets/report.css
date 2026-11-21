@@ -6,6 +6,7 @@
   --rule:#d8d9d4;--muted:#5f615b;--ink:#222321;--text:#363832;--surface:#fdfdfa;--gutter:#efefec;
 }
 body{margin:0;background:var(--gutter);color:var(--text)}
+.reading p{text-indent:2em}
 @media screen {
 button,a,summary{ -webkit-tap-highlight-color:transparent }
 a{color:var(--accent);text-underline-offset:3px}
