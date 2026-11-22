@@ -1,4 +1,4 @@
 interface:
   display_name: "3D Deep Research"
-  short_description: "用证据链和 X/Y/Z 分析复杂问题，输出可追溯的深度研究报告"
-  default_prompt: "使用 $3d-deep-research 研究[对象]，回答[核心问题]，并输出可追溯的 HTML 报告。"
+  short_description: "用证据链和 X/Y/Z 分析复杂问题，输出可追溯的深度研究报告与配套全景图"
+  default_prompt: "使用 $3d-deep-research 研究[对象]，回答[核心问题]，并输出可追溯的 HTML 报告与配套全景图。"
