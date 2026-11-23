@@ -1,14 +1,14 @@
 ---
 name: 3d-deep-research
 description: |
-  用于需要系统取证并形成深度研究报告的分析、研究与调研。用证据链和 XYZ 分析形成可追溯的判断，默认交付 HTML 报告与配套全景图。
+  用于需要系统取证并形成深度研究报告的分析、研究与调研。用证据链和 XYZ 分析形成可追溯的判断，默认交付 HTML。
 ---
 
 # 3D Deep Research
 
 用证据链核实关键事实。用 XYZ 确定关键转折、查明推动与制约因素，并追踪核心因素对研究主体的影响。综合三轴形成可核查、可修订的研究判断。
 
-默认交付独立可打开的 HTML 报告与配套的全景图。以 Markdown 写作，保留源稿便于复查与更新。HTML 使用石墨杂志版式、折叠目录和三级编号，需要 PDF 时从浏览器打印。全景图由同一份 XYZ 数据生成，四个视角分别呈现结构、因素、影响与时间。作为其他研究流程的辅助方法时，按用户指定的主流程交付。
+默认交付独立可打开的 HTML 报告。以 Markdown 写作，保留源稿便于复查与更新。HTML 使用石墨杂志版式、折叠目录和三级编号，需要 PDF 时从浏览器打印。有可核实转折且全景能解释因素如何影响研究主体时，随报告交付 XYZ 全景图。作为其他研究流程的辅助方法时，按用户指定的主流程交付。
 
 开始研究时读[证据协议](references/evidence-protocol.md)，规划图表时读[视觉表达规范](references/visual-guidelines.md)。
 
@@ -36,7 +36,7 @@ description: |
 
 逐行将 X、Y、Z 写到证据能支持的范围，在关键事实和判断旁标注对应的 S、C 编号。证据不足处写清缺口。
 
-分析表同时落成项目目录里的 xyz.json，字段与全景图一一对应，规范见[全景图](references/panorama.md)。报告与全景图共用这一份数据，S、C 编号保持一致。
+适用全景图时，按[全景图规范](references/panorama.md)将转折、因素和影响路径写入 xyz.json，与报告账本核对。
 
 #### X · 确定关键转折
 
@@ -78,12 +78,6 @@ python [skill目录]/scripts/build_report.py report.md
 
 命令在源稿目录生成 output.html 和核验用的 output.html.manifest.json。每份报告使用独立目录。多个源稿共用目录时，为每份报告指定独立的 --output-dir。沿 XYZ 分章的旧稿可加 --require-xyz 检查原章节结构。较早账本可用[结构校验脚本](scripts/validate_report.py)的 --legacy-schema 单独复核。
 
-报告定稿后，用同一份 xyz.json 生成全景图。命令校验数据并输出单文件 HTML，字段与校验项见[全景图](references/panorama.md)。
+适用全景图时，按[全景图规范](references/panorama.md)将 XYZ 数据绑定报告，生成全景图并联合验收。离线检查三次累计展开、作用路径和账本跳转。
 
-```bash
-python [skill目录]/scripts/build_panorama.py xyz.json -o panorama.html
-```
-
-报告与全景图放在同一目录，报告附录写明配套全景图的文件名。数据修订后重跑两条命令，正文和图同步更新。
-
-将 output.html 和 panorama.html 复制到空目录，在离线浏览器分别检查。报告看正文、目录跳转、表格滚动和窄屏布局，全景图看四个视角切换、标签避让、点节点出详情和窄屏侧栏。联网检查需要访问原文的来源链接。图表使用可嵌入的本地图片或自包含 SVG。交付 HTML 与全景图，按需提供 Markdown 源稿或浏览器打印的 PDF。报告机器校验、事实审计和实际版面检查的结果。
+将交付 HTML 复制到空目录离线打开，检查正文、图表、目录跳转和窄屏布局。联网检查需要访问原文的来源链接。图表使用可嵌入的本地图片或自包含 SVG。按需提供 Markdown 源稿或浏览器打印的 PDF。报告机器校验、事实审计和实际版面检查的结果。

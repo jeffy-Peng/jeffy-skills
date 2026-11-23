@@ -16,6 +16,7 @@ from tempfile import TemporaryDirectory
 from urllib.parse import quote, urlsplit, urlunsplit
 from xml.etree import ElementTree
 
+from build_panorama import TEMPLATE as PANORAMA_TEMPLATE, load_panorama
 from report_artifacts import MediaReferences, local_path, manifest_path, sha256, write_manifest
 from validate_report import (
     _configure_utf8_console,
@@ -342,7 +343,26 @@ def collect_dependencies(html_body: str, base: Path) -> tuple[set[Path], list[st
     return dependencies, remote
 
 
-def build_report(source: Path, output: Path, *, require_xyz: bool = False) -> None:
+def with_panorama_link(document: str, xyz_hash: str) -> str:
+    claims = re.search(
+        r'(<h3\b[^>]*>(?:<span class="heading-number">[^<]*</span>)?\s*A2\b[^<]*</h3>\s*(?:<div\b[^>]*>\s*)?<table\b[^>]*>)(.*?)(</table>(?:\s*</div>)?)',
+        document, re.S,
+    )
+    if claims is None:
+        raise ValueError("Rendered report is missing the A2 ledger.")
+    rows = re.sub(
+        r"<tr>\s*(<td(?:\s[^>]*)?>\s*(C\d{2,})\s*</td>)",
+        lambda match: f'<tr id="claim-{match[2]}">{match[1]}',
+        claims[2],
+    )
+    link = '<p><a href="panorama.html">查看 XYZ 全景图</a></p>'
+    document = document[:claims.start(2)] + rows + document[claims.start(3):claims.end(3)] + link + document[claims.end(3):]
+    return document.replace("</head>", f'<meta name="xyz-sha256" content="{xyz_hash}">\n</head>', 1)
+
+
+def build_report(
+    source: Path, output: Path, *, require_xyz: bool = False, xyz: Path | None = None
+) -> None:
     if source == output:
         raise ValueError("The input report and HTML destination must be different files.")
     source_bytes = source.read_bytes()
@@ -361,10 +381,24 @@ def build_report(source: Path, output: Path, *, require_xyz: bool = False) -> No
     dependencies, remote = collect_dependencies(html_body, source.parent)
     expected_inputs = {path: sha256(path) for path in dependencies}
     expected_inputs[source] = source_hash
+    if xyz is not None:
+        xyz = xyz.resolve()
+        if xyz == output.resolve():
+            raise ValueError("The XYZ input and HTML destination must be different files.")
+        raw_xyz = xyz.read_bytes()
+        load_panorama(raw_xyz, md_text)
+        dependencies.update((xyz, PANORAMA_TEMPLATE, SKILL_DIR / "scripts" / "build_panorama.py"))
+        expected_inputs.update({
+            xyz: hashlib.sha256(raw_xyz).hexdigest(),
+            PANORAMA_TEMPLATE: sha256(PANORAMA_TEMPLATE),
+            SKILL_DIR / "scripts" / "build_panorama.py": sha256(SKILL_DIR / "scripts" / "build_panorama.py"),
+        })
     html_body = embed_local_media(html_body, source.parent)
     document, _, _ = linkify_html(
         build_html(title, metadata, html_body), source_dir=source.parent, output_dir=output.parent
     )
+    if xyz is not None:
+        document = with_panorama_link(document, expected_inputs[xyz])
     errors = validate_html_links(document)
     if errors:
         raise ValueError("\n".join(errors))
@@ -396,12 +430,13 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, help="Default: Markdown directory")
     parser.add_argument("--require-xyz", action="store_true", help="Check the order of the analysis chapters")
     parser.add_argument("--formats", nargs="+", choices=("html",), help=argparse.SUPPRESS)
+    parser.add_argument("--xyz", type=Path, help="Bind a checked XYZ file for a companion panorama")
     args = parser.parse_args()
     source = args.input.expanduser().resolve()
     output_dir = args.output_dir.expanduser().resolve() if args.output_dir else source.parent
     output = output_dir / "output.html"
     try:
-        build_report(source, output, require_xyz=args.require_xyz)
+        build_report(source, output, require_xyz=args.require_xyz, xyz=args.xyz)
     except (OSError, ValueError, RuntimeError) as exc:
         print(f"[ERROR] {exc}")
         return 1

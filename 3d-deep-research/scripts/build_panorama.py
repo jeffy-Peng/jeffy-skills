@@ -1,176 +1,227 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""从 xyz.json 生成一份独立可打开的全景图 HTML。
+"""Build or check a panorama bound to a validated report and its XYZ data."""
+from __future__ import annotations
 
-用法
-  python build_panorama.py xyz.json -o panorama.html
-  python build_panorama.py xyz.json --check
-
-数据契约见 references/panorama.md，模板是 assets/panorama-template.html。
-"""
 import argparse
+import hashlib
 import html
 import json
-import os
 import re
-import sys
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE = os.path.join(HERE, '..', 'assets', 'panorama-template.html')
-START = '/*__XYZ_DATA_START__*/'
-END = '/*__XYZ_DATA_END__*/'
-SCALES = {'短周期', '中周期', '长周期'}
-TIERS = {'弱', '中', '强'}
-CONFS = {'high', 'medium', 'low'}
-CITE_RE = re.compile(r'^S\d{2}$')
-CLAIM_RE = re.compile(r'^C\d{2}$')
-HEX_RE = re.compile(r'^#[0-9a-fA-F]{6}$')
+from report_artifacts import manifest_path, sha256, validate_manifest
+from validate_report import (
+    _configure_utf8_console, _extract_table, _plain_text,
+    _split_body_and_appendix, validate_markdown,
+)
 
-
-def validate(d):
-    errors, warnings = [], []
-    for k in ('subject', 'question', 'cutoff'):
-        if not isinstance(d.get(k), str) or not d.get(k).strip():
-            errors.append('缺少 %s' % k)
-
-    xs = d.get('xs') or []
-    factors = d.get('factors') or []
-    impacts = d.get('impacts') or []
-    if not isinstance(xs, list) or not xs:
-        errors.append('xs 必须是非空数组')
-        return errors, warnings
-    if not isinstance(factors, list) or not factors:
-        errors.append('factors 必须是非空数组')
-        return errors, warnings
-
-    ids = [x.get('id') for x in xs]
-    if len(set(ids)) != len(ids):
-        errors.append('xs 的 id 有重复')
-    for x in xs:
-        for k in ('id', 'time', 'title'):
-            if not isinstance(x.get(k), str) or not x.get(k).strip():
-                errors.append('转折 %s 缺 %s' % (x.get('id'), k))
-        if not isinstance(x.get('cites'), list) or not x.get('cites'):
-            warnings.append('转折 %s 没有来源编号' % x.get('id'))
-
-    fids = [f.get('id') for f in factors]
-    if len(set(fids)) != len(fids):
-        errors.append('factors 的 id 有重复')
-    for f in factors:
-        fid = f.get('id')
-        if not isinstance(f.get('name'), str) or not f.get('name').strip():
-            errors.append('因素 %s 缺 name' % fid)
-        if not HEX_RE.match(f.get('hex') or ''):
-            errors.append('因素 %s 的 hex 必须是 #rrggbb' % fid)
-        segs = f.get('segs') or []
-        if not segs:
-            errors.append('因素 %s 没有站位' % fid)
-        for s in segs:
-            where = '%s@%s' % (fid, s.get('x'))
-            if s.get('x') not in ids:
-                errors.append('%s 的 x 不在 xs 里' % where)
-            if s.get('dir') not in (1, -1, 0):
-                errors.append('%s 的 dir 必须是 1 / -1 / 0' % where)
-            w = s.get('w')
-            if not isinstance(w, (int, float)) or isinstance(w, bool) or not (0 < w <= 1.2):
-                errors.append('%s 的 w 必须在 0 到 1.2 之间' % where)
-            if s.get('scale') not in SCALES:
-                errors.append('%s 的 scale 必须是 短周期 / 中周期 / 长周期' % where)
-            if s.get('cite') and not CITE_RE.match(s['cite']):
-                errors.append('%s 的 cite 必须形如 S01' % where)
-
-    covered = {}
-    for im in impacts:
-        xid = im.get('xid')
-        if xid not in ids:
-            errors.append('影响记录 %s 的 xid 不在 xs 里' % xid)
-        if xid in covered:
-            errors.append('%s 有两条影响记录' % xid)
-        covered[xid] = True
-        if im.get('tier') not in TIERS:
-            errors.append('%s 的 tier 必须是 弱 / 中 / 强' % xid)
-        if im.get('conf') not in CONFS:
-            errors.append('%s 的 conf 必须是 high / medium / low' % xid)
-        if im.get('c') and not CLAIM_RE.match(im['c']):
-            errors.append('%s 的 c 必须形如 C01' % xid)
-        path = im.get('path')
-        if not isinstance(path, list) or len(path) < 2:
-            warnings.append('%s 的 path 少于两步' % xid)
-        for c in (im.get('cites') or []):
-            if not CITE_RE.match(c):
-                errors.append('%s 的 cites 里有非法编号 %s' % (xid, c))
-
-    for x in ids:
-        if x not in covered:
-            errors.append('%s 没有影响记录' % x)
-        n = sum(1 for f in factors for s in (f.get('segs') or []) if s.get('x') == x)
-        if n == 0:
-            warnings.append('%s 没有任何因素' % x)
-
-    if len(xs) > 8:
-        warnings.append('转折有 %d 个，标签会更密，建议拆成两张' % len(xs))
-    if len(factors) > 8:
-        warnings.append('因素有 %d 个，轴距可能挤，建议合并次要因素' % len(factors))
-    return errors, warnings
+TEMPLATE = Path(__file__).resolve().parent.parent / "assets" / "panorama-template.html"
+NODE_ID = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,39}")
+KINDS = {"推动", "制约", "待查"}
 
 
-def build(data_path, out_path, template):
-    with open(data_path, encoding='utf-8') as fh:
-        data = json.load(fh)
-    errors, warnings = validate(data)
-    for w in warnings:
-        print('[WARN] %s' % w)
-    if errors:
-        for e in errors:
-            print('[ERROR] %s' % e)
-        raise SystemExit('数据校验没过，没有生成文件')
-
-    with open(template, encoding='utf-8') as fh:
-        page = fh.read()
-    if START not in page or END not in page:
-        raise SystemExit('模板里找不到数据占位符')
-
-    payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    payload = payload.replace('</', '<\\/')
-    block = START + '\nconst DATA = ' + payload + ';\n' + END
-    i = page.index(START)
-    j = page.index(END) + len(END)
-    page = page[:i] + block + page[j:]
-
-    subject = html.escape(data['subject'], quote=False)
-    page = re.sub(r'<title>.*?</title>', '<title>XYZ 三维分析画布 · %s</title>' % subject, page, count=1, flags=re.S)
-    page = re.sub(r'<p class="corner-label">.*?</p>', '<p class="corner-label">结构演示 · %s</p>' % subject, page, count=1, flags=re.S)
-
-    with open(out_path, 'w', encoding='utf-8', newline='\n') as fh:
-        fh.write(page)
-
-    segs = sum(len(f.get('segs') or []) for f in data['factors'])
-    print('[OK] %s' % out_path)
-    print('  转折 %d，因素 %d，站位 %d，影响 %d' % (len(data['xs']), len(data['factors']), segs, len(data['impacts'])))
+def require(ok: bool, message: str) -> None:
+    if not ok:
+        raise ValueError(message)
 
 
-def main():
-    ap = argparse.ArgumentParser(description='从 xyz.json 生成全景图 HTML')
-    ap.add_argument('data', help='xyz.json 路径')
-    ap.add_argument('-o', '--output', default='panorama.html', help='输出 HTML，默认 panorama.html')
-    ap.add_argument('--check', action='store_true', help='只校验数据，不生成文件')
-    ap.add_argument('--template', default=TEMPLATE, help='模板路径')
-    args = ap.parse_args()
-
-    if args.check:
-        with open(args.data, encoding='utf-8') as fh:
-            data = json.load(fh)
-        errors, warnings = validate(data)
-        for w in warnings:
-            print('[WARN] %s' % w)
-        for e in errors:
-            print('[ERROR] %s' % e)
-        if errors:
-            raise SystemExit(1)
-        print('[OK] 数据校验通过')
-        return
-    build(args.data, args.output, args.template)
+def string(record: dict, key: str, where: str) -> str:
+    value = record.get(key)
+    require(isinstance(value, str) and bool(value.strip()), f"{where}.{key} 必须是非空文本")
+    return value.strip()
 
 
-if __name__ == '__main__':
-    main()
+def ids(record: dict, key: str, allowed, where: str, *, empty: bool = False) -> list[str]:
+    values = record.get(key)
+    require(isinstance(values, list) and (bool(values) or empty), f"{where}.{key} 必须是编号数组")
+    for value in values:
+        require(isinstance(value, str) and value in allowed, f"{where}.{key} 未登记或不属于此关系：{value!r}")
+    require(len(set(values)) == len(values), f"{where}.{key} 包含重复编号")
+    return values
+
+
+def records(data: dict, key: str) -> dict[str, dict]:
+    rows = data.get(key)
+    require(isinstance(rows, list) and bool(rows), f"{key} 必须是非空数组")
+    indexed = {}
+    for index, row in enumerate(rows):
+        where = f"{key}[{index}]"
+        require(isinstance(row, dict), f"{where} 必须是对象")
+        identifier = string(row, "id", where)
+        require(bool(NODE_ID.fullmatch(identifier)), f"{where}.id 必须是短编号")
+        require(identifier not in indexed, f"{key} 编号重复：{identifier}")
+        indexed[identifier] = row
+    return indexed
+
+
+def load_panorama(raw: bytes, report: str) -> dict:
+    data = json.loads(raw)
+    require(isinstance(data, dict), "xyz.json 必须是对象")
+    _, appendix = _split_body_and_appendix(report)
+    _, source_rows, _ = _extract_table(appendix, "A1")
+    _, claim_rows, _ = _extract_table(appendix, "A2")
+    sources = {row[0] for row in source_rows}
+    claims = {row[0]: row for row in claim_rows}
+
+    xs = records(data, "xs")
+    factors = records(data, "factors")
+    impacts = records(data, "impacts")
+    require(not (set(xs) & set(factors) or set(xs) & set(impacts) or set(factors) & set(impacts)),
+            "X、Y 和 Z 的节点编号须在全图唯一")
+    events = {}
+    for xid, x in xs.items():
+        fields = {k: string(x, k, xid) for k in ("time", "title", "detail")}
+        events[xid] = dict(fields, id=xid, cites=ids(x, "cites", sources, xid), factors=[], impacts=[])
+
+    for fid, f in factors.items():
+        xid = string(f, "x", fid)
+        require(xid in events, f"{fid}.x 未登记：{xid}")
+        fields = {k: string(f, k, fid) for k in ("name", "kind", "detail")}
+        require(fields["kind"] in KINDS, f"{fid}.kind 必须是推动、制约或待查")
+        events[xid]["factors"].append(dict(fields, id=fid, cites=ids(
+            f, "cites", sources, fid, empty=fields["kind"] == "待查")))
+
+    for zid, z in impacts.items():
+        xid = string(z, "x", zid)
+        require(xid in events, f"{zid}.x 未登记：{xid}")
+        related = ids(z, "factors", {f["id"] for f in events[xid]["factors"]}, zid)
+        pending = z.get("pending")
+        require(isinstance(pending, bool), f"{zid}.pending 必须是布尔值")
+        require(pending or all(factors[fid]["kind"].strip() != "待查" for fid in related),
+                f"{zid} 涉及待查因素，影响路径也必须标为待验证")
+        claim = z.get("claim")
+        cites = ids(z, "cites", sources, zid, empty=pending and claim is None)
+        condition = string(z, "condition", zid)
+        path = z.get("path")
+        require(isinstance(path, list) and bool(path) and all(
+            isinstance(step, str) and step.strip() for step in path
+        ), f"{zid}.path 必须由非空文本组成")
+        if claim is None and pending:
+            result = "对研究主体的影响待验证"
+            evidence = ""
+        else:
+            require(isinstance(claim, str) and claim in claims, f"{zid}.claim 未在 A2 登记：{claim!r}")
+            row = claims[claim]
+            supporting = set(re.findall(r"S\d{2,}", row[3]))
+            require(bool(cites) and set(cites) <= supporting, f"{zid}.cites 必须对应 {claim} 的支持证据")
+            result = _plain_text(row[1])
+            evidence = _plain_text(row[5])
+        require("result" not in z and "label" not in z, f"{zid} 的结果由 A2 提供，请删除 result 或 label")
+        events[xid]["impacts"].append(dict(
+            id=zid, factors=related, claim=claim, result=result, evidence=evidence,
+            path=[step.strip() for step in path], condition=condition, cites=cites, pending=pending,
+        ))
+
+    lines = [line.strip() for line in report.splitlines() if line.strip()]
+    meta = re.fullmatch(r">\s*研究问题\s*[：:]\s*(.+?)\s*\|\s*资料截止\s*[：:]\s*(\d{4}-\d{2}-\d{2})\s*\|.*", lines[1] if len(lines) > 1 else "")
+    require(bool(meta), "报告缺少研究问题或资料截止日")
+    return dict(title=_plain_text(lines[0].lstrip("#")), question=meta[1], cutoff=meta[2],
+                events=list(events.values()))
+
+
+def citation_links(cites: list[str], claim: str | None = None) -> str:
+    if not cites and not claim:
+        return "依据待查"
+    links = [f'<a href="output.html#src-{value}">{value}</a>' for value in cites]
+    if claim:
+        links.append(f'<a href="output.html#claim-{claim}">{claim}</a>')
+    return " · ".join(links)
+
+
+def fallback(data: dict) -> str:
+    def p(value: str) -> str:
+        return f"<p>{html.escape(value)}</p>"
+
+    def entry(node: dict, title: str, description: str, claim: str | None = None) -> str:
+        return f'<h4>{html.escape(title)}</h4>{p(description)}<p>{citation_links(node["cites"], claim)}</p>'
+
+    sections = []
+    for event in data["events"]:
+        sections.append(f'<section><h3>{html.escape(event["time"]+" · "+event["title"])}</h3>')
+        sections.append(p(event["detail"]) + f'<p>{citation_links(event["cites"])}</p>')
+        for factor in event["factors"]:
+            sections.append(entry(factor, "Y · "+factor["name"], factor["kind"]+"。"+factor["detail"]))
+        names = {f["id"]: f["name"] for f in event["factors"]}
+        for impact in event["impacts"]:
+            title = "Z · " + ("待验证 · " if impact["pending"] else "") + impact["result"]
+            chain = " → ".join(impact["path"])
+            description = "、".join(names[fid] for fid in impact["factors"]) + " → " + chain
+            sections.append(entry(impact, title, description, impact["claim"]))
+            sections.append(p("成立条件　"+impact["condition"]))
+            if impact["evidence"]:
+                sections.append(p(impact["evidence"]))
+        sections.append("</section>")
+    return "\n".join(sections)
+
+
+def render(data: dict, xyz_hash: str) -> str:
+    template = TEMPLATE.read_text(encoding="utf-8")
+    replacements = {
+        "TITLE": html.escape(data["title"]),
+        "QUESTION": html.escape(data["question"]),
+        "CUTOFF": html.escape(data["cutoff"]),
+        "DATA": json.dumps(data, ensure_ascii=False, allow_nan=False).replace("<", "\\u003c"),
+        "FALLBACK": fallback(data),
+        "REVISION": xyz_hash,
+    }
+    return re.sub(r"@@([A-Z]+)@@", lambda match: replacements[match[1]], template)
+
+
+def build(source: Path, report: Path, output: Path, *, check: bool = False) -> None:
+    report_html = output.parent / "output.html"
+    require(output.name == "panorama.html", "输出文件名必须是 panorama.html，以便报告打开全景图")
+    require(output not in {source, report}, "输出文件不能覆盖输入")
+    require(not output.exists() or not any(output.samefile(path) for path in (source,report)), "输出文件不能覆盖输入")
+    report_bytes = report.read_bytes()
+    report_text = report_bytes.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    report_hash = hashlib.sha256(report_bytes).hexdigest()
+    raw = source.read_bytes()
+    xyz_hash = hashlib.sha256(raw).hexdigest()
+    errors, _ = validate_markdown(report_text, report.parent)
+    require(not errors, "\n".join(errors))
+    data = load_panorama(raw, report_text)
+    errors, _ = validate_manifest(report, report_html)
+    require(not errors, "\n".join(errors))
+    require(report_hash == sha256(report), "报告源稿已变化")
+    manifest = json.loads(manifest_path(report_html).read_text(encoding="utf-8"))
+    tracked = any((report.parent / dependency["path"]).resolve() == source and dependency["sha256"] == xyz_hash
+                  for dependency in manifest["dependencies"])
+    require(tracked, "报告没有绑定此版本 XYZ 数据，请先用 build_report.py --xyz 重建报告")
+    built_report = report_html.read_text(encoding="utf-8")
+    require('href="panorama.html"' in built_report and f'<meta name="xyz-sha256" content="{xyz_hash}">' in built_report,
+            "报告 HTML 未绑定此版本全景图，请重建报告")
+    page = render(data, xyz_hash)
+    if check:
+        require(output.read_text(encoding="utf-8") == page, "全景图与当前 XYZ 数据或报告不一致，请重建")
+    else:
+        with TemporaryDirectory(prefix=".panorama-build-", dir=output.parent) as work:
+            staged = Path(work) / output.name
+            staged.write_text(page, encoding="utf-8", newline="\n")
+            fresh_errors, _ = validate_manifest(report, report_html)
+            require(not fresh_errors and sha256(source)==xyz_hash and sha256(report)==report_hash
+                    and json.loads(manifest_path(report_html).read_text(encoding="utf-8")) == manifest,
+                    "构建期间数据或报告已修订，请重建")
+            staged.replace(output)
+
+
+def main() -> int:
+    _configure_utf8_console()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("data", type=Path)
+    parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("-o", "--output", type=Path)
+    parser.add_argument("--check", action="store_true", help="联合验收已生成的报告与全景图")
+    args = parser.parse_args()
+    output = args.output or args.report.with_name("panorama.html")
+    try:
+        build(args.data.resolve(), args.report.resolve(), output.resolve(), check=args.check)
+    except (OSError, ValueError) as exc:
+        print(f"[ERROR] {exc}")
+        return 1
+    print(f"[OK] {output}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

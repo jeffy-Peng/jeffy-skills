@@ -1,1432 +1,309 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>XYZ 三维分析画布 · Apple 发展历程</title>
+<meta name="xyz-sha256" content="@@REVISION@@">
+<title>XYZ 全景图 · @@TITLE@@</title>
 <style>
-:root{
-  --accent:#3a3b38; --accent-ink:#222321; --accent-soft:#e7e7e3; --soft:#eeefeb;
-  --rule:#d8d9d4; --muted:#5f615b; --ink:#222321; --text:#363832;
-  --surface:#fdfdfa; --gutter:#efefec;
-  --f1:#5a6b7a; --f2:#6b7a5e; --f3:#8a6a52; --f4:#7a5f66; --f5:#4f6b6b; --f6:#8c877a; --f7:#6f6357;
-}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;overflow:hidden}
-body{
-  background:var(--gutter); color:var(--text);
-  font-family:Georgia,"Noto Serif SC","Source Han Serif SC","Songti SC",SimSun,serif;
-  font-size:14px; line-height:1.65; -webkit-font-smoothing:antialiased;
-}
-button{font:inherit; color:inherit}
-h1,h2,h3,p,dl,dd{margin:0}
+:root{color-scheme:light;--paper:#fdfdfa;--panel:#f8f8f3;--ink:#222321;--muted:#5f615b;--rule:#d8d9d4;--accent:#8b3e28;--sans:"Microsoft YaHei",system-ui,sans-serif}
+body{margin:0;background:#efefec;color:var(--ink);font-family:Georgia,SimSun,serif}
+main{width:min(1328px,calc(100% - 48px));margin:22px auto;background:var(--paper);border:1px solid var(--rule);border-top:4px solid #41423e}
+header,aside,.fallback,.scene-head{padding:18px 26px}
+header{border-bottom:1px solid var(--rule)}
+h1{font-size:clamp(27px,4vw,49px);font-weight:500;margin:5px 0 10px}
+h2,h3,h4,p{margin:0 0 8px}
+p,figcaption{font:14px/1.7 var(--sans)}
+small,.meta,figcaption{color:var(--muted)}
+a{color:inherit;text-underline-offset:3px}button{font:600 13px var(--sans);color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 [hidden]{display:none!important}
-
-/* 模式按钮 */
-.seg{font-size:11px; padding:6px 9px; border:1px solid var(--rule); background:#fff; color:var(--accent); border-radius:7px; cursor:pointer}
-.seg.active{background:var(--accent); border-color:var(--accent); color:#fff}
-
-/* 布局 */
-.app{position:relative; height:100vh; transition:padding-right .22s ease}
-body.drawer-open .app{padding-right:380px}
-.center{position:relative; height:100%}
-.stage{position:absolute; inset:0; background:var(--surface); overflow:hidden; touch-action:none}
-.plot{position:absolute; inset:0; animation:plotIn .9s cubic-bezier(.18,.7,.25,1) both}
-@keyframes plotIn{from{opacity:0; transform:scale(.992)} to{opacity:1; transform:none}}
-.plot svg{display:block; width:100%; height:100%; touch-action:none; user-select:none}
-.tableview{position:absolute; inset:0; overflow:auto; background:var(--surface); padding:16px 18px; scrollbar-width:none}
-.tableview::-webkit-scrollbar{width:0; height:0}
-
-/* 右侧抽屉 */
-.drawer{position:fixed; top:0; right:0; bottom:0; width:380px; z-index:30; pointer-events:none; overflow:hidden}
-.drawer-panel{position:absolute; top:0; right:0; bottom:0; width:100%; background:var(--surface); border-left:1px solid var(--rule); box-shadow:-10px 0 30px rgba(34,35,33,.08); overflow:auto; padding:16px 18px 28px; transform:translateX(100%); transition:transform .2s ease; pointer-events:auto; scrollbar-width:none}
-.drawer-panel::-webkit-scrollbar{width:0; height:0}
-.drawer.open .drawer-panel{transform:translateX(0)}
-.drawer-tab{position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:31; writing-mode:vertical-rl; letter-spacing:.16em; font-size:11.5px; padding:10px 7px; background:var(--surface); border:1px solid var(--rule); border-right:0; border-radius:8px 0 0 8px; cursor:pointer; color:var(--accent-ink); pointer-events:auto; transition:right .2s ease; box-shadow:-4px 0 12px rgba(34,35,33,.06)}
-.drawer.open .drawer-tab{right:380px}
-.drawer-pick{padding-bottom:2px}
-.pick-tabs{display:grid; grid-template-columns:1fr 1fr; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:6px}
-.pick-tab{font:inherit; font-size:11.5px; padding:7px 6px; background:none; border:0; border-bottom:2px solid transparent; color:var(--muted); cursor:pointer; letter-spacing:.04em}
-.pick-tab:hover{color:var(--accent-ink)}
-.pick-tab.active{color:var(--accent-ink); border-bottom-color:var(--accent); font-weight:600}
-.detail:not(:empty){margin-top:14px; border-top:1px solid var(--rule); padding-top:14px}
-
-/* 图表上的面板 */
-.panel-area{position:absolute; inset:0; z-index:8; pointer-events:none}
-.panel-area > *{pointer-events:auto}
-.pops{position:absolute; top:10px; display:flex; flex-direction:column; gap:6px}
-.pops-r{right:10px; width:360px; align-items:flex-end}
-.btnrow{display:flex; gap:6px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
-.sep{width:1px; height:16px; background:var(--rule); margin:0 2px}
-.corner-label{position:absolute; top:10px; left:12px; z-index:7; font-size:10.5px; letter-spacing:.06em; color:var(--muted); background:#fdfdfad9; padding:3px 8px; border-radius:5px; pointer-events:none}
-.pop-btn{display:inline-flex; align-items:center; gap:6px; padding:7px 10px; font:inherit; font-size:11.5px; color:var(--accent-ink); background:#fdfdfaf2; border:1px solid var(--rule); border-radius:8px; cursor:pointer; backdrop-filter:blur(8px)}
-.pop-btn:hover{background:#fff}
-.pop-btn,.seg,.chip,.btn{transition:background .15s ease, color .15s ease, border-color .15s ease, transform .12s ease}
-.pop-btn:active,.seg:active,.chip:active,.btn:active{transform:translateY(1px) scale(.985)}
-.pop-btn[aria-expanded="true"]{background:var(--accent); border-color:var(--accent); color:#fff}
-.pop-btn[aria-expanded="true"] .caret{color:#fff; transform:rotate(180deg)}
-.caret{font-size:10px; color:var(--muted); transition:transform .15s}
-.pop-body{display:none; width:100%; padding:10px 11px 11px; background:#fdfdfaf7; border:1px solid var(--rule); border-radius:8px; box-shadow:0 10px 28px rgba(34,35,33,.10); max-height:calc(64vh - 96px); overflow:auto}
-.pop-body.open{display:block; animation:popIn .18s ease both}
-@keyframes popIn{from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none}}
-.detail.swap{animation:detailIn .26s ease both}
-@keyframes detailIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
-.drawer-pick .list{animation:detailIn .22s ease both}
-.pops .eyebrow{margin:0 0 6px}
-.pops .eyebrow.tight{margin-top:12px}
-.pops .row-btns{gap:5px}
-.pops .btn{font-size:11px; padding:5px 6px}
-.pops .slider{margin-top:12px}
-.pops .checks{gap:6px; font-size:11.5px; flex-direction:column; align-items:flex-start}
-.pops .chip{font-size:11px}
-.pops .btn.wide{margin-top:10px}
-
-/* 卡片内排版 */
-.eyebrow{margin:0 0 7px; font-size:11px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase}
-.eyebrow.tight{margin-top:14px}
-.question{font-size:17px; line-height:1.45; font-weight:600; color:var(--accent-ink); letter-spacing:-.012em; margin-bottom:8px}
-.meta{font-size:11.5px; color:var(--muted); line-height:1.6}
-.prose{font-size:12.5px; line-height:1.8; text-indent:2em; color:#403f3a; margin-top:9px}
-
-/* 控件 */
-.row-btns{display:grid; grid-template-columns:1fr 1fr; gap:6px}
-.btn{font-size:11.5px; padding:6px 8px; border:1px solid var(--rule); background:#fff; color:var(--accent); border-radius:7px; cursor:pointer; text-align:center; white-space:nowrap}
-.btn:hover{background:var(--accent-soft)}
-.btn.active{background:var(--accent); border-color:var(--accent); color:#fff}
-.btn.wide{width:100%; margin-top:12px}
-.slider{display:block; margin-top:14px}
-.slider span{display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); margin-bottom:6px}
-.slider i{font-style:normal; color:var(--accent)}
-input[type=range]{width:100%; accent-color:#3a3b38; margin:0}
-.checks{display:flex; flex-wrap:wrap; gap:8px 14px; font-size:12px; color:var(--text)}
-.checks label{display:flex; align-items:center; gap:5px; cursor:pointer}
-input[type=checkbox]{accent-color:#3a3b38; margin:0}
-.chips{display:flex; flex-wrap:wrap; gap:6px}
-.chip{font-size:11.5px; padding:4px 9px; border:1px solid var(--rule); background:#fff; color:var(--muted); border-radius:999px; cursor:pointer}
-.chip.active{background:var(--accent-soft); border-color:#b9bab4; color:var(--accent-ink)}
-.chip:hover{color:var(--accent-ink)}
-
-/* 列表 */
-.list{display:flex; flex-direction:column}
-.row{display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:8px; align-items:center; padding:6px 5px; border-top:1px solid var(--rule); background:none; border-left:0; border-right:0; border-bottom:0; cursor:pointer; text-align:left; width:100%; transition:background .15s ease}
-.row:first-child{border-top:0}
-.row:hover{background:var(--accent-soft)}
-.row.sel{background:var(--accent-soft); box-shadow:inset 2px 0 0 var(--accent)}
-.row .code{font-size:10.5px; letter-spacing:.04em; color:#fff; background:var(--accent); border-radius:4px; text-align:center; padding:2px 0}
-.row .name{font-size:12.5px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.row .sub{display:block; font-size:10.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.row .tail{font-size:10px; color:var(--muted); white-space:nowrap}
-.swatch{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px; vertical-align:middle}
-
-/* 图例，贴在图的底部中间 */
-.legend{position:absolute; left:50%; bottom:10px; transform:translateX(-50%); z-index:7; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:4px 14px; max-width:calc(100% - 40px); padding:4px 10px; background:#fdfdfad9; border-radius:6px; font-size:10.5px; color:var(--muted); line-height:1.4; pointer-events:none}
-.legend .lg{display:inline-flex; align-items:center; gap:5px}
-.legend .lg-n{color:var(--muted)}
-.legend svg{display:block; width:20px; height:14px}
-.legend b{color:var(--ink); font-weight:600}
-
-/* 舞台 */
-.hint{position:absolute; left:50%; bottom:36px; transform:translateX(-50%); font-size:10.5px; color:var(--muted); pointer-events:none; background:#fdfdfad9; padding:3px 7px; border-radius:5px; white-space:nowrap}
-.tooltip{position:absolute; z-index:9; max-width:236px; background:#fdfdfaf7; border:1px solid var(--rule); border-left:3px solid var(--accent); padding:8px 10px; font-size:11.5px; line-height:1.55; color:var(--text); pointer-events:none; box-shadow:0 6px 20px rgba(34,35,33,.10)}
-.tooltip .t-name{display:block; font-weight:600; color:var(--accent-ink); font-size:12px; margin-bottom:2px}
-.tooltip .t-meta{color:var(--muted)}
-
-/* 详情 */
-.detail h2{font-size:18px; line-height:1.45; color:var(--accent-ink); letter-spacing:-.012em; margin:2px 0 8px; font-weight:600}
-.detail h3{font-size:11px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; margin:18px 0 7px; font-weight:600}
-.detail p{font-size:12.5px; line-height:1.8}
-.detail .lead{font-size:13px; line-height:1.85; text-indent:2em; color:#3f3e39}
-.detail .hintline{font-size:11.5px; color:var(--muted); line-height:1.7; margin-top:10px}
-.kv{display:grid; grid-template-columns:62px minmax(0,1fr); gap:5px 10px; font-size:12px; line-height:1.65; margin:10px 0 4px}
-.kv dt{color:var(--muted); font-size:11px; padding-top:2px}
-.kv dd{color:var(--text)}
-.chip-row{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 2px}
-.pill{font-size:10.5px; padding:2px 8px; border-radius:999px; border:1px solid var(--rule); color:var(--muted); white-space:nowrap}
-.pill.push{background:#3a3b38; border-color:#3a3b38; color:#fff}
-.pill.con{background:#fff; border-color:#9a9b95; color:#3a3b38}
-.pill.pend{border-style:dashed; color:#8a7f5f}
-.pill.core{border-color:#3a3b38; color:#222321}
-.mini{width:100%; border-collapse:collapse; font-size:11.5px; margin:6px 0 2px}
-.mini th{text-align:left; font-weight:600; color:var(--muted); font-size:10.5px; letter-spacing:.04em; border-bottom:1px solid var(--rule); padding:4px 5px}
-.mini td{padding:5px; border-bottom:1px solid var(--soft); vertical-align:top; line-height:1.55}
-.mini tr:last-child td{border-bottom:0}
-.bar{display:inline-block; width:52px; height:5px; background:var(--soft); border:1px solid var(--rule); vertical-align:middle}
-.bar i{display:block; height:100%; background:var(--accent)}
-.act-btn{display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--accent); border:1px solid var(--rule); background:#fff; border-radius:6px; padding:3px 8px; cursor:pointer; margin-top:10px}
-.act-btn:hover{background:var(--accent-soft)}
-.cases{list-style:none; padding:0; margin:6px 0 0; display:grid; gap:6px}
-.cases li{display:grid; grid-template-columns:96px minmax(0,1fr); gap:8px; font-size:11.5px; line-height:1.6; padding-bottom:6px; border-bottom:1px solid var(--soft)}
-.cases li:last-child{border-bottom:0; padding-bottom:0}
-.cases .k{color:var(--accent-ink); font-weight:600}
-.cases .v{color:var(--muted)}
-.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0 4px}
-.stat{border:1px solid var(--rule); padding:6px 8px; background:#fcfcfa}
-.stat b{display:block; font-size:17px; line-height:1.2; color:var(--accent-ink); font-weight:600}
-.stat span{font-size:10px; color:var(--muted); letter-spacing:.04em}
-.link-row{display:block; width:100%; text-align:left; background:none; border:0; border-bottom:1px solid var(--soft); padding:6px 2px; font-size:12px; cursor:pointer; color:var(--ink); line-height:1.6}
-.link-row:hover{background:var(--accent-soft)}
-.link-row:last-child{border-bottom:0}
-
-/* 表格视图 */
-.tb-title{font-size:14px; font-weight:600; color:var(--accent-ink); margin:2px 0 2px}
-.tb-note{font-size:11.5px; color:var(--muted); margin-bottom:10px}
-table.grid{width:100%; border-collapse:collapse; font-size:12px; line-height:1.65; margin-bottom:26px}
-table.grid th{text-align:left; font-size:10.5px; letter-spacing:.06em; color:var(--muted); font-weight:600; border-bottom:1px solid #b9bab4; padding:6px 7px; vertical-align:bottom}
-table.grid td{border-bottom:1px solid var(--rule); padding:8px 7px; vertical-align:top}
-table.grid td.x-cell{width:118px; white-space:nowrap}
-table.grid td.z-cell{width:220px}
-table.grid .xh{font-weight:600; color:var(--accent-ink)}
-table.grid .sm{font-size:11px; color:var(--muted)}
-table.matrix td.cell{text-align:center; font-variant-numeric:tabular-nums; white-space:nowrap}
-table.matrix td.cell.push{color:#2f3b34}
-table.matrix td.cell.con{color:#6b4b46}
-table.matrix td.cell.pend{color:#8a7f5f; font-size:11px}
-table.matrix td.cell.empty{color:#b9bab4}
-
-@media(max-width:1120px){
-  .drawer{width:340px}
-  .drawer.open .drawer-tab{right:340px}
-  body.drawer-open .app{padding-right:340px}
-  .pops-r{width:320px}
+.explorer{display:none}.ready .explorer{display:block}.ready .fallback{display:none}
+nav,.scene-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+nav{padding:8px 20px;border-bottom:1px solid var(--rule)}
+.steps,.view{display:flex;gap:5px;align-items:center}
+.control{min-height:44px;background:var(--paper);border:1px solid var(--rule);border-radius:5px;padding:6px 11px;white-space:nowrap}
+.control[aria-current=step]{border-color:var(--accent);color:var(--accent)}
+.next{background:#393b35;color:white;border-color:#393b35}
+.intro{padding:38px 26px;background:var(--panel)}
+figure{margin:0;background:var(--panel)}
+.scene-head{flex-wrap:wrap}
+.scene-head h2{font-size:20px;margin:0}
+.viewport{overflow:auto;position:relative;overscroll-behavior-x:contain}
+.viewport[data-phase="3"]:not(.large){cursor:grab;touch-action:pan-y}
+.surface{position:relative;width:100%;min-height:210px;container-type:inline-size}
+.surface svg,.nodes{position:absolute;inset:0;width:100%;height:100%}
+.surface svg{overflow:hidden}
+.nodes{pointer-events:none}
+.node{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;height:40px;display:grid;align-content:center;gap:1px;padding:3px 6px;border:1px solid #bfc3b5;background:var(--paper);border-radius:5px;overflow:hidden;text-align:center;font-size:clamp(7px,1.2cqw,15px);line-height:1.13}
+.node small{font-size:.77em}
+.node span,.node small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node[data-level="3"]{background:#f3eee7;border-color:#c9bdae}
+.node[aria-pressed=true]{outline:2px solid var(--accent);color:var(--accent)}
+.node.context{border-color:var(--accent)}
+.axis,.guide,.route,.plane{fill:none;stroke:#666b61;stroke-width:1.2;vector-effect:non-scaling-stroke}
+.guide{stroke:#adada0;stroke-dasharray:3 4}.route{stroke:#877c6c}.route.pending{stroke-dasharray:4 4}
+.plane{fill:#eeeee7;stroke:#d8d9cd}
+.axis-label{fill:#4d5148;font:600 16px Consolas,monospace}
+.context.route,.context.guide{stroke:var(--accent);stroke-width:2}
+figcaption,aside,.fallback section{border-top:1px solid var(--rule)}
+figcaption{padding:9px 20px;font-size:12px}
+aside p.prose{text-indent:2em}
+.impact{border-left:2px solid var(--accent);padding-left:12px}
+.back{font:13px var(--sans)}
+@media(max-width:770px){
+ main{width:calc(100% - 20px);margin:10px auto}
+ header,aside,.fallback,.scene-head{padding:12px}
+ nav{padding:5px 8px}
+ .step span{display:none}
+ .control{padding:5px 9px}
+ .node{height:clamp(12px,6cqw,29px);padding:1px;line-height:1.08}
+ .node small{font-size:.85em}
 }
-@media(max-width:720px){
-  .pops-r{width:240px}
-  .pop-body{max-height:calc(56vh - 96px)}
-  .hint{display:none}
-  .legend{font-size:10px; gap:3px 10px; max-width:calc(100% - 16px)}
-  .corner-label{display:none}
-  .drawer{width:92vw}
-  .drawer.open .drawer-tab{right:92vw}
-  body.drawer-open .app{padding-right:0}
-}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 @media print{
-  .hint,.panel-area,.drawer,.drawer-tab,.grain{display:none}
-  .app{height:520px}
-  .stage{position:relative; height:520px}
-  .tableview{position:relative; min-height:0}
-  body{background:#fff}
+ main{width:100%;margin:0;border:0}
+ .ready .fallback{display:block}
+ .explorer,.ready .explorer,.back{display:none!important}
+ .fallback section{break-inside:avoid}
 }
-@media (prefers-reduced-motion:reduce){
-  .plot{animation:none; opacity:1; transform:none}
-  .pop-btn,.seg,.chip,.btn{transition:none}
-}
-/* 纸面颗粒 */
-.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.045; filter:grayscale(1); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:140px 140px}
 </style>
 </head>
 <body>
-
-<div class="app">
-  <section class="center">
-    <div class="stage" id="stage">
-      <div class="plot" id="plot"></div>
-      <p class="corner-label">结构演示 · Apple 1997 至 2020</p>
-
-      <div class="panel-area">
-        <div class="pops pops-r">
-          <div class="btnrow">
-            <button type="button" class="pop-btn" data-panel="filter" aria-expanded="false" aria-controls="bodyFilter">
-              过滤<span class="caret" aria-hidden="true">▾</span>
-            </button>
-            <button type="button" class="pop-btn" data-panel="view" aria-expanded="false" aria-controls="bodyView">
-              视角<span class="caret" aria-hidden="true">▾</span>
-            </button>
-          </div>
-          <div class="pop-body" id="bodyFilter">
-            <div class="chips">
-              <button class="chip active" data-act="filter" data-filter="all">全部</button>
-              <button class="chip" data-act="filter" data-filter="core">核心</button>
-              <button class="chip" data-act="filter" data-filter="flip">有翻转</button>
-              <button class="chip" data-act="filter" data-filter="push">只看推动</button>
-              <button class="chip" data-act="filter" data-filter="constraint">只看制约</button>
-            </div>
-          </div>
-          <div class="pop-body" id="bodyView">
-            <div class="row-btns">
-              <button class="btn active" data-act="view" data-preset="iso">等轴</button>
-              <button class="btn" data-act="view" data-preset="factors">因素平面</button>
-              <button class="btn" data-act="view" data-preset="impact">影响剖面</button>
-              <button class="btn" data-act="view" data-preset="top">时间俯视</button>
-            </div>
-            <label class="slider">
-              <span>轴距展开 <i id="spreadVal">32%</i></span>
-              <input type="range" id="spread" min="0" max="100" value="32">
-            </label>
-            <button class="btn wide" data-act="reset">复位视角与过滤</button>
-          </div>
-        </div>
-      </div>
-
-      <p class="hint">拖拽旋转 · 滚轮缩放 · 点击节点聚焦 · 双击空白复位</p>
-      <div class="legend" id="legend"></div>
-      <div class="tooltip" id="tip" hidden></div>
+<main>
+<header>
+  <a class="back" href="output.html">← 研究报告</a>
+  <h1>@@TITLE@@</h1>
+  <p>@@QUESTION@@</p>
+  <p class="meta">资料截至 @@CUTOFF@@</p>
+</header>
+<section class="explorer" aria-label="XYZ 三轴交互图">
+  <nav aria-label="依次展开三轴">
+    <div class="steps">
+      <button class="control step" data-step="1" aria-label="X 关键转折">X <span>关键转折</span></button>
+      <button class="control step" data-step="2" aria-label="Y 推动与制约" disabled>Y <span>推动与制约</span></button>
+      <button class="control step" data-step="3" aria-label="Z 对主体的影响" disabled>Z <span>对主体的影响</span></button>
     </div>
-  </section>
-</div>
-
-<aside class="drawer" id="drawer">
-  <button type="button" class="drawer-tab" id="drawerTab" aria-expanded="false" aria-controls="drawerBody">详情</button>
-  <div class="drawer-panel" id="drawerBody">
-    <div class="drawer-pick">
-      <div class="pick-tabs">
-        <button type="button" class="pick-tab active" data-pick="x">转折节点 X</button>
-        <button type="button" class="pick-tab" data-pick="y">因素 Y</button>
+    <button id="next" class="control next">展开全部 X</button>
+  </nav>
+  <div class="intro" id="intro"><h2>从时间轴开始</h2><p>依次展开全部转折、因素和影响路径。</p></div>
+  <figure id="figure" aria-labelledby="scene-title" hidden>
+    <div class="scene-head"><h2 id="scene-title"></h2>
+      <div class="view">
+        <button class="control" id="zoom" aria-pressed="false">放大标签</button>
+        <button class="control" data-turn="-1" aria-label="向左旋转" hidden>←</button>
+        <button class="control" data-turn="0" aria-label="复位视角" hidden>复位</button>
+        <button class="control" data-turn="1" aria-label="向右旋转" hidden>→</button>
       </div>
-      <div class="list" id="xlist"></div>
-      <div class="list" id="flist" hidden></div>
     </div>
-    <div class="detail" id="detail"></div>
-  </div>
-</aside>
-
-<div class="grain" aria-hidden="true"></div>
-
+    <div id="viewport" class="viewport" tabindex="0" aria-label="三维架构，方向键可旋转">
+      <div id="surface" class="surface">
+        <svg id="plot" aria-hidden="true" preserveAspectRatio="none"></svg>
+        <div id="nodes" class="nodes"></div>
+      </div>
+    </div>
+    <figcaption><span id="status" role="status"></span>。间距和景深用于展示结构。</figcaption>
+  </figure>
+  <aside id="detail" aria-label="节点详情与账本链接" aria-live="polite" hidden></aside>
+</section>
+<section class="fallback" aria-label="完整 XYZ 路径与证据">
+  <h2>XYZ 转折、因素与影响路径</h2>
+  @@FALLBACK@@
+</section>
+</main>
 <script>
-(function(){
-'use strict';
+(()=>{
+"use strict";
+const data=@@DATA@@;
+const $=id=>document.getElementById(id);
+const figure=$("figure"), viewport=$("viewport"), surface=$("surface"), plot=$("plot");
+const panel=$("detail"), next=$("next"), zoom=$("zoom");
+const steps=[...document.querySelectorAll("[data-step]")], turns=[...document.querySelectorAll("[data-turn]")];
+const reduced=matchMedia("(prefers-reduced-motion: reduce)");
+const constraints=(value,min,max)=>Math.max(min,Math.min(max,value));
+const make=(tag,text)=>{const el=document.createElement(tag);el.textContent=text;return el};
+const cards=[], wires=[];
+let rows=1;
+function add(level, record, col, row, title, meta) {
+  const el=make("button","");
+  el.className="node";
+  el.dataset.level=level;
+  el.dataset.id=record.id;
+  el.title=title;
+  el.setAttribute("aria-label",title+" · "+meta);
+  el.setAttribute("aria-controls","detail");
+  el.append(make("small",meta),make("span",title));
+  const card={level,record,col,row,el,title,meta};
+  cards.push(card);
+  $("nodes").append(el);
+  el.onclick=()=>{selected=card; showDetail(); paint()};
+  return card;
+}
+data.events.forEach((x,col)=>{
+  const root=add(1,x,col,0,x.title,x.time);
+  const factors=new Map();
+  x.factors.forEach((f,row)=>{
+    const card=add(2,f,col,row,f.name,f.kind);
+    factors.set(f.id,card);
+    wires.push({from:root,to:card,level:2});
+  });
+  const ordered=x.impacts.map(z=>({z,from:z.factors.map(id=>factors.get(id))}))
+    .sort((a,b)=>Math.min(...a.from.map(c=>c.row))-Math.min(...b.from.map(c=>c.row)));
+  let prior=-1;
+  for(const {z,from} of ordered){
+    prior=Math.max(prior+1,Math.min(...from.map(c=>c.row)));
+    const card=add(3,z,col,prior,z.result,z.pending?"待验证":z.claim);
+    for(const factor of from) wires.push({from:factor,to:card,level:3});
+  }
+  rows=Math.max(rows,x.factors.length,prior+1);
+});
+const width=Math.max(460,200*data.events.length+142);
+const height=190+rows*147+width*.054;
+const titles=["","X · 关键转折","X + Y · 推动与制约","X + Y + Z · 对研究主体的影响"];
+const labels=["展开全部 X","展开全部 Y","展开全部 Z","从头查看 ↺"];
+let phase=0, unlocked=0, selected=null, trace=0, opening=0, depth=0, yaw=0, frame=0, drag=null;
 
-/* ==========================================================================
-   数据层。替换 DATA 即可用于真实研究，其余部分不需要改。
-
-   xs      每个转折一个对象，字段 id / time / short / title / before / after /
-           result / cites / question
-   factors 每个因素一个对象，字段 id / name / core / kind / hex / alt / thesis，
-           segs 是它在各个转折上的站位：x / dir（1 推动，-1 制约，0 待查）/
-           w 强度 0 到 1 / scale（短周期、中周期、长周期）/ cite / note
-   impacts 每个转折的影响：xid / label / tier 影响强度（弱、中、强）/ c 判断编号 /
-           conf 置信度 / attr 归因 / process 过程 / condition 成立条件 / path 作用路径 / cites
-   ========================================================================== */
-/*__XYZ_DATA_START__*/
-const DATA = {
-  subject: 'Apple（1997 至 2020）',
-  question: 'Apple 为什么在 1997 年之后从濒临破产走到全球市值最高的公司',
-  cutoff: '2025-06',
-  xs: [
-    {
-      id:'X1', time:'1997 Q3', short:'乔布斯回归',
-      title:'乔布斯回归，产品线大幅收缩',
-      before:'产品线庞杂，连续亏损，现金紧张',
-      after:'砍掉大部分产品线，接受微软注资，推出 iMac',
-      result:'现金流转正，公司重新有了主线产品',
-      cites:['S01','S02'],
-      question:'活下来主要靠成本收缩，还是靠新产品'
-    },
-    {
-      id:'X2', time:'2001 Q4', short:'iPod 与直营店',
-      title:'iPod 与 Apple Store，进入数字音乐',
-      before:'收入几乎全靠 Mac 一条产品线',
-      after:'iPod 与 iTunes 上线，首批直营店开业',
-      result:'出现第二条收入来源，硬件加内容的组合成形',
-      cites:['S03','S04'],
-      question:'iPod 的增长里有多少来自 Mac 用户的迁移'
-    },
-    {
-      id:'X3', time:'2007 Q1', short:'iPhone 发布',
-      title:'iPhone 发布，手机成为主线',
-      before:'手机市场由诺基亚与黑莓主导，触屏体验粗糙',
-      after:'多点触控 iPhone 发布，次年开放应用商店',
-      result:'体量跃升，手机取代电脑成为收入主体',
-      cites:['S05','S06'],
-      question:'应用商店的开放节奏是否被低估'
-    },
-    {
-      id:'X4', time:'2011 Q3', short:'库克接任',
-      title:'库克接任，运营与服务成为主线',
-      before:'产品节奏由乔布斯主导，运营已由库克分管',
-      after:'库克接任 CEO，供应链效率与服务业务继续推进',
-      result:'增长延续，但收入更依赖 iPhone 单品',
-      cites:['S07','S08'],
-      question:'单品依赖与供应链效率之间是否存在取舍'
-    },
-    {
-      id:'X5', time:'2020 Q4', short:'自研芯片',
-      title:'自研 M 系列芯片，垂直整合加深',
-      before:'Mac 依赖 Intel 处理器，性能与功耗受限',
-      after:'M1 发布，芯片、系统、硬件归到同一套架构',
-      result:'服务收入占比上升，市值继续抬升',
-      cites:['S09','S10'],
-      question:'垂直整合的边界在哪里，监管是否成为新约束'
-    }
-  ],
-
-  factors: [
-    {
-      id:'F1', name:'产品与设计', core:true, kind:'产品', color:'var(--f1)', hex:'#5a6b7a',
-      thesis:'全期推动，1997 年之后每一轮主线产品都由它开启。',
-      segs:[
-        {x:'X1', dir:1, w:0.80, scale:'短周期', cite:'S01', note:'砍产品线，回到四条主线'},
-        {x:'X2', dir:1, w:0.85, scale:'中周期', cite:'S03', note:'iPod 与直营店的体验设计'},
-        {x:'X3', dir:1, w:0.90, scale:'长周期', cite:'S05', note:'多点触控重新定义手机'},
-        {x:'X4', dir:1, w:0.70, scale:'中周期', cite:'S07', note:'延续既有产品节奏'},
-        {x:'X5', dir:1, w:0.80, scale:'长周期', cite:'S09', note:'芯片与系统合到一套架构'}
-      ]
-    },
-    {
-      id:'F2', name:'供应链与规模', core:true, kind:'运营', color:'var(--f2)', hex:'#6b7a5e',
-      thesis:'从 iPod 开始成为推动力，库克接任后强度最高。',
-      segs:[
-        {x:'X2', dir:1, w:0.60, scale:'长周期', cite:'S04', note:'外包制造，库存周转改善'},
-        {x:'X3', dir:1, w:0.75, scale:'长周期', cite:'S06', note:'零部件规模采购压低成本'},
-        {x:'X4', dir:1, w:0.85, scale:'长周期', cite:'S08', note:'接任后继续压缩库存，供应商更集中'},
-        {x:'X5', dir:1, w:0.90, scale:'长周期', cite:'S10', note:'自研芯片减少对外部供应依赖'}
-      ]
-    },
-    {
-      id:'F3', name:'外部竞争', core:true, kind:'竞争', color:'var(--f3)', hex:'#8a6a52',
-      thesis:'全期制约，强度随对手变化，方向没有变过。',
-      segs:[
-        {x:'X1', dir:-1, w:0.70, scale:'中周期', cite:'S02', note:'兼容机与低价 PC 挤压份额'},
-        {x:'X2', dir:-1, w:0.60, scale:'中周期', cite:'S03', note:'数字播放器市场很快出现跟随者'},
-        {x:'X3', dir:-1, w:0.65, scale:'长周期', cite:'S05', note:'诺基亚与黑莓守住运营商渠道'},
-        {x:'X4', dir:-1, w:0.70, scale:'中周期', cite:'S08', note:'安卓阵营以机海覆盖中低价位'},
-        {x:'X5', dir:-1, w:0.50, scale:'长周期', cite:'S10', note:'高端安卓与折叠形态分流需求'}
-      ]
-    },
-    {
-      id:'F4', name:'资本与现金流', core:true, kind:'资本', color:'var(--f4)', hex:'#7a5f66',
-      thesis:'1997 年是约束，之后转为推动，翻转点落在 iPod。',
-      segs:[
-        {x:'X1', dir:-1, w:0.85, scale:'短周期', cite:'S01', note:'现金紧张，靠注资续命'},
-        {x:'X2', dir: 1, w:0.42, scale:'中周期', cite:'S04', note:'现金流转正，开始回购'},
-        {x:'X3', dir: 1, w:0.70, scale:'中周期', cite:'S06', note:'利润积累支撑研发投入'},
-        {x:'X4', dir: 1, w:0.60, scale:'中周期', cite:'S08', note:'大额回购与分红'},
-        {x:'X5', dir: 1, w:0.55, scale:'长周期', cite:'S09', note:'现金储备支撑自研芯片'}
-      ]
-    },
-    {
-      id:'F5', name:'开发者与内容生态', core:false, kind:'生态', color:'var(--f5)', hex:'#4f6b6b',
-      thesis:'只在两个节点出现，身份不变，强度上升。',
-      segs:[
-        {x:'X3', dir:1, w:0.45, scale:'长周期', cite:'S06', note:'应用商店开放，开发者进入'},
-        {x:'X5', dir:1, w:0.40, scale:'长周期', cite:'S09', note:'服务收入成为第二增长曲线'}
-      ]
-    },
-    {
-      id:'F6', name:'监管与反垄断', core:false, kind:'监管', color:'var(--f6)', hex:'#8c877a',
-      thesis:'诉讼与调查刚出现，X4 方向待查，X5 定为制约。',
-      segs:[
-        {x:'X4', dir:0, pending:true, w:0.30, scale:'长周期', cite:'S08', note:'应用商店规则开始被质疑，结论未定'},
-        {x:'X5', dir:-1, w:0.45, scale:'长周期', cite:'S10', note:'抽成比例与默认浏览器成为主要争议'}
-      ]
-    }
-  ],
-
-  impacts: [
-    {
-      xid:'X1', label:'活下来，产品线收缩', tier:'弱', c:'C01', conf:'high', attr:'强',
-      process:'亏损收窄与现金流转正可核对，过程已观察',
-      condition:'产品线不再反弹，注资按期到位',
-      path:['砍掉边缘产品','库存与费用下降','现金流转正','公司活下来'],
-      cites:['S01','S02'], pending:false
-    },
-    {
-      xid:'X2', label:'进入数字音乐，营收结构改变', tier:'中', c:'C02', conf:'medium', attr:'中',
-      process:'iPod 销量与直营店数量同期上升',
-      condition:'iPod 与 Mac 的兼容策略不变，内容方的授权继续',
-      path:['iPod 上市','iTunes 上线','直营店开业','第二条收入来源'],
-      cites:['S03','S04'], pending:false
-    },
-    {
-      xid:'X3', label:'手机成为主线，体量跃升', tier:'强', c:'C03', conf:'high', attr:'强',
-      process:'换代节奏与出货量同期上升，过程已观察',
-      condition:'运营商补贴延续，应用生态按时开放',
-      path:['多点触控发布','应用商店开放','开发者进入','体量跃升'],
-      cites:['S05','S06'], pending:false
-    },
-    {
-      xid:'X4', label:'权力交接，增长延续但更依赖单品', tier:'中', c:'C04', conf:'medium', attr:'中',
-      process:'库存周转与毛利可核对，单品依赖同期加深',
-      condition:'iPhone 需求不出现断崖，供应链不出系统性事故',
-      path:['库克接手运营','供应链周转改善','毛利维持','单品依赖加深'],
-      cites:['S07','S08'], pending:false
-    },
-    {
-      xid:'X5', label:'垂直整合加深，服务放大', tier:'强', c:'C05', conf:'low', attr:'待验证',
-      process:'芯片迭代与服务收入可核对，长期效应仍待验证',
-      condition:'自研芯片迭代不断档，监管不改变应用商店规则',
-      path:['M1 发布','软硬件架构统一','服务收入上升','估值抬升'],
-      cites:['S09','S10'], pending:true
-    }
-  ]
+function position(card){
+  const x=110+200*card.col;
+  const y=phase===1?height*.45:height-115;
+  const lift=card.level===1?0:(card.row+1)*147-(card.level===3?68:0);
+  const run=card.level===3?(55+19*yaw)*depth:0;
+  return [x+run,y-lift*(card.level===2?opening:1)-x*(.029+.014*yaw)*depth];
+}
+function connected(w){
+  return Boolean(selected&&(selected===w.from||selected===w.to));
+}
+function line(a,b,kind){
+  return '<line class="'+kind+'" x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'"/>';
+}
+function label(text,x,y){return '<text class="axis-label" x="'+x+'" y="'+y+'">'+text+'</text>'}
+function paint(){
+  if(!phase)return;
+  plot.setAttribute("viewBox","0 0 "+width+" "+height);
+  const baseline=phase===1?height*.45:height-115;
+  const right=width-48, tilt=(.029+.014*yaw)*depth;
+  const origin=[34,baseline-34*tilt], end=[right,baseline-right*tilt];
+  const front=[origin[0]+76*depth,origin[1]+69*depth], far=[end[0]+52*depth,end[1]+69*depth];
+  let svg=depth>0?'<polygon class="plane" points="'+[origin,end,far,front].map(p=>p.join(",")).join(" ")+'"/>':"";
+  const xHead=[origin[0]+(end[0]-origin[0])*trace,origin[1]+(end[1]-origin[1])*trace];
+  svg+=line(origin,xHead,"axis")+label("X",xHead[0]+11,xHead[1]+5);
+  if(phase>=2) svg+=line(origin,[34,32],"axis")+label("Y",24,25);
+  if(phase===3) svg+=line(origin,front,"axis")+label("Z",front[0]+7,front[1]+14);
+  for(const w of wires){
+    if(w.level>phase)continue;
+    const a=position(w.from), b=position(w.to);
+    const kind=(w.level===2?"guide":"route")+(connected(w)?" context":"")+(w.to.record.pending?" pending":"");
+    svg+='<g data-link="'+w.from.record.id+'-'+w.to.record.id+'">'+line(a,b,kind)+"</g>";
+  }
+  plot.innerHTML=svg;
+  for(const card of cards){
+    const {el,level,col}=card;
+    el.hidden=level>phase;
+    if(el.hidden)continue;
+    const [x,y]=position(card);
+    el.style.left=100*x/width+"%";
+    el.style.top=100*y/height+"%";
+    el.style.width=100*(level===3?149:145)/width+"%";
+    el.style.opacity=level===3?depth:level===2?opening:trace;
+    el.setAttribute("aria-pressed",String(card===selected));
+    el.classList.toggle("context",Boolean(selected&&(card.col===selected.col&&card.level===1||
+      wires.some(w=>connected(w)&&(w.from===card||w.to===card)))));
+  }
+}
+function showDetail(){
+  panel.replaceChildren();
+  if(!selected)return;
+  const {record,level,title,meta,col}=selected;
+  const text=make("p",level===3?record.path.join(" → "):record.detail);
+  text.className="prose";
+  panel.append(make("small",data.events[col].title+" · "+["","X","Y","Z"][level]+" · "+meta),make("h2",title),text);
+  if(level===3){
+    text.classList.add("impact");
+    const names=new Map(data.events[col].factors.map(f=>[f.id,f.name]));
+    panel.append(make("p","相关因素　"+record.factors.map(id=>names.get(id)).join("、")),make("p","成立条件　"+record.condition));
+    if(record.evidence)panel.append(make("p",record.evidence));
+  }
+  const refs=make("p","");
+  for(const [id,anchor] of [...record.cites.map(id=>[id,"src-"] ),...(record.claim?[[record.claim,"claim-"]]:[])]){
+    const a=make("a",id);
+    a.href="output.html#"+anchor+id;
+    refs.append(a," ");
+  }
+  panel.append(refs);
+}
+function go(value){
+  cancelAnimationFrame(frame);
+  phase=value;
+  unlocked=value?Math.max(value,unlocked):0;
+  selected=selected&&selected.level<=value?selected:null;
+  figure.hidden=!value;
+  $("intro").hidden=Boolean(value);
+  panel.hidden=!value;
+  viewport.dataset.phase=value;
+  surface.style.aspectRatio=width+" / "+(value===1?230:height);
+  $("scene-title").textContent=titles[value];
+  $("status").textContent=[1,2,3].slice(0,value).map((level,index)=>"XYZ"[index]+" "+cards.filter(c=>c.level===level).length).join(" · ");
+  next.textContent=labels[value];
+  steps.forEach((el,i)=>{
+    el.disabled=i>unlocked;
+    if(i+1===value)el.setAttribute("aria-current","step");
+    else el.removeAttribute("aria-current");
+  });
+  turns.forEach(el=>el.hidden=value!==3);
+  showDetail();
+  if(!selected && value)panel.append(make("p","点选任一节点查看依据。"));
+  if(!value)trace=0;
+  if(value<2)opening=0;
+  if(value<3){depth=0;yaw=0}
+  const start=performance.now(), initialX=trace, initialY=opening, initialZ=depth;
+  function tick(now){
+    const t=reduced.matches?1:constraints((now-start)/450,0,1);
+    const eased=t*t*(3-2*t);
+    trace=value?initialX+(1-initialX)*eased:0;
+    opening=value>=2?initialY+(1-initialY)*eased:0;
+    depth=value===3?initialZ+(1-initialZ)*eased:0;
+    paint();
+    if(t<1)frame=requestAnimationFrame(tick);
+  }
+  tick(start);
+}
+function rotate(dir){
+  yaw=dir?constraints(yaw+dir*.5,-1,1):0;
+  paint();
+}
+next.onclick=()=>go(phase===3?0:phase+1);
+steps.forEach(el=>el.onclick=()=>go(Number(el.dataset.step)));
+turns.forEach(el=>el.onclick=()=>rotate(Number(el.dataset.turn)));
+zoom.onclick=()=>{
+  const expanded=viewport.classList.toggle("large");
+  surface.style.minWidth=expanded?width+"px":"";
+  zoom.textContent=expanded?"查看全图":"放大标签";
+  zoom.setAttribute("aria-pressed",String(expanded));
+  if(!expanded)viewport.scrollLeft=0;
 };
-/*__XYZ_DATA_END__*/
-
-/* ==========================================================================
-   派生模型
-   ========================================================================== */
-const GAP = 2.3;
-const XIDS = DATA.xs.map(x => x.id);
-const XMAP = {};
-DATA.xs.forEach((x, i) => { XMAP[x.id] = Object.assign({ i: i }, x); });
-
-const F = {};
-DATA.factors.forEach(f => {
-  F[f.id] = f;
-  f.segs.forEach(s => { s.dir = s.pending ? 0 : s.dir; });
-  let last = null;
-  f.segs.forEach(s => {
-    s.flip = (s.dir !== 0 && last !== null && last !== s.dir);
-    if (s.dir !== 0) last = s.dir;
-  });
-  f.flipCount = f.segs.filter(s => s.flip).length;
-  f.pushCount = f.segs.filter(s => s.dir === 1).length;
-  f.conCount = f.segs.filter(s => s.dir === -1).length;
-  f.pendCount = f.segs.filter(s => s.dir === 0).length;
-  f.xs = f.segs.map(s => s.x);
-});
-const FMAP_LIST = DATA.factors;
-const IM = {};
-DATA.impacts.forEach(im => { IM[im.xid] = im; });
-const Y_LIM = 2.05;
-/* 起点相同的因素，标签按顺序上下错开 */
-const LABEL_SLOT = {};
-XIDS.forEach(xid => {
-  let n = 0;
-  DATA.factors.forEach(f => { if (f.segs[0].x === xid) LABEL_SLOT[f.id] = n++; });
-});
-
-const state = {
-  focus: null,               // {kind:'x'|'f', id}
-  filter: 'all',
-  preset: 'iso',
-  levels: { factors: true, links: true, impacts: true },
-  spread: 0.32
+viewport.onkeydown=event=>{
+  if(phase!==3||event.target!==viewport)return;
+  const dir={ArrowLeft:-1,ArrowRight:1,Home:0}[event.key];
+  if(dir!==undefined){event.preventDefault();rotate(dir)}
 };
-const view = { yaw: -0.55, pitch: 0.5, zoom: 1, panX: 0, panY: 0 };
-
-const stage = document.getElementById('stage');
-const plot  = document.getElementById('plot');
-const tipEl = document.getElementById('tip');
-const detailEl = document.getElementById('detail');
-
-const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-
-/* ==========================================================================
-   投影：正交相机，先绕 Z 旋转（yaw），再按俯仰角（pitch）压平
-   ========================================================================== */
-function syScale(){ return 1 + state.spread * 0.8; }
-function szScale(){ return 1 + state.spread * 0.45; }
-function wx(id){ return XMAP[id].i * GAP; }
-function yWorld(seg){
-  if (seg.dir === 0) return 0;
-  return seg.dir * (0.5 + 1.05 * seg.w) * syScale();
-}
-const TIER_Z = { '弱': 0.95, '中': 1.75, '强': 2.55 };
-function zWorld(im){ return (TIER_Z[im.tier] || 1.75) * szScale(); }
-function zX(xid){ const im = IM[xid]; return im ? zWorld(im) : 0; }
-/* 同一时刻同一侧的因素站位如果靠得太近，按顺序撑开到最小间距 */
-function buildDisp(){
-  const map = {};
-  DATA.xs.forEach(x => {
-    [1, -1].forEach(dir => {
-      const list = [];
-      DATA.factors.forEach(f => {
-        const s = f.segs.find(v => v.x === x.id && v.dir === dir);
-        if (s) list.push({ fid: f.id, y: yWorld(s) });
-      });
-      if (!list.length) return;
-      list.sort((a, b) => a.y - b.y);
-      const before = list.map(o => o.y);
-      const gap = 0.16 * syScale();
-      for (let i = 1; i < list.length; i++){
-        if (list[i].y - list[i - 1].y < gap) list[i].y = list[i - 1].y + gap;
-      }
-      const midA = (before[0] + before[before.length - 1]) / 2;
-      const midB = (list[0].y + list[list.length - 1].y) / 2;
-      const shift = midB - midA;
-      list.forEach(o => { map[o.fid + '@' + x.id] = o.y - shift; });
-    });
-  });
-  return map;
-}
-
-function rawProj(x, y, z){
-  const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw);
-  const sp = Math.sin(view.pitch), cp = Math.cos(view.pitch);
-  const x1 = x * cy - y * sy;
-  const y1 = x * sy + y * cy;
-  return {
-    u: x1,
-    v: -(y1 * sp + z * cp),
-    d: y1 * cp + z * sp
-  };
-}
-
-function makeCam(W, H, yFit){
-  const lastX = wx(XIDS[XIDS.length - 1]);
-  const yK = 0.12 + 0.88 * (yFit === undefined ? 1 : yFit);
-  const yLim = Y_LIM * yK * syScale();
-  const lastIm = DATA.impacts[DATA.impacts.length - 1];
-  const zLim = zWorld(lastIm) + 0.6;
-  const xs = [-2.6, lastX + 1.5];
-  const ys = [-yLim, yLim];
-  const pts = [];
-  xs.forEach(x => ys.forEach(y => {
-    pts.push([x, y, 0]);
-    pts.push([x, y, zLim]);
-  }));
-  let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
-  pts.forEach(p => {
-    const r = rawProj(p[0], p[1], p[2]);
-    if (r.u < minU) minU = r.u; if (r.u > maxU) maxU = r.u;
-    if (r.v < minV) minV = r.v; if (r.v > maxV) maxV = r.v;
-  });
-  const padL = 30, padR = 48, padTop = 24, padBottom = 72;
-  const availW = Math.max(80, W - padL - padR);
-  const availH = Math.max(80, H - padTop - padBottom);
-  const s = Math.min(availW / Math.max(0.001, maxU - minU), availH / Math.max(0.001, maxV - minV)) * view.zoom;
-  return {
-    s: s,
-    ox: padL + availW / 2 - (minU + maxU) / 2 * s + view.panX,
-    oy: padTop + availH / 2 - (minV + maxV) / 2 * s + view.panY
-  };
-}
-
-/* ==========================================================================
-   透明度：筛选与聚焦共用一个计算入口
-   ========================================================================== */
-function factorAlpha(f){
-  let a = 1;
-  if (state.filter === 'core' && !f.core) a *= 0.10;
-  if (state.filter === 'flip' && !f.flipCount) a *= 0.09;
-  if (state.filter === 'push' && f.pushCount === 0) a *= 0.09;
-  if (state.filter === 'constraint' && f.conCount === 0) a *= 0.09;
-  if (state.focus){
-    if (state.focus.kind === 'f') a *= (state.focus.id === f.id ? 1 : 0.10);
-    if (state.focus.kind === 'x') a *= (f.xs.indexOf(state.focus.id) >= 0 ? 1 : 0.20);
-  }
-  return clamp(a, 0.04, 1);
-}
-function stationAlpha(seg){
-  const f = F[seg.fid];
-  let a = 1;
-  if (state.filter === 'core' && !f.core) a *= 0.10;
-  if (state.filter === 'flip' && !f.flipCount) a *= 0.09;
-  if (state.filter === 'push' && seg.dir !== 1) a *= 0.10;
-  if (state.filter === 'constraint' && seg.dir !== -1) a *= 0.10;
-  if (state.focus){
-    if (state.focus.kind === 'f') a *= (state.focus.id === f.id ? 1 : 0.08);
-    if (state.focus.kind === 'x') a *= (seg.xid === state.focus.id ? 1 : 0.12);
-  }
-  return clamp(a, 0.03, 1);
-}
-function impactAlpha(im){
-  let a = 1;
-  if (state.focus){
-    if (state.focus.kind === 'x') a = (im.xid === state.focus.id) ? 1 : 0.18;
-    else if (state.focus.kind === 'f') a = (F[state.focus.id].xs.indexOf(im.xid) >= 0) ? 1 : 0.45;
-  }
-  return a;
-}
-
-/* ==========================================================================
-   场景渲染
-   ========================================================================== */
-let stations = [];
-DATA.factors.forEach(f => {
-  f.segs.forEach(s => {
-    stations.push({ fid: f.id, xid: s.x, seg: s, dir: s.dir, w: s.w, pending: s.dir === 0, flip: !!s.flip });
-  });
-});
-
-let raf = 0;
-function schedule(){ if (raf) return; raf = requestAnimationFrame(() => { raf = 0; renderScene(); }); }
-
-/* 状态切换时透明度逐帧逼近目标，避免硬切 */
-const ALPHA_MAP = {};
-let alphaBusy = false;
-function fade(key, target){
-  const cur = ALPHA_MAP[key];
-  if (cur === undefined){ ALPHA_MAP[key] = target; return target; }
-  const next = cur + (target - cur) * 0.3;
-  if (Math.abs(target - next) > 0.008){ ALPHA_MAP[key] = next; alphaBusy = true; return next; }
-  ALPHA_MAP[key] = target;
-  return target;
-}
-
-/* 视角缓动、拖拽惯性、滚轮平滑缩放 */
-let tween = null, fling = null, ticking = false;
-function startTween(to, ms){
-  tween = { from: { yaw: view.yaw, pitch: view.pitch, zoom: view.zoom }, to: to, t0: performance.now(), ms: ms };
-  fling = null;
-  if (!ticking){ ticking = true; requestAnimationFrame(motionTick); }
-}
-function motionTick(){
-  const now = performance.now();
-  let active = false;
-  if (tween){
-    const k = Math.min(1, (now - tween.t0) / Math.max(1, tween.ms));
-    const e = 1 - Math.pow(1 - k, 3);
-    view.yaw = tween.from.yaw + (tween.to.yaw - tween.from.yaw) * e;
-    view.pitch = tween.from.pitch + (tween.to.pitch - tween.from.pitch) * e;
-    view.zoom = tween.from.zoom + (tween.to.zoom - tween.from.zoom) * e;
-    if (k >= 1) tween = null; else active = true;
-  }
-  if (fling){
-    view.yaw += fling.vy;
-    view.pitch = clamp(view.pitch + fling.vp, -0.25, 1.5);
-    fling.vy *= 0.92;
-    fling.vp *= 0.92;
-    if (Math.abs(fling.vy) + Math.abs(fling.vp) < 0.0008) fling = null; else active = true;
-  }
-  renderScene();
-  if (active) requestAnimationFrame(motionTick);
-  else ticking = false;
-}
-
-function renderScene(){
-  const W = stage.clientWidth, H = stage.clientHeight;
-  if (W < 20 || H < 20) return;
-  alphaBusy = false;
-  const layF = fade('lay:f', state.levels.factors ? 1 : 0);
-  const layL = fade('lay:l', state.levels.links ? 1 : 0);
-  const layI = fade('lay:i', state.levels.impacts ? 1 : 0);
-  const cam = makeCam(W, H, layF);
-  const P = (x, y, z) => {
-    const r = rawProj(x, y, z);
-    return [cam.ox + r.u * cam.s, cam.oy + r.v * cam.s, r.d];
-  };
-  const dpath = pts => pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
-  /* 标签统一收集，最后按优先级避让放置 */
-  const labels = [];
-  const labelBoxes = [];
-  const textW = (s, size) => {
-    let w = 0;
-    for (let i = 0; i < s.length; i++) w += s.charCodeAt(i) > 255 ? size : size * 0.56;
-    return w;
-  };
-  const placeLabel = (L, text) => {
-    const w = textW(text, L.size);
-    const tries = L.weight ? [[0, 0], [0, -14], [0, 14], [0, -28], [0, 28], [-14, 0], [14, 0]] : [[0, 0], [0, -13], [0, 13], [0, -26], [0, 26]];
-    for (let k = 0; k < tries.length; k++){
-      const x = L.x + tries[k][0], y = L.y + tries[k][1];
-      const x0 = L.anchor === 'middle' ? x - w / 2 : (L.anchor === 'end' ? x - w : x);
-      const box = [x0 - 2, y - L.size * 0.85, x0 + w + 2, y + L.size * 0.3];
-      let hit = false;
-      for (let j = 0; j < labelBoxes.length; j++){
-        const b = labelBoxes[j];
-        if (!(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3])){ hit = true; break; }
-      }
-      if (!hit){ labelBoxes.push(box); return [x, y]; }
-    }
-    return null;
-  };
-  const reserveBox = (x, y, anchor, size, str) => {
-    const w = textW(str, size);
-    const x0 = anchor === 'middle' ? x - w / 2 : (anchor === 'end' ? x - w : x);
-    labelBoxes.push([x0 - 2, y - size * 0.85, x0 + w + 2, y + size * 0.3]);
-  };
-  const dispY = buildDisp();
-  const dyOf = (fid, xid) => (dispY[fid + '@' + xid] !== undefined ? dispY[fid + '@' + xid] : 0);
-
-  const lastX = wx(XIDS[XIDS.length - 1]);
-  const yLim = Y_LIM * syScale();
-  const zTop = zWorld(DATA.impacts[DATA.impacts.length - 1]) + 0.5;
-  const base = [];
-  const topView = view.pitch > 1.25;
-
-  /* 地面与两个参考面 */
-  const g1 = P(-2.4, -yLim, 0), g2 = P(lastX + 1.3, -yLim, 0), g3 = P(lastX + 1.3, yLim, 0), g4 = P(-2.4, yLim, 0);
-  base.push('<polygon points="' + [g1, g2, g3, g4].map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') + '" fill="#3a3b38" fill-opacity="0.02" stroke="none"/>');
-
-  const v1 = P(-1.9, 0, 0), v2 = P(lastX + 1.3, 0, 0), v3 = P(lastX + 1.3, 0, zTop), v4 = P(-1.9, 0, zTop);
-  base.push('<polygon points="' + [v1, v2, v3, v4].map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') + '" fill="#3a3b38" fill-opacity="0.014" stroke="none"/>');
-
-  /* 网格：时间方向的竖线，强度方向的横线 */
-  DATA.xs.forEach(x => {
-    const a = P(wx(x.id), -yLim, 0), b = P(wx(x.id), yLim, 0);
-    base.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="#d8d9d4" stroke-width="1" stroke-dasharray="2 5"/>');
-  });
-  if (!topView){
-    [-1.5, -0.75, 0.75, 1.5].forEach(yv => {
-      const a = P(-2.3, yv * syScale(), 0), b = P(lastX + 1.2, yv * syScale(), 0);
-      base.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="#d8d9d4" stroke-width="1" stroke-dasharray="2 6"/>');
-    });
-  }
-
-  /* Y 轴 */
-  if (!topView){
-    const yA = P(-1.75, -yLim, 0), yB = P(-1.75, yLim, 0);
-    base.push('<line x1="' + yA[0].toFixed(1) + '" y1="' + yA[1].toFixed(1) + '" x2="' + yB[0].toFixed(1) + '" y2="' + yB[1].toFixed(1) + '" stroke="#a9aaa3" stroke-width="1.1" stroke-dasharray="4 4"/>');
-    base.push('<text x="' + (yB[0] - 5).toFixed(1) + '" y="' + (yB[1] - 5).toFixed(1) + '" text-anchor="end" font-size="10" fill="#5f615b" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3">推动</text>');
-    base.push('<text x="' + (yA[0] - 5).toFixed(1) + '" y="' + (yA[1] + 12).toFixed(1) + '" text-anchor="end" font-size="10" fill="#5f615b" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3">制约</text>');
-    reserveBox(yB[0] - 5, yB[1] - 5, 'end', 10, '推动');
-    reserveBox(yA[0] - 5, yA[1] + 12, 'end', 10, '制约');
-  }
-
-  /* 每个转折所在的高度，这一层的高度由它对主体的影响决定 */
-  if (!topView){
-    DATA.xs.forEach(x => {
-      const z = zX(x.id);
-      const a = P(wx(x.id), -yLim, z), b = P(wx(x.id), yLim, z);
-      base.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="#e2e3dd" stroke-width="1" stroke-dasharray="2 6"/>');
-    });
-  }
-
-  /* X 轴与节点 */
-  const ax0 = P(-1.7, 0, 0), ax1 = P(lastX + 1.5, 0, 0);
-  base.push('<line x1="' + ax0[0].toFixed(1) + '" y1="' + ax0[1].toFixed(1) + '" x2="' + ax1[0].toFixed(1) + '" y2="' + ax1[1].toFixed(1) + '" stroke="#8f9089" stroke-width="1.2" marker-end="url(#arrow)"/>');
-  DATA.xs.forEach((x, xi) => {
-    const a = P(wx(x.id), 0, 0);
-    const focused = state.focus && state.focus.kind === 'x' && state.focus.id === x.id;
-    base.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + a[0].toFixed(1) + '" y2="' + (a[1] + 7).toFixed(1) + '" stroke="#8f9089" stroke-width="1"/>');
-    base.push('<g class="node" data-kind="x" data-id="' + x.id + '" style="cursor:pointer">' +
-      '<rect x="' + (a[0] - 42).toFixed(1) + '" y="' + (a[1] + 6).toFixed(1) + '" width="84" height="20" fill="#000" fill-opacity="0.001"/>' +
-      '</g>');
-    labels.push({ x: a[0], y: a[1] + 21 + (xi % 2) * 15, anchor: 'middle', size: 10.5, text: x.id + ' ' + x.time, short: x.id, opacity: 1, fill: focused ? '#222321' : '#5f615b', weight: focused ? 600 : 0, priority: 80 + (focused ? 40 : 0) });
-  });
-
-  /* Z 轴：影响强度只分三挡 */
-  if (!topView){
-    const zxA = -1.75;
-    const zA = P(zxA, 0, 0), zB = P(zxA, 0, zTop);
-    base.push('<line x1="' + zA[0].toFixed(1) + '" y1="' + zA[1].toFixed(1) + '" x2="' + zB[0].toFixed(1) + '" y2="' + zB[1].toFixed(1) + '" stroke="#a9aaa3" stroke-width="1.1" marker-end="url(#arrow)"/>');
-    base.push('<text x="' + (zB[0] - 6).toFixed(1) + '" y="' + (zB[1] - 6).toFixed(1) + '" text-anchor="end" font-size="10" fill="#5f615b" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3">Z 影响强度</text>');
-    reserveBox(zB[0] - 6, zB[1] - 6, 'end', 10, 'Z 影响强度');
-    ['弱', '中', '强'].forEach(t => {
-      const z = TIER_Z[t] * szScale();
-      const t1 = P(zxA - 0.04, 0, z), t2 = P(zxA + 0.16, 0, z);
-      base.push('<line x1="' + t1[0].toFixed(1) + '" y1="' + t1[1].toFixed(1) + '" x2="' + t2[0].toFixed(1) + '" y2="' + t2[1].toFixed(1) + '" stroke="#a9aaa3" stroke-width="1"/>');
-      base.push('<text x="' + (t1[0] - 7).toFixed(1) + '" y="' + (t1[1] + 3.4).toFixed(1) + '" text-anchor="end" font-size="9.5" fill="#5f615b" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3">' + t + '</text>');
-      reserveBox(t1[0] - 7, t1[1] + 3.4, 'end', 9.5, t);
-    });
-  }
-
-  /* 时间切片命中区 */
-  const curtainParts = [];
-  DATA.xs.forEach(x => {
-    const xw = wx(x.id);
-    const q = [P(xw, -yLim, 0), P(xw, yLim, 0), P(xw, yLim, zTop), P(xw, -yLim, zTop)];
-    const on = state.focus && state.focus.kind === 'x' && state.focus.id === x.id;
-    curtainParts.push('<polygon class="node" data-kind="x" data-id="' + x.id + '" data-quiet="1" points="' +
-      q.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') +
-      '" fill="#3a3b38" fill-opacity="' + (on ? '0.05' : '0.001') + '" stroke="none" style="pointer-events:fill;cursor:pointer"/>');
-  });
-
-  /* 数据元素 */
-  const items = [];
-  const solo = state.preset === 'factors' || state.preset === 'top';
-  const nodeK = solo ? 1.35 : 1;
-  const labK = state.preset === 'factors' ? 1.18 : 1;
-
-  // 作用路径：因素站 → 该节点的影响
-  if (layL > 0.01 && layI > 0.01 && layF > 0.01){
-    stations.forEach(st => {
-      if (!IM[st.xid] || st.dir === 0) return;
-      const imA = impactAlpha(IM[st.xid]);
-      const fa = factorAlpha(F[st.fid]);
-      const target = Math.min(stationAlpha(st), 1) * imA;
-      if (target < 0.06 && !state.focus) return;
-      const a = fade('lk:' + st.fid + '@' + st.xid, target) * layL * layF * layI;
-      const zs = zX(st.xid);
-      const from = [wx(st.xid), dyOf(st.fid, st.xid), zs];
-      const to = [wx(st.xid), 0, zs];
-      const cp = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2 + (st.dir === 0 ? 0 : st.dir * 0.25), zs];
-      const pts = [];
-      for (let i = 0; i <= 14; i++){
-        const t = i / 14, mt = 1 - t;
-        const x = mt * mt * from[0] + 2 * mt * t * cp[0] + t * t * to[0];
-        const y = mt * mt * from[1] + 2 * mt * t * cp[1] + t * t * to[1];
-        const z = mt * mt * from[2] + 2 * mt * t * cp[2] + t * t * to[2];
-        const p = P(x, y, z);
-        pts.push([p[0], p[1]]);
-      }
-      const d = P(cp[0], cp[1], cp[2])[2];
-      items.push({
-        d: d,
-        html: '<path d="' + dpath(pts) + '" fill="none" stroke="' + F[st.fid].hex + '" stroke-width="' + (state.preset === 'impact' ? 1.3 : 0.9) + '" stroke-opacity="' + (0.28 * (state.preset === 'impact' ? 1.7 : 1) * a).toFixed(3) + '" stroke-dasharray="' + (st.dir === -1 ? '3 3' : '0') + '"/>'
-      });
-    });
-  }
-
-  /* 因素线：一条连续的线穿过所有站位。方向看它在轴的哪一侧，强度看离轴多远 */
-  if (layF > 0.01){
-    DATA.factors.forEach(f => {
-      const a = fade('f:' + f.id, factorAlpha(f)) * layF;
-      const hot = state.focus && ((state.focus.kind === 'f' && state.focus.id === f.id) || (state.focus.kind === 'x' && f.xs.indexOf(state.focus.id) >= 0));
-      const nodes = f.segs.map(s => {
-        const x = wx(s.x), y = (s.dir === 0 ? 0 : dyOf(f.id, s.x)), z = zX(s.x);
-        return { s: s, x: x, y: y, z: z, p: P(x, y, z) };
-      });
-      const lineTo = (p1, p2, dash, op) => '<line x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) + '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" stroke="' + f.hex + '" stroke-width="' + (hot ? 3 : 2.2) + '" stroke-opacity="' + op.toFixed(3) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>';
-
-      for (let i = 1; i < nodes.length; i++){
-        const A = nodes[i - 1], B = nodes[i];
-        const cross = A.s.dir !== 0 && B.s.dir !== 0 && A.s.dir !== B.s.dir;
-        if (!cross){
-          const dash = (A.s.dir === -1 || B.s.dir === -1) ? '4 3' : ((A.s.dir === 0 || B.s.dir === 0) ? '2 4' : '');
-          items.push({ d: (A.p[2] + B.p[2]) / 2, html: lineTo(A.p, B.p, dash, 0.85 * a) });
-          continue;
-        }
-        /* 跨轴：两侧各停住留一个断口，中间架一条短弧 */
-        const stop = 0.18;
-        const t0 = (0 - A.y) / (B.y - A.y);
-        const xc = A.x + (B.x - A.x) * t0;
-        const zc = A.z + (B.z - A.z) * t0;
-        const eA = P(xc, A.s.dir * stop, zc), eB = P(xc, B.s.dir * stop, zc);
-        items.push({ d: (A.p[2] + eA[2]) / 2, html: lineTo(A.p, eA, A.s.dir === -1 ? '4 3' : '', 0.85 * a) });
-        items.push({ d: (B.p[2] + eB[2]) / 2, html: lineTo(eB, B.p, B.s.dir === -1 ? '4 3' : '', 0.85 * a) });
-        const cwx = xc + 0.22;
-        const bp = [];
-        for (let k = 0; k <= 10; k++){
-          const t = k / 10, mt = 1 - t;
-          const xx = mt * mt * xc + 2 * mt * t * cwx + t * t * xc;
-          const yy = mt * mt * (A.s.dir * stop) + 2 * mt * t * 0 + t * t * (B.s.dir * stop);
-          const pp = P(xx, yy, zc);
-          bp.push([pp[0], pp[1]]);
-        }
-        const midp = bp[5];
-        items.push({ d: Math.max(A.p[2], B.p[2]) - 0.02, html:
-          '<g class="node" data-kind="station" data-id="' + f.id + '" data-xid="" style="cursor:pointer">' +
-          '<path d="' + dpath(bp) + '" fill="none" stroke="' + f.hex + '" stroke-width="1.4" stroke-dasharray="3 3" stroke-opacity="' + (0.8 * a).toFixed(3) + '"/>' +
-          '<path d="M' + midp[0].toFixed(1) + ' ' + (midp[1] - 4.5).toFixed(1) + 'L' + (midp[0] + 4.5).toFixed(1) + ' ' + midp[1].toFixed(1) + 'L' + midp[0].toFixed(1) + ' ' + (midp[1] + 4.5).toFixed(1) + 'L' + (midp[0] - 4.5).toFixed(1) + ' ' + midp[1].toFixed(1) + 'Z" fill="#fdfdfa" stroke="' + f.hex + '" stroke-width="1.2"/>' +
-          '</g>' });
-        labels.push({ x: midp[0] + 8, y: midp[1] + 3, anchor: 'start', size: 9, text: '翻转', short: '', opacity: a, fill: '#40403b', weight: 0, priority: 30 });
-      }
-
-      /* 站位 */
-      nodes.forEach(nd => {
-        const s = nd.s, p = nd.p;
-        const sa = fade('s:' + f.id + '@' + s.x, stationAlpha({ fid: f.id, xid: s.x, dir: s.dir, w: s.w, pending: s.dir === 0 })) * layF;
-        const on = state.focus && ((state.focus.kind === 'f' && state.focus.id === f.id) || (state.focus.kind === 'x' && state.focus.id === s.x));
-        const r = (3.0 + 1.7 * s.w) * nodeK;
-        let g = '<g class="node" data-kind="station" data-id="' + f.id + '" data-xid="' + s.x + '" opacity="' + sa.toFixed(3) + '" style="cursor:pointer">';
-        if (s.dir === 0){
-          const pd = 5 * nodeK;
-          const dx = p[0] + 11 * nodeK, dy = p[1] - 9 * nodeK;
-          g += '<line x1="' + p[0].toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + dx.toFixed(1) + '" y2="' + dy.toFixed(1) + '" stroke="' + f.hex + '" stroke-width="0.8" stroke-dasharray="1 2" stroke-opacity="0.6"/>';
-          g += '<path d="M' + dx.toFixed(1) + ' ' + (dy - pd).toFixed(1) + 'L' + (dx + pd).toFixed(1) + ' ' + dy.toFixed(1) + 'L' + dx.toFixed(1) + ' ' + (dy + pd).toFixed(1) + 'L' + (dx - pd).toFixed(1) + ' ' + dy.toFixed(1) + 'Z" fill="#fdfdfa" stroke="' + f.hex + '" stroke-width="1.3" stroke-dasharray="2.4 2"/>';
-          labels.push({ x: dx + 8, y: dy + 3.4, anchor: 'start', size: 8.5 * labK, text: '待查', short: '', opacity: sa, fill: '#8a7f5f', weight: 0, priority: 30 });
-        } else if (s.dir === 1){
-          g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + f.hex + '" stroke="#fdfdfa" stroke-width="1.6"/>';
-        } else {
-          g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + r.toFixed(1) + '" fill="#fdfdfa" stroke="' + f.hex + '" stroke-width="1.7"/>';
-          g += '<line x1="' + (p[0] - r * 0.5).toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + (p[0] + r * 0.5).toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="' + f.hex + '" stroke-width="1.4"/>';
-        }
-        if (on && s.dir !== 0) g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (r + 4).toFixed(1) + '" fill="none" stroke="' + f.hex + '" stroke-opacity="0.4" stroke-width="1"/>';
-        if (s.dir !== 0){
-          const sc = s.scale || '中周期';
-          const n = sc.indexOf('长') >= 0 ? 3 : (sc.indexOf('短') >= 0 ? 1 : 2);
-          for (let k = 0; k < n; k++){
-            g += '<circle cx="' + (p[0] - (n - 1) * 2 + k * 4).toFixed(1) + '" cy="' + (p[1] + (s.dir === -1 ? r + 6 : -r - 6)).toFixed(1) + '" r="1.05" fill="' + f.hex + '" fill-opacity="0.6"/>';
-          }
-        }
-        g += '</g>';
-        items.push({ d: p[2], html: g });
-      });
-
-      /* 名字标在第一个站位旁边 */
-      const s0 = nodes[0], lp = s0.p;
-      const slot = LABEL_SLOT[f.id] || 0;
-      const up = s0.s.dir !== -1;
-      const tx = up ? lp[0] + 9 : lp[0] - 9;
-      const ty = up ? lp[1] - 10 - slot * 8 : lp[1] + 16 + slot * 8;
-      labels.push({ x: tx, y: ty, anchor: up ? 'start' : 'end', size: 10.5 * labK, text: f.id + ' ' + f.name + (f.alt ? ' · 替代' : ''), short: f.id, opacity: a, fill: f.hex, weight: 600, priority: 50 + (hot ? 80 : 0) });
-    });
-  }
-
-  // 影响层
-  if (layI > 0.01){
-    const spine = [];
-    DATA.impacts.forEach(im => {
-      const p = P(wx(im.xid), 0, zWorld(im));
-      spine.push([p[0], p[1]]);
-    });
-    items.push({ d: 0.02, html: '<path d="' + dpath(spine) + '" fill="none" stroke="#3a3b38" stroke-width="1.1" stroke-opacity="' + (0.35 * layI).toFixed(3) + '"/>' });
-
-    DATA.impacts.forEach((im, ii) => {
-      const p = P(wx(im.xid), 0, zWorld(im));
-      const a0 = P(wx(im.xid), 0, 0);
-      const a = fade('i:' + im.xid, impactAlpha(im)) * layI;
-      const on = state.focus && state.focus.kind === 'x' && state.focus.id === im.xid;
-      const isProfile = state.preset === 'impact';
-      let g = '<g class="node" data-kind="x" data-id="' + im.xid + '" opacity="' + a.toFixed(3) + '" style="cursor:pointer">';
-      if (isProfile){
-        g += '<line x1="' + p[0].toFixed(1) + '" y1="' + a0[1].toFixed(1) + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="#3a3b38" stroke-width="10" stroke-opacity="0.085" stroke-linecap="butt"/>';
-        g += '<line x1="' + (p[0] - 9).toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + (p[0] + 9).toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="#3a3b38" stroke-width="2.2"/>';
-      } else {
-        g += '<line x1="' + a0[0].toFixed(1) + '" y1="' + a0[1].toFixed(1) + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="#8f9089" stroke-width="0.8" stroke-dasharray="2 4"/>';
-      }
-      const bs = 11 * nodeK;
-      if (topView){
-        g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (5.4 * nodeK).toFixed(1) + '" fill="#fdfdfa" stroke="#3a3b38" stroke-width="1.8"/>';
-      } else if (!isProfile){
-        g += '<rect x="' + (p[0] - bs / 2).toFixed(1) + '" y="' + (p[1] - bs / 2).toFixed(1) + '" width="' + bs.toFixed(1) + '" height="' + bs.toFixed(1) + '" rx="' + (1.6 * nodeK).toFixed(1) + '" fill="#fdfdfa" stroke="#3a3b38" stroke-width="' + (on ? 2.2 : 1.5) + '"/>';
-      }
-      const isLast = im.xid === XIDS[XIDS.length - 1];
-      const lx = isLast ? p[0] - bs : p[0] + bs;
-      const anchor = isLast ? 'end' : 'start';
-      g += '</g>';
-      items.push({ d: p[2], html: g });
-      if (isProfile){
-        labels.push({ x: p[0], y: p[1] - 13, anchor: 'middle', size: 10.5, text: im.xid, short: '', opacity: a, fill: '#40403b', weight: 0, priority: 70 + (on ? 40 : 0) });
-      } else {
-        labels.push({ x: lx, y: p[1] + (topView ? -12 - (ii % 2) * 24 : 3.8), anchor: anchor, size: 10 * labK, text: im.xid + ' ' + im.label, short: im.xid, opacity: a, fill: '#40403b', weight: 0, priority: 60 + (on ? 40 : 0) });
-      }
-      if (im.pending && !topView && !isProfile){
-        labels.push({ x: lx, y: p[1] + 17, anchor: anchor, size: 9 * labK, text: '归因待验证', short: '', opacity: Math.min(1, a), fill: '#8a7f5f', weight: 0, priority: 20 });
-      }
-    });
-  }
-
-  items.sort((a, b) => b.d - a.d);
-
-  /* 标签按优先级放，放不下的缩成编号，再放不下就省掉 */
-  labels.sort((a, b) => b.priority - a.priority);
-  const labelParts = [];
-  labels.forEach(L => {
-    if (L.opacity < 0.12) return;
-    let text = L.text;
-    let pos = placeLabel(L, text);
-    if (!pos && L.short && L.short !== L.text){
-      text = L.short;
-      pos = placeLabel(L, text);
-    }
-    if (!pos) return;
-    labelParts.push('<text x="' + pos[0].toFixed(1) + '" y="' + pos[1].toFixed(1) + '" text-anchor="' + L.anchor + '" font-size="' + L.size + '" fill="' + L.fill + '"' + (L.weight ? ' font-weight="' + L.weight + '"' : '') + ' opacity="' + L.opacity.toFixed(3) + '" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3;pointer-events:none">' + esc(text) + '</text>');
-  });
-
-  const svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="XYZ 三维分析图，横轴是时间转折，纵轴是推动与制约因素，竖轴是对主体的影响">' +
-    '<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#8f9089"/></marker></defs>' +
-    curtainParts.join('') + base.join('') + items.map(i => i.html).join('') + labelParts.join('') + '</svg>';
-
-  plot.innerHTML = svg;
-  if (alphaBusy) schedule();
-}
-
-/* ==========================================================================
-   详情面板
-   ========================================================================== */
-function dirPill(dir){
-  if (dir === 1) return '<span class="pill push">推动</span>';
-  if (dir === -1) return '<span class="pill con">制约</span>';
-  return '<span class="pill pend">待查</span>';
-}
-function factorPattern(f){
-  const seq = [];
-  f.segs.forEach(s => {
-    const d = s.dir;
-    if (seq.length === 0 || seq[seq.length - 1].d !== d) seq.push({ d: d, n: 1 });
-    else seq[seq.length - 1].n++;
-  });
-  return seq.map(o => (o.d === 1 ? '推动' : o.d === -1 ? '制约' : '待查') + (o.n > 1 ? '×' + o.n : '')).join(' → ');
-}
-function scaleSet(f){
-  const seen = [];
-  f.segs.forEach(s => { if (seen.indexOf(s.scale) < 0) seen.push(s.scale); });
-  return seen.length ? seen.join('／') : '未标注';
-}
-function bar(v){
-  return '<span class="bar"><i style="width:' + Math.round(v * 100) + '%"></i></span>';
-}
-
-/* 未选中对象时，右侧详情区留空 */
-function overviewHTML(){
-  return '';
-}
-
-function xDetailHTML(x){
-  const rows = stations.filter(s => s.xid === x.id);
-  const im = IM[x.id];
-  let html = '<p class="eyebrow">转折节点 ' + esc(x.id) + ' · ' + esc(x.time) + '</p>' +
-    '<h2>' + esc(x.title) + '</h2>' +
-    '<dl class="kv">' +
-      '<dt>之前</dt><dd>' + esc(x.before) + '</dd>' +
-      '<dt>之后</dt><dd>' + esc(x.after) + '</dd>' +
-      '<dt>结果</dt><dd>' + esc(x.result) + '</dd>' +
-      '<dt>依据</dt><dd>' + x.cites.map(c => '[' + esc(c) + ']').join(' ') + '</dd>' +
-    '</dl>' +
-    '<h3>这一节点的因素</h3>' +
-    '<table class="mini"><thead><tr><th>因素</th><th>方向</th><th>强度</th><th>尺度</th><th>依据</th></tr></thead><tbody>';
-  if (rows.length === 0){
-    html += '<tr><td colspan="5" class="hintline">这一节点没有登记因素</td></tr>';
-  }
-  rows.forEach(s => {
-    const f = F[s.fid];
-    html += '<tr><td><button class="link-row" data-act="focus-f" data-id="' + f.id + '" style="border:0;padding:0">' +
-      '<span class="swatch" style="background:' + f.hex + '"></span>' + esc(f.name) + '</button></td>' +
-      '<td>' + dirPill(s.dir) + '</td>' +
-      '<td>' + bar(s.w) + ' <span class="sm">' + s.w.toFixed(2) + '</span></td>' +
-      '<td><span class="sm">' + esc(s.seg.scale) + '</span></td>' +
-      '<td><span class="sm">' + (s.seg.cite ? '[' + esc(s.seg.cite) + ']' : '无') + '</span></td></tr>';
-  });
-  html += '</tbody></table>';
-  if (im){
-    html += '<h3>对主体的影响 ' + esc(im.c) + '</h3>' +
-      '<dl class="kv">' +
-        '<dt>结果</dt><dd>' + esc(im.label) + '</dd>' +
-        '<dt>强度</dt><dd>' + esc(im.tier) + '，置信度 ' + esc(im.conf) + '</dd>' +
-        '<dt>作用路径</dt><dd>' + im.path.map(esc).join(' → ') + '</dd>' +
-        '<dt>成立条件</dt><dd>' + esc(im.condition) + '</dd>' +
-        '<dt>过程</dt><dd>' + esc(im.process) + '</dd>' +
-        '<dt>归因</dt><dd>' + esc(im.attr) + '</dd>' +
-      '</dl>';
-  }
-  html += '<h3>待查</h3><p class="hintline">' + esc(x.question) + '</p>' +
-    '<button class="act-btn" data-act="clear">回到总览</button>';
-  return html;
-}
-
-function factorDetailHTML(f){
-  let html = '<p class="eyebrow">因素 ' + esc(f.id) + (f.core ? ' · 核心' : ' · 非核心') + (f.alt ? ' · 替代解释' : '') + '</p>' +
-    '<h2>' + esc(f.name) + '</h2>' +
-    '<div class="chip-row">' +
-      '<span class="pill">' + esc(factorPattern(f)) + '</span>' +
-      '<span class="pill">' + esc(f.kind) + '</span>' +
-      '<span class="pill">' + esc(scaleSet(f)) + '</span>' +
-      (f.flipCount ? '<span class="pill">翻转 ' + f.flipCount + ' 处</span>' : '<span class="pill">方向未变</span>') +
-    '</div>' +
-    '<p class="lead">' + esc(f.thesis) + '</p>' +
-    '<p class="hintline">一条线穿过这个因素在两侧出现过的站位，同色同号。跨轴的地方线会断开一小段，用一条短弧接上。</p>' +
-    '<h3>站位与方向</h3>' +
-    '<table class="mini"><thead><tr><th>节点</th><th>方向</th><th>强度</th><th>尺度</th><th>依据</th></tr></thead><tbody>';
-  f.segs.forEach(s => {
-    const x = XMAP[s.x];
-    html += '<tr><td>' + esc(s.x) + ' <span class="sm">' + esc(x.time) + '</span>' + (s.flip ? ' <span class="sm">翻转</span>' : '') + '</td>' +
-      '<td>' + dirPill(s.dir) + '</td>' +
-      '<td>' + bar(s.w) + ' <span class="sm">' + s.w.toFixed(2) + '</span></td>' +
-      '<td><span class="sm">' + esc(s.scale) + '</span></td>' +
-      '<td><span class="sm">' + (s.cite ? '[' + esc(s.cite) + ']' : '无') + '</span></td></tr>';
-  });
-  html += '</tbody></table>';
-  html += '<h3>作用说明</h3><p class="hintline">' +
-    f.segs.map(s => esc(s.x) + ' ' + (s.dir === 1 ? '推动' : s.dir === -1 ? '制约' : '待查') + '，' + esc(s.note) + '（' + esc(s.scale) + '）').join('；') + '</p>';
-  const touched = DATA.impacts.filter(im => f.xs.indexOf(im.xid) >= 0);
-  if (touched.length){
-    html += '<h3>落在哪些影响上</h3><div>';
-    touched.forEach(im => {
-      html += '<button class="link-row" data-act="focus-x" data-id="' + im.xid + '">' + esc(im.xid) + ' ' + esc(im.label) + ' <span class="sm">' + esc(im.c) + ' · ' + esc(im.conf) + '</span></button>';
-    });
-    html += '</div>';
-  }
-  html += '<button class="act-btn" data-act="clear">回到总览</button>';
-  return html;
-}
-
-function renderDetail(){
-  const f = state.focus;
-  if (!f){
-    detailEl.innerHTML = '';
-    detailEl.classList.remove('swap');
-    return;
-  }
-  if (f.kind === 'x') detailEl.innerHTML = xDetailHTML(XMAP[f.id]);
-  else detailEl.innerHTML = factorDetailHTML(F[f.id]);
-  detailEl.classList.remove('swap');
-  void detailEl.offsetWidth;
-  detailEl.classList.add('swap');
-}
-
-/* ==========================================================================
-   左侧列表、图例
-   ========================================================================== */
-function buildRail(){
-  const xl = document.getElementById('xlist');
-  xl.innerHTML = DATA.xs.map(x =>
-    '<button class="row" data-act="focus-x" data-id="' + x.id + '">' +
-      '<span class="code">' + esc(x.id) + '</span>' +
-      '<span class="name">' + esc(x.short) + '<span class="sub">' + esc(x.time) + ' · ' + esc(x.title) + '</span></span>' +
-      '<span class="tail">' + stations.filter(s => s.xid === x.id).length + ' 因素</span>' +
-    '</button>').join('');
-
-  const fl = document.getElementById('flist');
-  fl.innerHTML = DATA.factors.map(f =>
-    '<button class="row" data-act="focus-f" data-id="' + f.id + '">' +
-      '<span class="code" style="background:' + f.hex + '">' + esc(f.id) + '</span>' +
-      '<span class="name"><span class="swatch" style="background:' + f.hex + '"></span>' + esc(f.name) + '<span class="sub">' + esc(factorPattern(f)) + ' · ' + esc(scaleSet(f)) + '</span></span>' +
-      '<span class="tail">' + [f.core ? '核心' : '', f.alt ? '替代' : ''].filter(Boolean).join(' · ') + '</span>' +
-    '</button>').join('');
-
-  const legend = document.getElementById('legend');
-  const glyph = (inner) => '<svg width="24" height="16" viewBox="0 0 24 16" aria-hidden="true">' + inner + '</svg>';
-  const leg = [
-    ['推动', glyph('<line x1="12" y1="14" x2="12" y2="5" stroke="#3a3b38" stroke-width="2"/><circle cx="12" cy="4" r="3" fill="#3a3b38"/>'), ''],
-    ['制约', glyph('<line x1="12" y1="2" x2="12" y2="11" stroke="#3a3b38" stroke-width="1.8" stroke-dasharray="4 3"/><circle cx="12" cy="13" r="3" fill="#fdfdfa" stroke="#3a3b38" stroke-width="1.4"/>'), ''],
-    ['翻转', glyph('<line x1="12" y1="1.5" x2="12" y2="6" stroke="#3a3b38" stroke-width="1.6"/><line x1="12" y1="10" x2="12" y2="14.5" stroke="#3a3b38" stroke-width="1.6" stroke-dasharray="3 2"/><path d="M12 6 Q18 8 12 10" fill="none" stroke="#3a3b38" stroke-width="1.2" stroke-dasharray="2 2"/>'), ''],
-    ['待查', glyph('<path d="M12 3.5L16.8 8L12 12.5L7.2 8Z" fill="#fdfdfa" stroke="#8a7f5f" stroke-width="1.2" stroke-dasharray="2 2"/>'), ''],
-    ['层高', '', '弱 / 中 / 强 三挡'],
-    ['强度', '', '离轴越远越大'],
-    ['尺度', glyph('<circle cx="7" cy="8" r="1.3" fill="#3a3b38"/><circle cx="12" cy="8" r="1.3" fill="#3a3b38"/><circle cx="17" cy="8" r="1.3" fill="#3a3b38"/>'), '短 / 中 / 长']
-  ];
-  legend.innerHTML = leg.map(o => '<span class="lg">' + o[1] + '<b>' + o[0] + '</b>' + (o[2] ? '<span class="lg-n">' + o[2] + '</span>' : '') + '</span>').join('');
-}
-
-/* ==========================================================================
-   表格视图
-   ========================================================================== */
-function buildTables(){
-  const tv = document.getElementById('tableview');
-  let h = '<p class="tb-title">XYZ 分析表</p>' +
-    '<p class="tb-note">同一份数据在图和表之间互通。表中的 S 是来源编号，C 是判断编号，与详情面板一致。</p>' +
-    '<table class="grid"><thead><tr><th>关键转折 X</th><th>推动与制约因素 Y</th><th>对主体的影响 Z</th><th>证据与待查</th></tr></thead><tbody>';
-  DATA.xs.forEach(x => {
-    const rows = stations.filter(s => s.xid === x.id);
-    const im = IM[x.id];
-    h += '<tr><td class="x-cell"><span class="xh">' + esc(x.id) + ' ' + esc(x.time) + '</span><br><span class="sm">' + esc(x.title) + '</span></td><td>';
-    if (rows.length === 0) h += '<span class="sm">未登记因素</span>';
-    rows.forEach(s => {
-      const f = F[s.fid];
-      h += '<div><span class="swatch" style="background:' + f.hex + '"></span>' + esc(f.name) + ' ' +
-        (s.dir === 1 ? '＋' : s.dir === -1 ? '－' : '？') + s.w.toFixed(2) + ' <span class="sm">' + esc(s.seg.scale) + ' ' + (s.seg.cite ? '[' + esc(s.seg.cite) + ']' : '') + '</span></div>';
-    });
-    h += '</td><td class="z-cell">' + (im ? '<span class="xh">' + esc(im.label) + '</span><br><span class="sm">' + esc(im.c) + ' · 强度 ' + esc(im.tier) + ' · 置信度 ' + esc(im.conf) + ' · 归因 ' + esc(im.attr) + '<br>' + im.path.map(esc).join(' → ') + '</span>' : '') + '</td><td class="sm">' + (im ? im.cites.map(c => '[' + esc(c) + ']').join(' ') + '<br>' : '') + esc(x.question) + '</td></tr>';
-  });
-  h += '</tbody></table>';
-
-  h += '<p class="tb-title">因素账本</p><p class="tb-note">一行是一个因素的全部时间尺度。方向在同一行内变化，就是翻转。</p>' +
-    '<table class="grid matrix"><thead><tr><th style="width:150px">因素</th>' +
-    DATA.xs.map(x => '<th style="text-align:center">' + esc(x.id) + '<br><span class="sm">' + esc(x.time) + '</span></th>').join('') +
-    '<th style="width:132px">方向</th><th style="width:96px">性质</th></tr></thead><tbody>';
-  DATA.factors.forEach(f => {
-    h += '<tr><td><span class="swatch" style="background:' + f.hex + '"></span>' + esc(f.name) + '</td>';
-    DATA.xs.forEach(x => {
-      const s = f.segs.find(v => v.x === x.id);
-      if (!s) h += '<td class="cell empty">·</td>';
-      else if (s.dir === 0) h += '<td class="cell pend">待查</td>';
-      else h += '<td class="cell ' + (s.dir === 1 ? 'push' : 'con') + '">' + (s.dir === 1 ? '＋' : '－') + s.w.toFixed(2) + '</td>';
-    });
-    h += '<td class="sm">' + esc(factorPattern(f)) + '</td><td class="sm">' + (f.core ? '核心' : '非核心') + (f.alt ? '<br>替代' : '') + '</td></tr>';
-  });
-  h += '</tbody></table>';
-  tv.innerHTML = h;
-}
-
-/* ==========================================================================
-   交互
-   ========================================================================== */
-function syncControls(){
-  const f = state.focus;
-  document.querySelectorAll('[data-act="focus-x"], [data-act="focus-f"]').forEach(b => {
-    if (!f) { b.classList.remove('sel'); return; }
-    const on = (f.kind === 'x' && b.dataset.act === 'focus-x' && b.dataset.id === f.id) ||
-               (f.kind === 'f' && b.dataset.act === 'focus-f' && b.dataset.id === f.id);
-    b.classList.toggle('sel', on);
-  });
-  document.querySelectorAll('[data-act="filter"]').forEach(b => {
-    b.classList.toggle('active', b.dataset.filter === state.filter);
-  });
-  document.getElementById('spreadVal').textContent = Math.round(state.spread * 100) + '%';
-  document.getElementById('spread').value = String(Math.round(state.spread * 100));
-}
-
-function updateAll(){
-  renderScene();
-  renderDetail();
-  syncControls();
-}
-
-function setFocus(nf){
-  if (nf && state.focus && nf.kind === state.focus.kind && nf.id === state.focus.id) nf = null;
-  state.focus = nf;
-  if (nf && !drawerEl.classList.contains('open')) setDrawer(true);
-  updateAll();
-}
-
-function setPreset(name){
-  const to = { yaw: -0.55, pitch: 0.5, zoom: 1 };
-  const layers = {
-    iso:     { factors: true,  links: true,  impacts: true },
-    factors: { factors: true,  links: false, impacts: false },
-    impact:  { factors: false, links: false, impacts: true },
-    top:     { factors: false, links: false, impacts: true }
-  }[name] || { factors: true, links: true, impacts: true };
-  if (name === 'factors'){ to.yaw = 0.02; to.pitch = 1.02; }
-  if (name === 'impact'){ to.yaw = 0.0; to.pitch = 0.03; }
-  if (name === 'top'){ to.yaw = 0.0; to.pitch = 1.5; }
-  view.panX = 0;
-  view.panY = 0;
-  state.levels.factors = layers.factors;
-  state.levels.links = layers.links;
-  state.levels.impacts = layers.impacts;
-  state.preset = name;
-  document.querySelectorAll('[data-act="view"]').forEach(b => b.classList.toggle('active', b.dataset.preset === name));
-  startTween(to, 560);
-  schedule();
-}
-
-document.addEventListener('click', e => {
-  const t = e.target.closest('[data-act]');
-  if (!t) return;
-  const act = t.dataset.act;
-  if (act === 'focus-x') setFocus({ kind: 'x', id: t.dataset.id });
-  else if (act === 'focus-f') setFocus({ kind: 'f', id: t.dataset.id });
-  else if (act === 'clear') setFocus(null);
-  else if (act === 'filter') { state.filter = t.dataset.filter; updateAll(); }
-  else if (act === 'view') setPreset(t.dataset.preset);
-  else if (act === 'reset') {
-    state.focus = null;
-    state.filter = 'all';
-    setPreset('iso');
-    updateAll();
-  }
-});
-
-document.getElementById('spread').addEventListener('input', e => {
-  state.spread = Number(e.target.value) / 100;
-  document.getElementById('spreadVal').textContent = e.target.value + '%';
-  schedule();
-});
-
-/* 舞台拖拽、缩放、点击 */
-let drag = null, suppressClick = false;
-
-stage.addEventListener('pointerdown', e => {
-  if (e.target.closest('.panel-area')) return;
-  tween = null; fling = null;
-  drag = { x: e.clientX, y: e.clientY, yaw: view.yaw, pitch: view.pitch, moved: 0, lx: e.clientX, ly: e.clientY, lt: performance.now(), vx: 0, vy: 0 };
-  try { stage.setPointerCapture(e.pointerId); } catch (err) {}
-  suppressClick = false;
-});
-stage.addEventListener('pointermove', e => {
-  if (drag){
-    const now = performance.now();
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    const dt = Math.max(8, now - drag.lt);
-    drag.vx = (e.clientX - drag.lx) / dt;
-    drag.vy = (e.clientY - drag.ly) / dt;
-    drag.lx = e.clientX;
-    drag.ly = e.clientY;
-    drag.lt = now;
-    drag.moved = Math.max(drag.moved, Math.hypot(dx, dy));
-    view.yaw = drag.yaw - dx * 0.008;
-    view.pitch = clamp(drag.pitch + dy * 0.006, -0.25, 1.5);
-    if (drag.moved > 4) tipEl.hidden = true;
-    schedule();
-    return;
-  }
-  const t = e.target.closest('[data-kind]');
-  if (!t || t.dataset.quiet){ tipEl.hidden = true; return; }
-  tipEl.innerHTML = tipHTML(t.dataset.kind, t.dataset.id, t.dataset.xid);
-  tipEl.hidden = false;
-  const r = stage.getBoundingClientRect();
-  let x = e.clientX - r.left + 14, y = e.clientY - r.top + 14;
-  if (x > r.width - 250) x = e.clientX - r.left - 250;
-  if (y > r.height - 96) y = e.clientY - r.top - 96;
-  tipEl.style.left = x + 'px';
-  tipEl.style.top = y + 'px';
-});
-stage.addEventListener('pointerup', e => {
-  if (drag && drag.moved > 5){
-    suppressClick = true;
-    if (performance.now() - drag.lt < 90){
-      const vy = clamp(-drag.vx * 0.12, -0.09, 0.09);
-      const vp = clamp(drag.vy * 0.09, -0.06, 0.06);
-      if (Math.abs(vy) + Math.abs(vp) > 0.003){
-        fling = { vy: vy, vp: vp };
-        if (!ticking){ ticking = true; requestAnimationFrame(motionTick); }
-      }
-    }
-  }
-  drag = null;
-});
-stage.addEventListener('pointerleave', () => { tipEl.hidden = true; });
-stage.addEventListener('wheel', e => {
-  if (e.target.closest('.panel-area')) return;
-  e.preventDefault();
-  const nz = clamp(view.zoom * Math.exp(-e.deltaY * 0.0012), 0.55, 2.8);
-  startTween({ yaw: view.yaw, pitch: view.pitch, zoom: nz }, 200);
-}, { passive: false });
-stage.addEventListener('click', e => {
-  if (e.target.closest('.panel-area')) return;
-  if (suppressClick){ suppressClick = false; return; }
-  const t = e.target.closest('[data-kind]');
-  if (!t){ setFocus(null); return; }
-  if (t.dataset.kind === 'station' || t.dataset.kind === 'lane') setFocus({ kind: 'f', id: t.dataset.id });
-  else if (t.dataset.kind === 'x') setFocus({ kind: 'x', id: t.dataset.id });
-});
-stage.addEventListener('dblclick', () => setFocus(null));
-
-/* 右侧读图抽屉 */
-const drawerEl = document.getElementById('drawer');
-const drawerTab = document.getElementById('drawerTab');
-function setDrawer(open){
-  drawerEl.classList.toggle('open', open);
-  document.body.classList.toggle('drawer-open', open);
-  drawerTab.setAttribute('aria-expanded', open ? 'true' : 'false');
-}
-drawerTab.addEventListener('click', e => {
-  e.stopPropagation();
-  setDrawer(!drawerEl.classList.contains('open'));
-});
-
-/* 抽屉里的 X / Y 切换 */
-const pickTabs = Array.from(document.querySelectorAll('[data-pick]'));
-function setPick(name){
-  pickTabs.forEach(b => b.classList.toggle('active', b.dataset.pick === name));
-  document.getElementById('xlist').hidden = (name !== 'x');
-  document.getElementById('flist').hidden = (name !== 'y');
-}
-pickTabs.forEach(b => b.addEventListener('click', e => {
-  e.stopPropagation();
-  setPick(b.dataset.pick);
-}));
-setPick('x');
-
-/* 图表上的三个面板，一次只开一个 */
-const PANEL_BODY = {
-  filter: document.getElementById('bodyFilter'),
-  view: document.getElementById('bodyView')
+viewport.onpointerdown=event=>{
+  if(phase!==3||event.button!==0||viewport.classList.contains("large")||event.target.closest("button"))return;
+  drag={id:event.pointerId,x:event.clientX,yaw};
+  viewport.setPointerCapture(event.pointerId);
 };
-const panelBtns = Array.from(document.querySelectorAll('[data-panel]'));
-function setPanel(name){
-  Object.keys(PANEL_BODY).forEach(k => {
-    PANEL_BODY[k].classList.toggle('open', k === name);
-  });
-  panelBtns.forEach(b => b.setAttribute('aria-expanded', String(b.dataset.panel === name)));
+viewport.onpointermove=event=>{
+  if(!drag||drag.id!==event.pointerId)return;
+  yaw=constraints(drag.yaw+(event.clientX-drag.x)/220,-1,1);
+  paint();
+};
+viewport.onlostpointercapture=()=>{drag=null};
+if(new URLSearchParams(location.search).get("motion")!=="static"){
+  go(reduced.matches?3:0);
+  if(reduced.matches)$("next").hidden=true;
+  document.documentElement.classList.add("ready");
 }
-panelBtns.forEach(b => {
-  b.addEventListener('click', e => {
-    e.stopPropagation();
-    setPanel(PANEL_BODY[b.dataset.panel].classList.contains('open') ? null : b.dataset.panel);
-  });
-});
-document.addEventListener('click', e => {
-  if (!e.target.closest('.panel-area')) setPanel(null);
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape'){
-    setFocus(null);
-    setPanel(null);
-  }
-});
-
-function tipHTML(kind, id, xid){
-  if (kind === 'x'){
-    const x = XMAP[id]; const im = IM[id];
-    return '<span class="t-name">' + esc(id) + ' · ' + esc(x.time) + '</span>' +
-      '<span class="t-meta">' + esc(x.title) + '</span>' +
-      (im ? '<br><span class="t-meta">' + esc(im.c) + ' ' + esc(im.label) + ' · 强度 ' + esc(im.tier) + ' · 置信度 ' + esc(im.conf) + '</span>' : '');
-  }
-  if (kind === 'station' && xid){
-    const f = F[id];
-    const s = f.segs.find(v => v.x === xid);
-    return '<span class="t-name">' + esc(f.name) + '</span>' +
-      '<span class="t-meta">' + esc(xid) + ' · ' + (s.dir === 1 ? '推动' : s.dir === -1 ? '制约' : '待查') + ' · 强度 ' + s.w.toFixed(2) + ' · ' + esc(s.scale) + '</span>' +
-      '<br><span class="t-meta">' + esc(s.note) + (s.cite ? ' [' + esc(s.cite) + ']' : '') + '</span>';
-  }
-  const f = F[id];
-  return '<span class="t-name">' + esc(f.name) + '</span>' +
-    '<span class="t-meta">' + esc(factorPattern(f)) + ' · ' + (f.core ? '核心' : '非核心') + (f.alt ? ' · 替代解释' : '') + '</span>';
-}
-
-/* 尺寸变化 */
-if (window.ResizeObserver){
-  new ResizeObserver(() => schedule()).observe(stage);
-} else {
-  window.addEventListener('resize', schedule);
-}
-
-/* 启动 */
-try {
-  buildRail();
-  updateAll();
-  document.querySelector('[data-act="view"][data-preset="iso"]').classList.add('active');
-} catch (err) {
-  plot.innerHTML = '<p style="padding:24px;font:12px/1.7 Georgia,serif;color:#7a5f66">初始化失败，浏览器控制台有完整报错。' + esc(err && err.message ? err.message : err) + '</p>';
-  if (window.console) console.error(err);
-}
-
 })();
 </script>
 </body>
