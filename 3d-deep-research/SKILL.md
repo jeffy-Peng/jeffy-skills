@@ -1,14 +1,14 @@
 ---
 name: 3d-deep-research
 description: |
-  用于需要系统取证并形成深度研究报告的分析、研究与调研。用证据链和 XYZ 分析形成可追溯的判断，默认交付 HTML 报告与 XYZ 全景图。
+  用于需要系统取证并形成深度研究报告的分析、研究与调研。用证据链和 XYZ 分析形成可追溯的判断，默认交付内含交互式 XYZ 全景图与完整报告的单文件 HTML。
 ---
 
 # 3D Deep Research
 
 用证据链核实关键事实。用 XYZ 确定关键转折、查明推动与制约因素，并追踪核心因素对研究主体的影响。综合三轴形成可核查、可修订的研究判断。
 
-默认成对交付 HTML 报告和交互式 XYZ 全景图。两份文件放在同一目录，可离线打开并互相跳转。报告使用石墨杂志版式、折叠目录和三级编号。保留 Markdown 源稿便于复查，需要 PDF 时从浏览器打印。用户指定只交付报告或使用其他主流程时，按其要求执行。
+默认交付**单文件离线 HTML（`output.html`）**，将交互式三维 XYZ 全景图与完整研究报告融合在同一文件中：打开默认首屏呈现全景图，通过顶栏「全景图 | 完整报告」切换视图，点击抽屉内来源或判断编号可无刷新跳转并高亮正文台账，切回全景图时保留视角与聚焦状态。禁用脚本或打印 PDF 时自动降级展示完整正文。保留 Markdown 源稿便于复查；用户指定只交付报告或分体交付时，按其要求执行。
 
 开始研究时读[证据协议](references/evidence-protocol.md)，规划图表时读[视觉表达规范](references/visual-guidelines.md)。
 
@@ -36,7 +36,7 @@ description: |
 
 逐行将 X、Y、Z 写到证据能支持的范围，在关键事实和判断旁标注对应的 S、C 编号。证据不足处写清缺口。
 
-交付 HTML 报告与全景图时，按[全景图规范](references/panorama.md)将 XYZ 分析表整理为 xyz.json，与报告账本同步。
+交付含全景图的单文件报告时，按[全景图规范](references/panorama.md)将 XYZ 分析表整理为 `xyz.json`，与报告账本同步。
 
 #### X · 确定关键转折
 
@@ -56,7 +56,7 @@ description: |
 
 #### 判断何时转入写作
 
-当核心判断已有可回源的证据、主要替代解释已核查时，逐项问「还可能查到什么，会改变哪条判断、因素主次或成立条件？去哪里找？」有可能改变判断且有具体线索可查时，继续补查。完成可行的检索后仍有关键缺口时，收窄判断或标明未决，并将已查范围及缺口对答案的影响记入 A3。能交代清楚当前证据支持的答案与未决问题时，开始拟提纲。写作和审计发现新的关键缺口时，回表补查。
+当核心判断已有可回源的证据、主要替代解释已核查时，逐项问「还能查到什么，会改变哪条判断、因素主次或成立条件？去哪里找？」有可能改变判断且有具体线索可查时，继续补查。完成可行的检索后仍有关键缺口时，收窄判断或标明未决，并将已查范围及缺口对答案的影响记入 A3。能交代清楚当前证据支持的答案与未决问题时，开始拟提纲。写作和审计发现新的关键缺口时，回表补查。
 
 ### 3. 写作、审计与内容验收
 
@@ -70,12 +70,13 @@ description: |
 
 ### 4. 校验与交付
 
-将 report.md 和 xyz.json 放在同一目录，用[构建脚本](scripts/build_report.py)生成两份 HTML。缺少 Python-Markdown 时运行 pip install Markdown。
+将 `report.md` 和 `xyz.json` 放在同一目录，用[构建脚本](scripts/build_report.py)生成单文件 HTML。缺少 Python-Markdown 时运行 `pip install Markdown`。
 
 ```bash
 python [skill目录]/scripts/build_report.py report.md
+python [skill目录]/scripts/build_panorama.py xyz.json --report report.md --check
 ```
 
-命令生成 output.html、panorama.html 和核验用的 output.html.manifest.json。每份报告使用独立目录。也可通过 --xyz 指定数据文件，通过 --output-dir 指定输出目录。只交付报告时加 --report-only。沿 XYZ 分章的旧稿可加 --require-xyz 检查原章节结构。较早账本可用[结构校验脚本](scripts/validate_report.py)的 --legacy-schema 单独复核。
+默认命令生成内含三维全景图与完整报告的单文件 `output.html` 及核验用的 `output.html.manifest.json`。每份报告使用独立目录。可通过 `--xyz` 指定数据文件，通过 `--output-dir` 指定输出目录；需要额外输出独立 `panorama.html` 时加 `--split-panorama`；只交付静态报告时加 `--report-only`。沿 XYZ 分章的旧稿可加 `--require-xyz` 检查原章节结构。较早账本可用[结构校验脚本](scripts/validate_report.py)的 `--legacy-schema` 单独复核。
 
-按[全景图规范](references/panorama.md)联合校验。将两份 HTML 一起复制到空目录离线打开，检查报告正文、图表、目录和窄屏布局，并验证全景图视角、作用路径和账本跳转。联网检查需要访问原文的来源链接。图表使用可嵌入的本地图片或自包含 SVG。按需提供 Markdown 源稿或浏览器打印的 PDF。报告机器校验、事实审计和实际版面检查的结果。
+将 `output.html` 复制到空目录离线打开，检查默认全景图首屏、顶栏切换、抽屉引用跳转至 A1/A2 台账以及禁用脚本/打印 PDF 降级效果。联网检查需要访问原文的来源链接。图表使用可嵌入的本地图片或自包含 SVG。按需提供 Markdown 源稿或浏览器打印的 PDF。

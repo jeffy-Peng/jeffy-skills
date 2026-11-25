@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a checked, portable 3d-deep-research HTML report."""
+"""Build a checked, portable single-file 3d-deep-research HTML report (with embedded XYZ panorama)."""
 from __future__ import annotations
 
 import argparse
@@ -56,7 +56,7 @@ def linkify_html(
             return match.group(0)
         try:
             destination = quote(Path(relpath(path, output_dir)).as_posix())
-        except ValueError:  # Different Windows drives have no relative path.
+        except ValueError:
             destination = path.as_uri()
         parsed = urlsplit(ref)
         resolved = urlsplit(destination)
@@ -72,7 +72,6 @@ def linkify_html(
             attrs += f' id="src-{match.group("sid")}"'
         return f"<tr{attrs}>{cells}"
 
-    # Limit source anchors to A1 so other report tables can also list Source IDs.
     heading = re.search(
         r'<h3\b[^>]*>(?:<span class="heading-number">[^<]*</span>)?\s*A1\b[^<]*</h3>',
         html_text, flags=re.I,
@@ -121,10 +120,7 @@ def linkify_html(
 
 def _split_report(md_text: str) -> tuple[str, str, str]:
     lines = md_text.splitlines()
-    first_content = next(
-        (index for index, line in enumerate(lines) if line.strip()),
-        None,
-    )
+    first_content = next((index for index, line in enumerate(lines) if line.strip()), None)
     if first_content is None:
         raise RuntimeError("The report is empty.")
 
@@ -159,9 +155,9 @@ def _check_svg_dependencies(path: Path, content: bytes) -> None:
         for attr, value in element.attrib.items():
             if tag != "a" and attr.rsplit("}", 1)[-1] == "href" and value.strip():
                 references.add(value.strip())
-            references.update(re.findall(r"""url\(\s*['"]?([^'")\s]+)""", value, flags=re.I))
+            references.update(re.findall(r"""url\(\s*['\"]?([^'\")\s]+)""", value, flags=re.I))
         if tag == "style" and element.text:
-            references.update(re.findall(r"""url\(\s*['"]?([^'")\s]+)""", element.text, flags=re.I))
+            references.update(re.findall(r"""url\(\s*['\"]?([^'\")\s]+)""", element.text, flags=re.I))
             if "@import" in element.text.lower():
                 raise ValueError(f"SVG image {path.name} imports CSS. Inline the CSS or export the figure as PNG.")
 
@@ -176,7 +172,7 @@ def _check_svg_dependencies(path: Path, content: bytes) -> None:
 def embed_local_media(html_body: str, base_dir: Path) -> str:
     """Embed images referenced by the HTML using the Markdown directory."""
     attribute = re.compile(
-        r'(<(?:img|image|use)\b[^>]*?\b(?:src|href|xlink:href)\s*=\s*)(["\'])(.*?)\2',
+        r'(<(?:img|image|use)\b[^>]*?\b(?:src|href|xlink:href)\s*=\s*)([\'"])(.*?)\2',
         flags=re.IGNORECASE | re.DOTALL,
     )
 
@@ -297,7 +293,9 @@ class ReadingOutline(HTMLParser):
         return "\n".join(groups)
 
 
-def build_html(report_title: str, meta_line: str, html_body: str) -> str:
+def build_html(
+    report_title: str, meta_line: str, html_body: str, *, panorama_html: str | None = None
+) -> str:
     css = DEFAULT_CSS.read_text(encoding="utf-8")
     if "HEADER_TEXT" not in css:
         raise RuntimeError(f"Missing HEADER_TEXT placeholder in {DEFAULT_CSS}")
@@ -317,9 +315,31 @@ def build_html(report_title: str, meta_line: str, html_body: str) -> str:
         if dates.strip():
             cover.append(f'<p class="date">{html.escape(dates.strip())}</p>')
     outline = ReadingOutline(html_body)
+
+    if panorama_html is not None:
+        escaped_pano = panorama_html.replace("</script>", "<\\/script>")
+        mode_switch = (
+            '<div class="mode-switch" hidden role="tablist" aria-label="阅读模式">'
+            '<button type="button" class="mode-btn" data-mode="panorama" aria-selected="false">全景图</button>'
+            '<button type="button" class="mode-btn active" data-mode="report" aria-selected="true">完整报告</button>'
+            '</div>'
+        )
+        panorama_stage = '<section class="pano-stage" id="panoStage" hidden><iframe id="panoFrame" title="XYZ 全景图"></iframe></section>'
+        panorama_data = f'<script type="text/plain" id="panorama-doc">{escaped_pano}</script>'
+    else:
+        mode_switch = "<div></div>"
+        panorama_stage = ""
+        panorama_data = ""
+
     return Template(REPORT_FRAME.read_text(encoding="utf-8")).substitute(
-        title=html.escape(report_title), css=css, cover="\n".join(cover),
-        toc=outline.toc(), body=outline.body(),
+        title=html.escape(report_title),
+        css=css,
+        cover="\n".join(cover),
+        toc=outline.toc(),
+        body=outline.body(),
+        mode_switch=mode_switch,
+        panorama_stage=panorama_stage,
+        panorama_data=panorama_data,
     )
 
 
@@ -344,7 +364,7 @@ def collect_dependencies(html_body: str, base: Path) -> tuple[set[Path], list[st
     return dependencies, remote
 
 
-def with_panorama_link(document: str, xyz_hash: str) -> str:
+def with_panorama_anchors(document: str, xyz_hash: str) -> str:
     claims = re.search(
         r'(<h3\b[^>]*>(?:<span class="heading-number">[^<]*</span>)?\s*A2\b[^<]*</h3>\s*(?:<div\b[^>]*>\s*)?<table\b[^>]*>)(.*?)(</table>(?:\s*</div>)?)',
         document, re.S,
@@ -356,9 +376,7 @@ def with_panorama_link(document: str, xyz_hash: str) -> str:
         lambda match: f'<tr id="claim-{match[2]}">{match[1]}',
         claims[2],
     )
-    link = '<p><a href="panorama.html">查看 XYZ 全景图</a></p>'
     document = document[:claims.start(2)] + rows + document[claims.start(3):]
-    document = document.replace('</header><div id="reading"', link + '</header><div id="reading"', 1)
     return document.replace("</head>", f'<meta name="xyz-sha256" content="{xyz_hash}">\n</head>', 1)
 
 
@@ -392,6 +410,7 @@ def build_report(
     dependencies, remote = collect_dependencies(html_body, source.parent)
     expected_inputs = {path: sha256(path) for path in dependencies}
     expected_inputs[source] = source_hash
+    rendered_panorama: str | None = None
     if xyz is not None:
         xyz = xyz.resolve()
         if xyz == output.resolve():
@@ -404,12 +423,15 @@ def build_report(
             PANORAMA_TEMPLATE: sha256(PANORAMA_TEMPLATE),
             SKILL_DIR / "scripts" / "build_panorama.py": sha256(SKILL_DIR / "scripts" / "build_panorama.py"),
         })
+        rendered_panorama = render_panorama(xyz_data, expected_inputs[xyz])
+
     html_body = embed_local_media(html_body, source.parent)
     document, _, _ = linkify_html(
-        build_html(title, metadata, html_body), source_dir=source.parent, output_dir=output.parent
+        build_html(title, metadata, html_body, panorama_html=rendered_panorama),
+        source_dir=source.parent, output_dir=output.parent,
     )
     if xyz is not None:
-        document = with_panorama_link(document, expected_inputs[xyz])
+        document = with_panorama_anchors(document, expected_inputs[xyz])
     errors = validate_html_links(document)
     if errors:
         raise ValueError("\n".join(errors))
@@ -417,23 +439,19 @@ def build_report(
         print("[WARN] Remote images need a network connection. Check them in the browser.")
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    # Stage both files before publishing and exclude overlapping writes to the same pair.
     lock = output.with_name(f".{output.name}.lock")
     with TemporaryDirectory(prefix=".report-build-", dir=output.parent) as directory:
         work = Path(directory)
         staged = work / output.name
         staged.write_text(document, encoding="utf-8")
-        if companion:
-            (work / panorama.name).write_text(
-                render_panorama(xyz_data, expected_inputs[xyz]), encoding="utf-8", newline="\n"
-            )
+        if companion and rendered_panorama is not None:
+            (work / panorama.name).write_text(rendered_panorama, encoding="utf-8", newline="\n")
         try:
             lock.touch(exist_ok=False)
         except FileExistsError as exc:
             raise RuntimeError(f"Build lock exists: {lock}. Remove it only if no build is running.") from exc
         try:
             write_manifest(source, staged, sorted(dependencies), remote, expected_inputs)
-            # Preserve the previous revision if an existing output cannot be replaced.
             backups = {}
             for target in destinations:
                 if target.exists():
@@ -461,6 +479,7 @@ def main() -> int:
     parser.add_argument("input", type=Path, help="Input Markdown report")
     parser.add_argument("--output-dir", type=Path, help="Default: Markdown directory")
     parser.add_argument("--require-xyz", action="store_true", help="Check the order of the analysis chapters")
+    parser.add_argument("--split-panorama", action="store_true", help="Also write a standalone panorama.html beside output.html")
     parser.add_argument("--formats", nargs="+", choices=("html",), help=argparse.SUPPRESS)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--xyz", type=Path, help="XYZ data file (default: xyz.json beside the report)")
@@ -474,15 +493,15 @@ def main() -> int:
         if not args.report_only:
             xyz = args.xyz.expanduser().resolve() if args.xyz else source.with_name("xyz.json")
             if not xyz.is_file():
-                raise ValueError(f"XYZ data is required for paired delivery: {xyz}")
-        build_report(source, output, require_xyz=args.require_xyz, xyz=xyz, companion=xyz is not None)
+                raise ValueError(f"XYZ data is required for panorama delivery: {xyz}")
+        build_report(source, output, require_xyz=args.require_xyz, xyz=xyz, companion=bool(args.split_panorama and xyz is not None))
     except (OSError, ValueError, RuntimeError) as exc:
         print(f"[ERROR] {exc}")
         return 1
 
-    print(f"[OK] HTML built and validated: {output}")
-    if xyz is not None:
-        print(f"[OK] Paired panorama built: {output_dir / 'panorama.html'}")
+    print(f"[OK] Single-file HTML built and validated: {output}")
+    if args.split_panorama and xyz is not None:
+        print(f"[OK] Standalone panorama built: {output_dir / 'panorama.html'}")
     return 0
 
 

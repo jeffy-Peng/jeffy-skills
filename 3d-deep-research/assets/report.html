@@ -8,32 +8,106 @@
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner">
-<a class="brand" href="#hero"><span class="brand-mark" aria-hidden="true">研</span>深度研究</a>
-<button type="button" class="print-button">打印 / PDF</button>
+<div class="brand">$title</div>
+$mode_switch
+<div class="topbar-actions"><button type="button" class="print-button">打印 / PDF</button></div>
 </div></header>
-<div class="layout">
+$panorama_stage
+<div class="layout" id="reportLayout">
 <aside class="sidebar" aria-label="报告目录"><p class="sidebar-title">目录</p><nav class="toc" aria-label="章节跳转">$toc</nav></aside>
 <main><details class="mobile-toc"><summary>报告目录</summary><nav class="toc" aria-label="章节跳转">$toc</nav></details>
 <article class="report"><header class="cover" id="hero">$cover</header><div id="reading" class="reading">$body</div></article></main>
 </div>
+$panorama_data
 <script>
-document.querySelector('.print-button').addEventListener('click',()=>window.print());
+const panoStage=document.getElementById('panoStage');
+const panoFrame=document.getElementById('panoFrame');
+const panoDoc=document.getElementById('panorama-doc');
+const reportLayout=document.getElementById('reportLayout');
+const modeBtns=[...document.querySelectorAll('.mode-btn[data-mode]')];
+let panoReady=false;
+function setMode(mode){
+  if(!panoStage||!panoReady)return;
+  const isPano=mode==='panorama';
+  document.body.classList.toggle('mode-panorama',isPano);
+  panoStage.hidden=!isPano;
+  if(reportLayout)reportLayout.hidden=isPano;
+  for(const b of modeBtns){
+    const on=b.dataset.mode===mode;
+    b.classList.toggle('active',on);
+    b.setAttribute('aria-selected',String(on));
+  }
+}
+function jumpToReportAnchor(id){
+  if(!id)return false;
+  const target=document.getElementById(id);
+  if(!target||(reportLayout&&!reportLayout.contains(target)))return false;
+  setMode('report');
+  requestAnimationFrame(()=>{
+    target.scrollIntoView({behavior:'smooth',block:'center'});
+    target.classList.remove('anchor-hit');
+    void target.offsetWidth;
+    target.classList.add('anchor-hit');
+    setTimeout(()=>target.classList.remove('anchor-hit'),2200);
+  });
+  return true;
+}
+function syncHashRoute(){
+  const raw=(location.hash||'').replace(/^#/,'');
+  if(!raw)return false;
+  if(raw==='panorama'){setMode('panorama');return true;}
+  return jumpToReportAnchor(decodeURIComponent(raw));
+}
+if(panoStage&&panoFrame&&panoDoc){
+  try{
+    panoFrame.srcdoc=panoDoc.textContent.replace(/<\\\/script>/g,'<'+'/script>');
+    panoStage.style.visibility='hidden';
+    panoStage.hidden=false;
+  }catch(err){
+    panoReady=false;
+    panoStage.hidden=true;
+    if(reportLayout)reportLayout.hidden=false;
+  }
+}
+for(const b of modeBtns)b.addEventListener('click',()=>setMode(b.dataset.mode));
+window.addEventListener('hashchange',syncHashRoute);
+window.addEventListener('message',e=>{
+  const d=e.data;
+  if(!panoFrame||e.source!==panoFrame.contentWindow||!d||typeof d!=='object')return;
+  if(d.type==='pano-ready'&&!panoReady){
+    panoReady=true;
+    panoStage.style.visibility='';
+    document.querySelector('.mode-switch').hidden=false;
+    if(!syncHashRoute())setMode('panorama');
+    return;
+  }
+  if(d.type==='pano-view'){
+    setMode(d.mode==='report'?'report':'panorama');
+  }else if(d.type==='pano-jump'&&d.hash){
+    jumpToReportAnchor(d.hash);
+  }
+});
+document.querySelector('.print-button').addEventListener('click',()=>{
+  if(panoStage&&panoReady)setMode('report');
+  setTimeout(()=>window.print(),60);
+});
 const navLinks=[...document.querySelectorAll('.toc a')];
 const headings=[...document.querySelectorAll('#reading [data-outline]')];
 function mark(id){
- for(const a of navLinks){
-   if(a.hash==='#'+id){a.setAttribute('aria-current','location');a.closest('details').open=true;}
-   else a.removeAttribute('aria-current');
- }
+  for(const a of navLinks){
+    if(a.hash==='#'+id){a.setAttribute('aria-current','location');a.closest('details').open=true;}
+    else a.removeAttribute('aria-current');
+  }
 }
 function current(){
- let selected=headings[0];
- for(const h of headings){if(h.getBoundingClientRect().top<=155)selected=h;else break;}
- if(selected)mark(selected.id);
+  if(reportLayout&&reportLayout.hidden)return;
+  let selected=headings[0];
+  for(const h of headings){if(h.getBoundingClientRect().top<=155)selected=h;else break;}
+  if(selected)mark(selected.id);
 }
 for(const a of navLinks)a.addEventListener('click',()=>{
- mark(a.hash.slice(1));
- const menu=a.closest('.mobile-toc');if(menu)menu.open=false;
+  mark(a.hash.slice(1));
+  const menu=a.closest('.mobile-toc');if(menu)menu.open=false;
 });
 let pending=false;
 window.addEventListener('scroll',()=>{if(!pending){pending=true;requestAnimationFrame(()=>{current();pending=false;});}},{passive:true});
