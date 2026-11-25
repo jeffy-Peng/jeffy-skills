@@ -19,6 +19,10 @@ from validate_report import (
 TEMPLATE = Path(__file__).resolve().parent.parent / "assets" / "panorama-template.html"
 NODE_ID = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,39}")
 KINDS = {"推动", "制约", "待查"}
+EMBEDDED_PANORAMA = re.compile(
+    r'<script\s+type="text/plain"\s+id="panorama-doc">(.*?)</script>',
+    re.S,
+)
 
 
 def require(ok: bool, message: str) -> None:
@@ -121,7 +125,7 @@ def load_panorama(raw: bytes, report: str) -> dict:
         ))
 
     lines = [line.strip() for line in report.splitlines() if line.strip()]
-    meta = re.fullmatch(r">\s*研究问题\s*[：:]\s*(.+?)\s*\|\s*资料截止\s*[：:]\s*(\d{4}-\d{2}-\d{2})\s*\|.*", lines[1] if len(lines) > 1 else "")
+    meta = re.fullmatch(r">\s*研究问题\s*[:：]\s*(.+?)\s*\|\s*资料截止\s*[:：]\s*(\d{4}-\d{2}-\d{2})\s*\|.*", lines[1] if len(lines) > 1 else "")
     require(bool(meta), "报告缺少研究问题或资料截止日")
     return dict(title=_plain_text(lines[0].lstrip("#")), question=meta[1], cutoff=meta[2], mode=mode,
                 events=list(events.values()))
@@ -149,14 +153,14 @@ def fallback(data: dict) -> str:
         sections.append(f"<section><h3>{html.escape(heading)}</h3>")
         sections.append(p(event["detail"]) + f'<p>{citation_links(event["cites"])}</p>')
         for factor in event["factors"]:
-            sections.append(entry(factor, "Y · "+factor["name"], factor["kind"]+"。"+factor["detail"]))
+            sections.append(entry(factor, "Y · " + factor["name"], factor["kind"] + "。" + factor["detail"]))
         names = {f["id"]: f["name"] for f in event["factors"]}
         for impact in event["impacts"]:
             title = "Z · " + ("待验证 · " if impact["pending"] else "") + impact["result"]
             chain = " → ".join(impact["path"])
             description = "、".join(names[fid] for fid in impact["factors"]) + " → " + chain
             sections.append(entry(impact, title, description, impact["claim"]))
-            sections.append(p("成立条件　"+impact["condition"]))
+            sections.append(p("成立条件 " + impact["condition"]))
             if impact["evidence"]:
                 sections.append(p(impact["evidence"]))
         sections.append("</section>")
@@ -164,8 +168,8 @@ def fallback(data: dict) -> str:
 
 
 def drawing_data(data: dict) -> dict:
-    """Project the evidence-bound data onto the original PR #48 isometric camera."""
-    palette = ("#5a6b7a", "#6b7a5e", "#8a6a52", "#7a5f66", "#4f6b6b", "#8c877a")
+    """Project the evidence-bound data onto the isometric camera."""
+    palette = ("#3b5b76", "#4b6e55", "#96613e", "#7e4f63", "#2f6c6c", "#8a7b4c", "#5f536e")
     directions = {"推动": 1, "制约": -1, "待查": 0}
     xs, impacts, series = [], [], {}
     timeline = data["mode"] == "timeline"
@@ -208,38 +212,70 @@ def render(data: dict, xyz_hash: str) -> str:
     return re.sub(r"@@([A-Z]+)@@", lambda match: replacements[match[1]], template)
 
 
+def _extract_embedded_panorama(report_html_text: str) -> str:
+    match = EMBEDDED_PANORAMA.search(report_html_text)
+    require(match is not None, "报告 HTML 缺少内嵌全景图，请使用 build_report.py 重建")
+    return match.group(1).replace("<\\/script>", "</script>")
+
+
+def _verify_report_anchors(report_html_text: str, data: dict) -> None:
+    for event in data["events"]:
+        for cite in event["cites"]:
+            require(f'id="src-{cite}"' in report_html_text, f"报告 HTML 缺少来源锚点：src-{cite}")
+        for factor in event["factors"]:
+            for cite in factor["cites"]:
+                require(f'id="src-{cite}"' in report_html_text, f"报告 HTML 缺少来源锚点：src-{cite}")
+        for impact in event["impacts"]:
+            for cite in impact["cites"]:
+                require(f'id="src-{cite}"' in report_html_text, f"报告 HTML 缺少来源锚点：src-{cite}")
+            if impact["claim"]:
+                require(f'id="claim-{impact["claim"]}"' in report_html_text,
+                        f'报告 HTML 缺少判断锚点：claim-{impact["claim"]}')
+
+
 def build(source: Path, report: Path, output: Path, *, check: bool = False) -> None:
-    report_html = output.parent / "output.html"
-    require(output.name == "panorama.html", "输出文件名必须是 panorama.html，以便报告打开全景图")
+    is_single_file_check = check and output.name == "output.html"
+    report_html = output if is_single_file_check else output.parent / "output.html"
+    if not is_single_file_check:
+        require(output.name == "panorama.html", "输出文件名必须是 panorama.html（或 --check 时指定 output.html）")
     require(output not in {source, report}, "输出文件不能覆盖输入")
-    require(not output.exists() or not any(output.samefile(path) for path in (source,report)), "输出文件不能覆盖输入")
+    require(not output.exists() or not any(output.samefile(path) for path in (source, report)), "输出文件不能覆盖输入")
+
     report_bytes = report.read_bytes()
     report_text = report_bytes.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
     report_hash = hashlib.sha256(report_bytes).hexdigest()
     raw = source.read_bytes()
     xyz_hash = hashlib.sha256(raw).hexdigest()
+
     errors, _ = validate_markdown(report_text, report.parent)
     require(not errors, "\n".join(errors))
     data = load_panorama(raw, report_text)
     errors, _ = validate_manifest(report, report_html)
     require(not errors, "\n".join(errors))
     require(report_hash == sha256(report), "报告源稿已变化")
+
     manifest = json.loads(manifest_path(report_html).read_text(encoding="utf-8"))
     tracked = any((report.parent / dependency["path"]).resolve() == source and dependency["sha256"] == xyz_hash
                   for dependency in manifest["dependencies"])
     require(tracked, "报告没有绑定此版本 XYZ 数据，请先用 build_report.py 重建报告")
+
     built_report = report_html.read_text(encoding="utf-8")
-    require('href="panorama.html"' in built_report and f'<meta name="xyz-sha256" content="{xyz_hash}">' in built_report,
+    require(f'<meta name="xyz-sha256" content="{xyz_hash}">' in built_report,
             "报告 HTML 未绑定此版本全景图，请重建报告")
+    _verify_report_anchors(built_report, data)
+
     page = render(data, xyz_hash)
     if check:
-        require(output.read_text(encoding="utf-8") == page, "全景图与当前 XYZ 数据或报告不一致，请重建")
+        embedded = _extract_embedded_panorama(built_report)
+        require(embedded == page, "内嵌全景图与当前 XYZ 数据或报告不一致，请重建")
+        if not is_single_file_check:
+            require(output.read_text(encoding="utf-8") == page, "独立全景图与当前 XYZ 数据或报告不一致，请重建")
     else:
         with TemporaryDirectory(prefix=".panorama-build-", dir=output.parent) as work:
             staged = Path(work) / output.name
             staged.write_text(page, encoding="utf-8", newline="\n")
             fresh_errors, _ = validate_manifest(report, report_html)
-            require(not fresh_errors and sha256(source)==xyz_hash and sha256(report)==report_hash
+            require(not fresh_errors and sha256(source) == xyz_hash and sha256(report) == report_hash
                     and json.loads(manifest_path(report_html).read_text(encoding="utf-8")) == manifest,
                     "构建期间数据或报告已修订，请重建")
             staged.replace(output)
@@ -251,9 +287,10 @@ def main() -> int:
     parser.add_argument("data", type=Path)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("-o", "--output", type=Path)
-    parser.add_argument("--check", action="store_true", help="联合验收已生成的报告与全景图")
+    parser.add_argument("--check", action="store_true", help="联合验收已生成的单文件报告（或独立全景图）")
     args = parser.parse_args()
-    output = args.output or args.report.with_name("panorama.html")
+    default_name = "output.html" if args.check else "panorama.html"
+    output = args.output or args.report.with_name(default_name)
     try:
         build(args.data.resolve(), args.report.resolve(), output.resolve(), check=args.check)
     except (OSError, ValueError) as exc:

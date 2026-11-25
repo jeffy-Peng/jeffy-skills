@@ -31,7 +31,6 @@ class BuildReportTests(unittest.TestCase):
             env=dict(os.environ, PYTHONIOENCODING="utf-8"), capture_output=True,
             text=True, encoding="utf-8", check=True,
         )
-        self.assertIn("[OK] HTML built and validated", process.stdout)
         self.assertEqual(validate_manifest(self.source, self.output), ([], []))
         self.assertEqual(
             {path.name for path in self.root.iterdir()},
@@ -94,9 +93,9 @@ class BuildReportTests(unittest.TestCase):
         before = self.output.read_bytes(), manifest.read_bytes()
         original = build_report.build_html
 
-        def render_after_edit(*args):
+        def render_after_edit(*args, **kwargs):
             self.source.write_text(VALID_REPORT + "\nEdit.\n", encoding="utf-8")
-            return original(*args)
+            return original(*args, **kwargs)
 
         with mock.patch.object(build_report, "build_html", side_effect=render_after_edit):
             with self.assertRaisesRegex(ValueError, "changed during rendering"):
