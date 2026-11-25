@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XYZ 全景图 · @@TITLE@@</title>
+<meta name="xyz-sha256" content="@@REVISION@@">
+<style>
+:root{
+  --accent:#3a3b38; --accent-ink:#222321; --accent-soft:#e7e7e3; --soft:#eeefeb;
+  --rule:#d8d9d4; --muted:#5f615b; --ink:#222321; --text:#363832;
+  --surface:#fdfdfa; --gutter:#efefec;
+  --f1:#5a6b7a; --f2:#6b7a5e; --f3:#8a6a52; --f4:#7a5f66; --f5:#4f6b6b; --f6:#8c877a; --f7:#6f6357;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{
+  background:var(--gutter); color:var(--text);
+  font-family:Georgia,"Noto Serif SC","Source Han Serif SC","Songti SC",SimSun,serif;
+  font-size:14px; line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+button{font:inherit; color:inherit}
+h1,h2,h3,p,dl,dd{margin:0}
+[hidden]{display:none!important}
+
+/* 模式按钮 */
+.seg{font-size:11px; padding:6px 9px; border:1px solid var(--rule); background:#fff; color:var(--accent); border-radius:7px; cursor:pointer}
+.seg.active{background:var(--accent); border-color:var(--accent); color:#fff}
+
+/* 布局 */
+.app{position:relative; height:100vh; transition:padding-right .22s ease}
+body.drawer-open .app{padding-right:380px}
+.center{position:relative; height:100%}
+.stage{position:absolute; inset:0; background:var(--surface); overflow:hidden; touch-action:none}
+.plot{position:absolute; inset:0; animation:plotIn .9s cubic-bezier(.18,.7,.25,1) both}
+@keyframes plotIn{from{opacity:0; transform:scale(.992)} to{opacity:1; transform:none}}
+.plot svg{display:block; width:100%; height:100%; touch-action:none; user-select:none}
+
+/* 右侧抽屉 */
+.drawer{position:fixed; top:0; right:0; bottom:0; width:380px; z-index:30; pointer-events:none; overflow:hidden}
+.drawer-panel{position:absolute; top:0; right:0; bottom:0; width:100%; background:var(--surface); border-left:1px solid var(--rule); box-shadow:-10px 0 30px rgba(34,35,33,.08); overflow:auto; padding:16px 18px 28px; transform:translateX(100%); transition:transform .2s ease; pointer-events:auto; scrollbar-width:none}
+.drawer-panel::-webkit-scrollbar{width:0; height:0}
+.drawer.open .drawer-panel{transform:translateX(0)}
+.drawer-tab{position:fixed; right:0; top:50%; transform:translateY(-50%); z-index:31; writing-mode:vertical-rl; letter-spacing:.16em; font-size:11.5px; padding:10px 7px; background:var(--surface); border:1px solid var(--rule); border-right:0; border-radius:8px 0 0 8px; cursor:pointer; color:var(--accent-ink); pointer-events:auto; transition:right .2s ease; box-shadow:-4px 0 12px rgba(34,35,33,.06)}
+.drawer.open .drawer-tab{right:380px}
+.drawer-pick{padding-bottom:2px}
+.pick-tabs{display:grid; grid-template-columns:1fr 1fr; gap:4px; border-bottom:1px solid var(--rule); margin-bottom:6px}
+.pick-tab{font:inherit; font-size:11.5px; padding:7px 6px; background:none; border:0; border-bottom:2px solid transparent; color:var(--muted); cursor:pointer; letter-spacing:.04em}
+.pick-tab:hover{color:var(--accent-ink)}
+.pick-tab.active{color:var(--accent-ink); border-bottom-color:var(--accent); font-weight:600}
+.detail:not(:empty){margin-top:14px; border-top:1px solid var(--rule); padding-top:14px}
+
+/* 图表上的面板 */
+.panel-area{position:absolute; inset:0; z-index:8; pointer-events:none}
+.panel-area > *{pointer-events:auto}
+.pops{position:absolute; top:10px; display:flex; flex-direction:column; gap:6px}
+.pops-r{right:10px; width:360px; align-items:flex-end}
+.btnrow{display:flex; gap:6px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
+.sep{width:1px; height:16px; background:var(--rule); margin:0 2px}
+.corner-label{position:absolute; top:10px; left:12px; z-index:7; font-size:10.5px; letter-spacing:.06em; color:var(--muted); background:#fdfdfad9; padding:3px 8px; border-radius:5px; pointer-events:none}
+.pop-btn{display:inline-flex; align-items:center; gap:6px; padding:7px 10px; font:inherit; font-size:11.5px; color:var(--accent-ink); background:#fdfdfaf2; border:1px solid var(--rule); border-radius:8px; cursor:pointer; backdrop-filter:blur(8px)}
+.pop-btn:hover{background:#fff}
+.pop-btn,.seg,.chip,.btn{transition:background .15s ease, color .15s ease, border-color .15s ease, transform .12s ease}
+.pop-btn:active,.seg:active,.chip:active,.btn:active{transform:translateY(1px) scale(.985)}
+.pop-btn[aria-expanded="true"]{background:var(--accent); border-color:var(--accent); color:#fff}
+.pop-btn[aria-expanded="true"] .caret{color:#fff; transform:rotate(180deg)}
+.caret{font-size:10px; color:var(--muted); transition:transform .15s}
+.pop-body{display:none; width:100%; padding:10px 11px 11px; background:#fdfdfaf7; border:1px solid var(--rule); border-radius:8px; box-shadow:0 10px 28px rgba(34,35,33,.10); max-height:calc(64vh - 96px); overflow:auto}
+.pop-body.open{display:block; animation:popIn .18s ease both}
+@keyframes popIn{from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none}}
+.detail.swap{animation:detailIn .26s ease both}
+@keyframes detailIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.drawer-pick .list{animation:detailIn .22s ease both}
+.pops .eyebrow{margin:0 0 6px}
+.pops .eyebrow.tight{margin-top:12px}
+.pops .row-btns{gap:5px}
+.pops .btn{font-size:11px; padding:5px 6px}
+.pops .slider{margin-top:12px}
+.pops .checks{gap:6px; font-size:11.5px; flex-direction:column; align-items:flex-start}
+.pops .chip{font-size:11px}
+.pops .btn.wide{margin-top:10px}
+
+/* 卡片内排版 */
+.eyebrow{margin:0 0 7px; font-size:11px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase}
+.eyebrow.tight{margin-top:14px}
+.question{font-size:17px; line-height:1.45; font-weight:600; color:var(--accent-ink); letter-spacing:-.012em; margin-bottom:8px}
+.meta{font-size:11.5px; color:var(--muted); line-height:1.6}
+.prose{font-size:12.5px; line-height:1.8; text-indent:2em; color:#403f3a; margin-top:9px}
+
+/* 控件 */
+.row-btns{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+.btn{font-size:11.5px; padding:6px 8px; border:1px solid var(--rule); background:#fff; color:var(--accent); border-radius:7px; cursor:pointer; text-align:center; white-space:nowrap}
+.btn:hover{background:var(--accent-soft)}
+.btn.active{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn.wide{width:100%; margin-top:12px}
+.slider{display:block; margin-top:14px}
+.slider span{display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); margin-bottom:6px}
+.slider i{font-style:normal; color:var(--accent)}
+input[type=range]{width:100%; accent-color:#3a3b38; margin:0}
+.checks{display:flex; flex-wrap:wrap; gap:8px 14px; font-size:12px; color:var(--text)}
+.checks label{display:flex; align-items:center; gap:5px; cursor:pointer}
+input[type=checkbox]{accent-color:#3a3b38; margin:0}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{font-size:11.5px; padding:4px 9px; border:1px solid var(--rule); background:#fff; color:var(--muted); border-radius:999px; cursor:pointer}
+.chip.active{background:var(--accent-soft); border-color:#b9bab4; color:var(--accent-ink)}
+.chip:hover{color:var(--accent-ink)}
+
+/* 列表 */
+.list{display:flex; flex-direction:column}
+.row{display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:8px; align-items:center; padding:6px 5px; border-top:1px solid var(--rule); background:none; border-left:0; border-right:0; border-bottom:0; cursor:pointer; text-align:left; width:100%; transition:background .15s ease}
+.row:first-child{border-top:0}
+.row:hover{background:var(--accent-soft)}
+.row.sel{background:var(--accent-soft); box-shadow:inset 2px 0 0 var(--accent)}
+.row .code{font-size:10.5px; letter-spacing:.04em; color:#fff; background:var(--accent); border-radius:4px; text-align:center; padding:2px 0}
+.row .name{font-size:12.5px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.row .sub{display:block; font-size:10.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.row .tail{font-size:10px; color:var(--muted); white-space:nowrap}
+.swatch{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px; vertical-align:middle}
+
+/* 图例，贴在图的底部中间 */
+.legend{position:absolute; left:50%; bottom:10px; transform:translateX(-50%); z-index:7; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:4px 14px; max-width:calc(100% - 40px); padding:4px 10px; background:#fdfdfad9; border-radius:6px; font-size:10.5px; color:var(--muted); line-height:1.4; pointer-events:none}
+.legend .lg{display:inline-flex; align-items:center; gap:5px}
+.legend .lg-n{color:var(--muted)}
+.legend svg{display:block; width:20px; height:14px}
+.legend b{color:var(--ink); font-weight:600}
+
+/* 舞台 */
+.hint{position:absolute; left:50%; bottom:36px; transform:translateX(-50%); font-size:10.5px; color:var(--muted); pointer-events:none; background:#fdfdfad9; padding:3px 7px; border-radius:5px; white-space:nowrap}
+.tooltip{position:absolute; z-index:9; max-width:236px; background:#fdfdfaf7; border:1px solid var(--rule); border-left:3px solid var(--accent); padding:8px 10px; font-size:11.5px; line-height:1.55; color:var(--text); pointer-events:none; box-shadow:0 6px 20px rgba(34,35,33,.10)}
+.tooltip .t-name{display:block; font-weight:600; color:var(--accent-ink); font-size:12px; margin-bottom:2px}
+.tooltip .t-meta{color:var(--muted)}
+
+/* 详情 */
+.detail h2{font-size:18px; line-height:1.45; color:var(--accent-ink); letter-spacing:-.012em; margin:2px 0 8px; font-weight:600}
+.detail h3{font-size:11px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; margin:18px 0 7px; font-weight:600}
+.detail p{font-size:12.5px; line-height:1.8}
+.detail .lead{font-size:13px; line-height:1.85; text-indent:2em; color:#3f3e39}
+.detail .hintline{font-size:11.5px; color:var(--muted); line-height:1.7; margin-top:10px}
+.kv{display:grid; grid-template-columns:62px minmax(0,1fr); gap:5px 10px; font-size:12px; line-height:1.65; margin:10px 0 4px}
+.kv dt{color:var(--muted); font-size:11px; padding-top:2px}
+.kv dd{color:var(--text)}
+.chip-row{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 2px}
+.pill{font-size:10.5px; padding:2px 8px; border-radius:999px; border:1px solid var(--rule); color:var(--muted); white-space:nowrap}
+.pill.push{background:#3a3b38; border-color:#3a3b38; color:#fff}
+.pill.con{background:#fff; border-color:#9a9b95; color:#3a3b38}
+.pill.pend{border-style:dashed; color:#8a7f5f}
+.pill.core{border-color:#3a3b38; color:#222321}
+.mini{width:100%; border-collapse:collapse; font-size:11.5px; margin:6px 0 2px}
+.mini th{text-align:left; font-weight:600; color:var(--muted); font-size:10.5px; letter-spacing:.04em; border-bottom:1px solid var(--rule); padding:4px 5px}
+.mini td{padding:5px; border-bottom:1px solid var(--soft); vertical-align:top; line-height:1.55}
+.mini tr:last-child td{border-bottom:0}
+.act-btn{display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--accent); border:1px solid var(--rule); background:#fff; border-radius:6px; padding:3px 8px; cursor:pointer; margin-top:10px}
+.act-btn:hover{background:var(--accent-soft)}
+.cases{list-style:none; padding:0; margin:6px 0 0; display:grid; gap:6px}
+.cases li{display:grid; grid-template-columns:96px minmax(0,1fr); gap:8px; font-size:11.5px; line-height:1.6; padding-bottom:6px; border-bottom:1px solid var(--soft)}
+.cases li:last-child{border-bottom:0; padding-bottom:0}
+.cases .k{color:var(--accent-ink); font-weight:600}
+.cases .v{color:var(--muted)}
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0 4px}
+.stat{border:1px solid var(--rule); padding:6px 8px; background:#fcfcfa}
+.stat b{display:block; font-size:17px; line-height:1.2; color:var(--accent-ink); font-weight:600}
+.stat span{font-size:10px; color:var(--muted); letter-spacing:.04em}
+.link-row{display:block; width:100%; text-align:left; background:none; border:0; border-bottom:1px solid var(--soft); padding:6px 2px; font-size:12px; cursor:pointer; color:var(--ink); line-height:1.6}
+.link-row:hover{background:var(--accent-soft)}
+.link-row:last-child{border-bottom:0}
+
+/* 表格视图 */
+table.grid{width:100%; border-collapse:collapse; font-size:12px; line-height:1.65; margin-bottom:26px}
+table.grid th{text-align:left; font-size:10.5px; letter-spacing:.06em; color:var(--muted); font-weight:600; border-bottom:1px solid #b9bab4; padding:6px 7px; vertical-align:bottom}
+table.grid td{border-bottom:1px solid var(--rule); padding:8px 7px; vertical-align:top}
+table.grid td.x-cell{width:118px; white-space:nowrap}
+table.grid td.z-cell{width:220px}
+table.grid .xh{font-weight:600; color:var(--accent-ink)}
+table.grid .sm{font-size:11px; color:var(--muted)}
+table.matrix td.cell{text-align:center; font-variant-numeric:tabular-nums; white-space:nowrap}
+table.matrix td.cell.push{color:#2f3b34}
+table.matrix td.cell.con{color:#6b4b46}
+table.matrix td.cell.pend{color:#8a7f5f; font-size:11px}
+table.matrix td.cell.empty{color:#b9bab4}
+
+@media(max-width:1120px){
+  .drawer{width:340px}
+  .drawer.open .drawer-tab{right:340px}
+  body.drawer-open .app{padding-right:340px}
+  .pops-r{width:320px}
+}
+@media(max-width:720px){
+  .pops-r{width:240px}
+  .pop-body{max-height:calc(56vh - 96px)}
+  .hint{display:none}
+  .legend{font-size:10px; gap:3px 10px; max-width:calc(100% - 16px)}
+  .corner-label{top:44px;max-width:calc(100% - 52px)}
+  .drawer{width:92vw}
+  .drawer.open .drawer-tab{right:92vw}
+  body.drawer-open .app{padding-right:0}
+}
+html:not(.ready) .app,html:not(.ready) .drawer,html:not(.ready) .grain{display:none}
+html:not(.ready),html:not(.ready) body{height:auto;overflow:visible}
+.fallback{max-width:880px;margin:auto;padding:24px;color:var(--ink);line-height:1.7}
+.fallback section{border-top:1px solid var(--rule);margin-top:24px}
+.ready .fallback{display:none}
+.corner-label{pointer-events:auto;margin:0}
+.corner-label a,.detail a,.fallback a{color:var(--accent-ink);text-underline-offset:3px}
+.path-detail{border-top:1px solid var(--rule);margin:14px 0;padding-top:8px}
+@media print{
+  .ready .app,.ready .drawer,.ready .grain{display:none}
+  .ready .fallback{display:block}
+  html,body{height:auto;overflow:visible;background:#fff}
+}
+@media (prefers-reduced-motion:reduce){
+  .plot{animation:none; opacity:1; transform:none}
+  .pop-btn,.seg,.chip,.btn,.drawer-panel,.drawer-tab{transition:none}
+  .detail.swap{animation:none}
+}
+/* 纸面颗粒 */
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.045; filter:grayscale(1); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:140px 140px}
+</style>
+</head>
+<body>
+
+<main class="fallback">
+  <h1>@@TITLE@@ · XYZ 全景图</h1>
+  <p>@@QUESTION@@</p>
+  <p>资料截至 @@CUTOFF@@ · <a href="output.html">返回报告</a></p>
+  @@FALLBACK@@
+</main>
+<div class="app">
+  <section class="center">
+    <div class="stage" id="stage">
+      <div class="plot" id="plot"></div>
+      <p class="corner-label">@@TITLE@@ · <a href="output.html">返回报告</a></p>
+
+      <div class="panel-area">
+        <div class="pops pops-r">
+          <div class="btnrow">
+            <button type="button" class="pop-btn" data-panel="filter" aria-expanded="false" aria-controls="bodyFilter">
+              过滤<span class="caret" aria-hidden="true">▾</span>
+            </button>
+            <button type="button" class="pop-btn" data-panel="view" aria-expanded="false" aria-controls="bodyView">
+              视角<span class="caret" aria-hidden="true">▾</span>
+            </button>
+          </div>
+          <div class="pop-body" id="bodyFilter">
+            <div class="chips">
+              <button class="chip active" data-act="filter" data-filter="all">全部</button>
+              <button class="chip" data-act="filter" data-filter="push">只看推动</button>
+              <button class="chip" data-act="filter" data-filter="constraint">只看制约</button>
+            </div>
+          </div>
+          <div class="pop-body" id="bodyView">
+            <div class="row-btns">
+              <button class="btn active" data-act="view" data-preset="iso">等轴</button>
+              <button class="btn" data-act="view" data-preset="factors">因素平面</button>
+              <button class="btn" data-act="view" data-preset="impact">影响剖面</button>
+              <button class="btn" data-act="view" data-preset="top">@@TOP@@</button>
+            </div>
+            <label class="slider">
+              <span>轴距展开 <i id="spreadVal">32%</i></span>
+              <input type="range" id="spread" min="0" max="100" value="32">
+            </label>
+            <button class="btn wide" data-act="reset">复位视角与过滤</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="hint">拖拽旋转 · 滚轮缩放 · 点击节点聚焦 · 双击空白复位</p>
+      <div class="legend" id="legend"></div>
+      <div class="tooltip" id="tip" hidden></div>
+    </div>
+  </section>
+</div>
+
+<aside class="drawer" id="drawer">
+  <button type="button" class="drawer-tab" id="drawerTab" aria-expanded="false" aria-controls="drawerBody">详情</button>
+  <div class="drawer-panel" id="drawerBody" inert>
+    <div class="drawer-pick">
+      <div class="pick-tabs">
+        <button type="button" class="pick-tab active" data-pick="x">@@XNAME@@ X</button>
+        <button type="button" class="pick-tab" data-pick="y">因素 Y</button>
+      </div>
+      <div class="list" id="xlist"></div>
+      <div class="list" id="flist" hidden></div>
+    </div>
+    <div class="detail" id="detail"></div>
+  </div>
+</aside>
+
+<div class="grain" aria-hidden="true"></div>
+
+<script>
+(function(){
+'use strict';
+
+const DATA = @@DATA@@;
+
+
+/* ==========================================================================
+   派生模型
+   ========================================================================== */
+const GAP = 2.3;
+const XIDS = DATA.xs.map(x => x.id);
+const XMAP = {};
+DATA.xs.forEach((x, i) => { XMAP[x.id] = Object.assign({ i: i }, x); });
+
+const F = {};
+DATA.factors.forEach(f => {
+  F[f.id] = f;
+  f.pushCount = f.segs.filter(s => s.dir === 1).length;
+  f.conCount = f.segs.filter(s => s.dir === -1).length;
+  f.pendCount = f.segs.filter(s => s.dir === 0).length;
+  f.xs = f.segs.map(s => s.x);
+});
+const FMAP_LIST = DATA.factors;
+const IM = {};
+DATA.impacts.forEach(im => { IM[im.xid] = im; });
+const Y_LIM = 2.05;
+/* 起点相同的因素，标签按顺序上下错开 */
+const LABEL_SLOT = {};
+XIDS.forEach(xid => {
+  let n = 0;
+  DATA.factors.forEach(f => { if (f.segs[0].x === xid) LABEL_SLOT[f.id] = n++; });
+});
+
+const state = {
+  focus: null,               // {kind:'x'|'f', id}
+  filter: 'all',
+  preset: 'iso',
+  levels: { factors: true, links: true, impacts: true },
+  spread: 0.32
+};
+const view = { yaw: -0.55, pitch: 0.5, zoom: 1, panX: 0, panY: 0 };
+
+const stage = document.getElementById('stage');
+const plot  = document.getElementById('plot');
+const tipEl = document.getElementById('tip');
+const detailEl = document.getElementById('detail');
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+/* ==========================================================================
+   投影：正交相机，先绕 Z 旋转（yaw），再按俯仰角（pitch）压平
+   ========================================================================== */
+function syScale(){ return 1 + state.spread * 0.8; }
+function szScale(){ return 1 + state.spread * 0.45; }
+function wx(id){ return XMAP[id].i * GAP; }
+function yWorld(seg){
+  if (seg.dir === 0) return 0;
+  return seg.dir * 1.34 * syScale();
+}
+function zWorld(){ return 1.75 * szScale(); }
+function zX(xid){ const im = IM[xid]; return im ? zWorld() : 0; }
+/* 同一时刻同一侧的因素站位如果靠得太近，按顺序撑开到最小间距 */
+function buildDisp(){
+  const map = {};
+  DATA.xs.forEach(x => {
+    [1, -1].forEach(dir => {
+      const list = [];
+      DATA.factors.forEach(f => {
+        const s = f.segs.find(v => v.x === x.id && v.dir === dir);
+        if (s) list.push({ fid: f.id, y: yWorld(s) });
+      });
+      if (!list.length) return;
+      list.sort((a, b) => a.y - b.y);
+      const before = list.map(o => o.y);
+      const gap = 0.16 * syScale();
+      for (let i = 1; i < list.length; i++){
+        if (list[i].y - list[i - 1].y < gap) list[i].y = list[i - 1].y + gap;
+      }
+      const midA = (before[0] + before[before.length - 1]) / 2;
+      const midB = (list[0].y + list[list.length - 1].y) / 2;
+      const shift = midB - midA;
+      list.forEach(o => { map[o.fid + '@' + x.id] = o.y - shift; });
+    });
+  });
+  return map;
+}
+
+function rawProj(x, y, z){
+  const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw);
+  const sp = Math.sin(view.pitch), cp = Math.cos(view.pitch);
+  const x1 = x * cy - y * sy;
+  const y1 = x * sy + y * cy;
+  return {
+    u: x1,
+    v: -(y1 * sp + z * cp),
+    d: y1 * cp + z * sp
+  };
+}
+
+function makeCam(W, H, yFit){
+  const lastX = wx(XIDS[XIDS.length - 1]);
+  const yK = 0.12 + 0.88 * (yFit === undefined ? 1 : yFit);
+  const yLim = Y_LIM * yK * syScale();
+  const lastIm = DATA.impacts[DATA.impacts.length - 1];
+  const zLim = zWorld(lastIm) + 0.6;
+  const xs = [-2.6, lastX + 1.5];
+  const ys = [-yLim, yLim];
+  const pts = [];
+  xs.forEach(x => ys.forEach(y => {
+    pts.push([x, y, 0]);
+    pts.push([x, y, zLim]);
+  }));
+  let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+  pts.forEach(p => {
+    const r = rawProj(p[0], p[1], p[2]);
+    if (r.u < minU) minU = r.u; if (r.u > maxU) maxU = r.u;
+    if (r.v < minV) minV = r.v; if (r.v > maxV) maxV = r.v;
+  });
+  const padL = 30, padR = 48, padTop = 24, padBottom = 72;
+  const availW = Math.max(80, W - padL - padR);
+  const availH = Math.max(80, H - padTop - padBottom);
+  const s = Math.min(availW / Math.max(0.001, maxU - minU), availH / Math.max(0.001, maxV - minV)) * view.zoom;
+  return {
+    s: s,
+    ox: padL + availW / 2 - (minU + maxU) / 2 * s + view.panX,
+    oy: padTop + availH / 2 - (minV + maxV) / 2 * s + view.panY
+  };
+}
+
+/* ==========================================================================
+   透明度：筛选与聚焦共用一个计算入口
+   ========================================================================== */
+function factorAlpha(f){
+  let a = 1;
+  if (state.filter === 'push' && f.pushCount === 0) a *= 0.09;
+  if (state.filter === 'constraint' && f.conCount === 0) a *= 0.09;
+  if (state.focus){
+    if (state.focus.kind === 'f') a *= (state.focus.id === f.id ? 1 : 0.10);
+    if (state.focus.kind === 'x') a *= (f.xs.indexOf(state.focus.id) >= 0 ? 1 : 0.20);
+  }
+  return clamp(a, 0.04, 1);
+}
+function stationAlpha(seg){
+  const f = F[seg.fid];
+  let a = 1;
+  if (state.filter === 'push' && seg.dir !== 1) a *= 0.10;
+  if (state.filter === 'constraint' && seg.dir !== -1) a *= 0.10;
+  if (state.focus){
+    if (state.focus.kind === 'f') a *= (state.focus.id === f.id ? 1 : 0.08);
+    if (state.focus.kind === 'x') a *= (seg.xid === state.focus.id ? 1 : 0.12);
+  }
+  return clamp(a, 0.03, 1);
+}
+function impactAlpha(im){
+  let a = 1;
+  if (state.focus){
+    if (state.focus.kind === 'x') a = (im.xid === state.focus.id) ? 1 : 0.18;
+    else if (state.focus.kind === 'f') a = im.paths.some(path => F[state.focus.id].segs.some(seg => path.factors.includes(seg.id))) ? 1 : 0.45;
+  }
+  return a;
+}
+
+/* ==========================================================================
+   场景渲染
+   ========================================================================== */
+const stations = [];
+DATA.factors.forEach(f => {
+  f.segs.forEach(s => {
+    stations.push({ fid: f.id, xid: s.x, seg: s, dir: s.dir });
+  });
+});
+
+let raf = 0;
+function schedule(){ if (raf) return; raf = requestAnimationFrame(() => { raf = 0; renderScene(); }); }
+
+/* 状态切换时透明度逐帧逼近目标，避免硬切 */
+const ALPHA_MAP = {};
+let alphaBusy = false;
+function fade(key, target){
+  const cur = ALPHA_MAP[key];
+  if (cur === undefined){ ALPHA_MAP[key] = target; return target; }
+  const next = cur + (target - cur) * 0.3;
+  if (Math.abs(target - next) > 0.008){ ALPHA_MAP[key] = next; alphaBusy = true; return next; }
+  ALPHA_MAP[key] = target;
+  return target;
+}
+
+/* 视角缓动、拖拽惯性、滚轮平滑缩放 */
+let tween = null, fling = null, ticking = false;
+function startTween(to, ms){
+  if (reduceMotion){ Object.assign(view, to); schedule(); return; }
+  tween = { from: { yaw: view.yaw, pitch: view.pitch, zoom: view.zoom }, to: to, t0: performance.now(), ms: ms };
+  fling = null;
+  if (!ticking){ ticking = true; requestAnimationFrame(motionTick); }
+}
+function motionTick(){
+  const now = performance.now();
+  let active = false;
+  if (tween){
+    const k = Math.min(1, (now - tween.t0) / Math.max(1, tween.ms));
+    const e = 1 - Math.pow(1 - k, 3);
+    view.yaw = tween.from.yaw + (tween.to.yaw - tween.from.yaw) * e;
+    view.pitch = tween.from.pitch + (tween.to.pitch - tween.from.pitch) * e;
+    view.zoom = tween.from.zoom + (tween.to.zoom - tween.from.zoom) * e;
+    if (k >= 1) tween = null; else active = true;
+  }
+  if (fling){
+    view.yaw += fling.vy;
+    view.pitch = clamp(view.pitch + fling.vp, -0.25, 1.5);
+    fling.vy *= 0.92;
+    fling.vp *= 0.92;
+    if (Math.abs(fling.vy) + Math.abs(fling.vp) < 0.0008) fling = null; else active = true;
+  }
+  renderScene();
+  if (active) requestAnimationFrame(motionTick);
+  else ticking = false;
+}
+
+function renderScene(){
+  const W = stage.clientWidth, H = stage.clientHeight;
+  if (W < 20 || H < 20) return;
+  alphaBusy = false;
+  const layF = fade('lay:f', state.levels.factors ? 1 : 0);
+  const layL = fade('lay:l', state.levels.links ? 1 : 0);
+  const layI = fade('lay:i', state.levels.impacts ? 1 : 0);
+  const cam = makeCam(W, H, layF);
+  const P = (x, y, z) => {
+    const r = rawProj(x, y, z);
+    return [cam.ox + r.u * cam.s, cam.oy + r.v * cam.s, r.d];
+  };
+  const dpath = pts => pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+  /* 标签统一收集，最后按优先级避让放置 */
+  const labels = [];
+  const labelBoxes = [];
+  const textW = (s, size) => {
+    let w = 0;
+    for (let i = 0; i < s.length; i++) w += s.charCodeAt(i) > 255 ? size : size * 0.56;
+    return w;
+  };
+  const placeLabel = (L, text) => {
+    const w = textW(text, L.size);
+    const tries = L.weight ? [[0, 0], [0, -14], [0, 14], [0, -28], [0, 28], [-14, 0], [14, 0]] : [[0, 0], [0, -13], [0, 13], [0, -26], [0, 26]];
+    for (let k = 0; k < tries.length; k++){
+      const x = L.x + tries[k][0], y = L.y + tries[k][1];
+      const x0 = L.anchor === 'middle' ? x - w / 2 : (L.anchor === 'end' ? x - w : x);
+      const box = [x0 - 2, y - L.size * 0.85, x0 + w + 2, y + L.size * 0.3];
+      let hit = false;
+      for (let j = 0; j < labelBoxes.length; j++){
+        const b = labelBoxes[j];
+        if (!(box[2] < b[0] || box[0] > b[2] || box[3] < b[1] || box[1] > b[3])){ hit = true; break; }
+      }
+      if (!hit){ labelBoxes.push(box); return [x, y]; }
+    }
+    return null;
+  };
+  const reserveBox = (x, y, anchor, size, str) => {
+    const w = textW(str, size);
+    const x0 = anchor === 'middle' ? x - w / 2 : (anchor === 'end' ? x - w : x);
+    labelBoxes.push([x0 - 2, y - size * 0.85, x0 + w + 2, y + size * 0.3]);
+  };
+  const dispY = buildDisp();
+  const dyOf = (fid, xid) => (dispY[fid + '@' + xid] !== undefined ? dispY[fid + '@' + xid] : 0);
+
+  const lastX = wx(XIDS[XIDS.length - 1]);
+  const yLim = Y_LIM * syScale();
+  const zTop = zWorld() + 0.5;
+  const base = [];
+  const topView = view.pitch > 1.25;
+  const compact = W < 600;
+
+  /* 地面与两个参考面 */
+  const g1 = P(-2.4, -yLim, 0), g2 = P(lastX + 1.3, -yLim, 0), g3 = P(lastX + 1.3, yLim, 0), g4 = P(-2.4, yLim, 0);
+  base.push('<polygon points="' + [g1, g2, g3, g4].map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') + '" fill="#3a3b38" fill-opacity="0.02" stroke="none"/>');
+
+  const v1 = P(-1.9, 0, 0), v2 = P(lastX + 1.3, 0, 0), v3 = P(lastX + 1.3, 0, zTop), v4 = P(-1.9, 0, zTop);
+  base.push('<polygon points="' + [v1, v2, v3, v4].map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') + '" fill="#3a3b38" fill-opacity="0.014" stroke="none"/>');
+
+  /* 参考网格 */
+  DATA.xs.forEach(x => {
+    const a = P(wx(x.id), -yLim, 0), b = P(wx(x.id), yLim, 0);
+    base.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="#d8d9d4" stroke-width="1" stroke-dasharray="2 5"/>');
+  });
+  if (!topView){
+    [-1.5, -0.75, 0.75, 1.5].forEach(yv => {
+      const a = P(-2.3, yv * syScale(), 0), b = P(lastX + 1.2, yv * syScale(), 0);
+      base.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="#d8d9d4" stroke-width="1" stroke-dasharray="2 6"/>');
+    });
+  }
+
+  /* Y 轴 */
+  if (!topView){
+    const yA = P(-1.75, -yLim, 0), yB = P(-1.75, yLim, 0);
+    base.push('<line x1="' + yA[0].toFixed(1) + '" y1="' + yA[1].toFixed(1) + '" x2="' + yB[0].toFixed(1) + '" y2="' + yB[1].toFixed(1) + '" stroke="#a9aaa3" stroke-width="1.1" stroke-dasharray="4 4"/>');
+    base.push('<text x="' + (yB[0] - 5).toFixed(1) + '" y="' + (yB[1] - 5).toFixed(1) + '" text-anchor="end" font-size="10" fill="#5f615b" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3">推动</text>');
+    base.push('<text x="' + (yA[0] - 5).toFixed(1) + '" y="' + (yA[1] + 12).toFixed(1) + '" text-anchor="end" font-size="10" fill="#5f615b" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3">制约</text>');
+    reserveBox(yB[0] - 5, yB[1] - 5, 'end', 10, '推动');
+    reserveBox(yA[0] - 5, yA[1] + 12, 'end', 10, '制约');
+  }
+
+  /* 每个节点的影响层投影 */
+  if (!topView){
+    DATA.xs.forEach(x => {
+      const z = zX(x.id);
+      const a = P(wx(x.id), -yLim, z), b = P(wx(x.id), yLim, z);
+      base.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="#e2e3dd" stroke-width="1" stroke-dasharray="2 6"/>');
+    });
+  }
+
+  /* X 轴与节点 */
+  const ax0 = P(-1.7, 0, 0), ax1 = P(lastX + 1.5, 0, 0);
+  base.push('<line x1="' + ax0[0].toFixed(1) + '" y1="' + ax0[1].toFixed(1) + '" x2="' + ax1[0].toFixed(1) + '" y2="' + ax1[1].toFixed(1) + '" stroke="#8f9089" stroke-width="1.2" marker-end="url(#arrow)"/>');
+  DATA.xs.forEach((x, xi) => {
+    const a = P(wx(x.id), 0, 0);
+    const focused = state.focus && state.focus.kind === 'x' && state.focus.id === x.id;
+    base.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + a[0].toFixed(1) + '" y2="' + (a[1] + 7).toFixed(1) + '" stroke="#8f9089" stroke-width="1"/>');
+    base.push('<g class="node" data-kind="x" data-id="' + x.id + '" style="cursor:pointer">' +
+      '<rect x="' + (a[0] - 42).toFixed(1) + '" y="' + (a[1] + 6).toFixed(1) + '" width="84" height="20" fill="#000" fill-opacity="0.001"/>' +
+      '</g>');
+    labels.push({ x: a[0], y: a[1] + 21 + (xi % 2) * 15, anchor: 'middle', size: 10.5, text: x.id + ' ' + (DATA.timeline ? x.time : x.title), short: x.id, opacity: 1, fill: focused ? '#222321' : '#5f615b', weight: focused ? 600 : 0, priority: 80 + (focused ? 40 : 0) });
+  });
+
+  /* Z 轴 */
+  if (!topView){
+    const zxA = -1.75;
+    const zA = P(zxA, 0, 0), zB = P(zxA, 0, zTop);
+    base.push('<line x1="' + zA[0].toFixed(1) + '" y1="' + zA[1].toFixed(1) + '" x2="' + zB[0].toFixed(1) + '" y2="' + zB[1].toFixed(1) + '" stroke="#a9aaa3" stroke-width="1.1" marker-end="url(#arrow)"/>');
+    const zLabel = compact ? 'Z 影响' : 'Z 对主体的影响';
+    base.push('<text x="' + (zB[0] - 6).toFixed(1) + '" y="' + (zB[1] - 6).toFixed(1) + '" text-anchor="end" font-size="10" fill="#5f615b" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3">' + zLabel + '</text>');
+    reserveBox(zB[0] - 6, zB[1] - 6, 'end', 10, zLabel);
+  }
+
+  /* 时间切片命中区 */
+  const curtainParts = [];
+  DATA.xs.forEach(x => {
+    const xw = wx(x.id);
+    const q = [P(xw, -yLim, 0), P(xw, yLim, 0), P(xw, yLim, zTop), P(xw, -yLim, zTop)];
+    const on = state.focus && state.focus.kind === 'x' && state.focus.id === x.id;
+    curtainParts.push('<polygon class="node" data-kind="x" data-id="' + x.id + '" data-quiet="1" points="' +
+      q.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') +
+      '" fill="#3a3b38" fill-opacity="' + (on ? '0.05' : '0.001') + '" stroke="none" style="pointer-events:fill;cursor:pointer"/>');
+  });
+
+  /* 数据元素 */
+  const items = [];
+  const solo = state.preset === 'factors' || state.preset === 'top';
+  const nodeK = solo ? 1.35 : 1;
+  const labK = state.preset === 'factors' ? 1.18 : 1;
+
+  // 作用路径：因素站 → 该节点的影响
+  if (layL > 0.01 && layI > 0.01 && layF > 0.01){
+    stations.forEach(st => {
+      const paths = IM[st.xid].paths.filter(path => path.factors.includes(st.seg.id));
+      if (paths.length === 0 || st.dir === 0) return;
+      const imA = impactAlpha(IM[st.xid]);
+      const target = Math.min(stationAlpha(st), 1) * imA;
+      if (target < 0.06 && !state.focus) return;
+      const a = fade('lk:' + st.fid + '@' + st.xid, target) * layL * layF * layI;
+      const zs = zX(st.xid);
+      const from = [wx(st.xid), dyOf(st.fid, st.xid), zs];
+      const to = [wx(st.xid), 0, zs];
+      const cp = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2 + (st.dir === 0 ? 0 : st.dir * 0.25), zs];
+      const pts = [];
+      for (let i = 0; i <= 14; i++){
+        const t = i / 14, mt = 1 - t;
+        const x = mt * mt * from[0] + 2 * mt * t * cp[0] + t * t * to[0];
+        const y = mt * mt * from[1] + 2 * mt * t * cp[1] + t * t * to[1];
+        const z = mt * mt * from[2] + 2 * mt * t * cp[2] + t * t * to[2];
+        const p = P(x, y, z);
+        pts.push([p[0], p[1]]);
+      }
+      const d = P(cp[0], cp[1], cp[2])[2];
+      items.push({
+        d: d,
+        html: '<path d="' + dpath(pts) + '" fill="none" pointer-events="none" stroke="' + F[st.fid].hex + '" stroke-width="' + (state.preset === 'impact' ? 1.3 : 0.9) + '" stroke-opacity="' + (0.28 * (state.preset === 'impact' ? 1.7 : 1) * a).toFixed(3) + '" stroke-dasharray="' + (paths.every(path => path.pending) ? '3 3' : '0') + '"/>'
+      });
+    });
+  }
+
+  /* 连接同一因素的已核实站位 */
+  if (layF > 0.01){
+    DATA.factors.forEach(f => {
+      const a = fade('f:' + f.id, factorAlpha(f)) * layF;
+      const hot = state.focus && ((state.focus.kind === 'f' && state.focus.id === f.id) || (state.focus.kind === 'x' && f.xs.indexOf(state.focus.id) >= 0));
+      const nodes = f.segs.map(s => {
+        const x = wx(s.x), y = (s.dir === 0 ? 0 : dyOf(f.id, s.x)), z = zX(s.x);
+        return { s: s, x: x, y: y, z: z, p: P(x, y, z) };
+      });
+      const lineTo = (p1, p2, dash, op) => '<line pointer-events="none" x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) + '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" stroke="' + f.hex + '" stroke-width="' + (hot ? 3 : 2.2) + '" stroke-opacity="' + op.toFixed(3) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>';
+
+      for (let i = 1; DATA.timeline && i < nodes.length; i++){
+        const A = nodes[i - 1], B = nodes[i];
+        const dash = A.s.dir === 0 || B.s.dir === 0 || A.s.dir !== B.s.dir ? '2 4' : (A.s.dir === -1 ? '4 3' : '');
+        items.push({ d: (A.p[2] + B.p[2]) / 2, html: lineTo(A.p, B.p, dash, 0.85 * a) });
+      }
+
+      /* 站位 */
+      nodes.forEach(nd => {
+        const s = nd.s, p = nd.p;
+        const sa = fade('s:' + f.id + '@' + s.x, stationAlpha({ fid: f.id, xid: s.x, dir: s.dir })) * layF;
+        const on = state.focus && ((state.focus.kind === 'f' && state.focus.id === f.id) || (state.focus.kind === 'x' && state.focus.id === s.x));
+        const r = 4.4 * nodeK;
+        let g = '<g class="node" data-kind="station" data-id="' + f.id + '" data-xid="' + s.x + '" data-factor="' + s.id + '" opacity="' + sa.toFixed(3) + '" style="cursor:pointer">';
+        if (s.dir === 0){
+          const pd = 5 * nodeK;
+          const dx = p[0] + 11 * nodeK, dy = p[1] - 9 * nodeK;
+          g += '<line x1="' + p[0].toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + dx.toFixed(1) + '" y2="' + dy.toFixed(1) + '" stroke="' + f.hex + '" stroke-width="0.8" stroke-dasharray="1 2" stroke-opacity="0.6"/>';
+          g += '<path d="M' + dx.toFixed(1) + ' ' + (dy - pd).toFixed(1) + 'L' + (dx + pd).toFixed(1) + ' ' + dy.toFixed(1) + 'L' + dx.toFixed(1) + ' ' + (dy + pd).toFixed(1) + 'L' + (dx - pd).toFixed(1) + ' ' + dy.toFixed(1) + 'Z" fill="#fdfdfa" stroke="' + f.hex + '" stroke-width="1.3" stroke-dasharray="2.4 2"/>';
+          labels.push({ x: dx + 8, y: dy + 3.4, anchor: 'start', size: 8.5 * labK, text: '待查', short: '', opacity: sa, fill: '#8a7f5f', weight: 0, priority: 30 });
+        } else if (s.dir === 1){
+          g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + f.hex + '" stroke="#fdfdfa" stroke-width="1.6"/>';
+        } else {
+          g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + r.toFixed(1) + '" fill="#fdfdfa" stroke="' + f.hex + '" stroke-width="1.7"/>';
+          g += '<line x1="' + (p[0] - r * 0.5).toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + (p[0] + r * 0.5).toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="' + f.hex + '" stroke-width="1.4"/>';
+        }
+        if (on && s.dir !== 0) g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (r + 4).toFixed(1) + '" fill="none" stroke="' + f.hex + '" stroke-opacity="0.4" stroke-width="1"/>';
+        g += '</g>';
+        items.push({ d: p[2], html: g });
+      });
+
+      /* 名字标在第一个站位旁边 */
+      const s0 = nodes[0], lp = s0.p;
+      const slot = LABEL_SLOT[f.id] || 0;
+      const up = s0.s.dir !== -1;
+      const tx = up ? lp[0] + 9 : lp[0] - 9;
+      const ty = up ? lp[1] - 10 - slot * 8 : lp[1] + 16 + slot * 8;
+      labels.push({ x: tx, y: ty, anchor: up ? 'start' : 'end', size: 10.5 * labK, text: f.name, short: f.id, opacity: a, fill: f.hex, weight: 600, priority: 50 + (hot ? 80 : 0) });
+    });
+  }
+
+  // 影响层
+  if (layI > 0.01){
+    const spine = [];
+    DATA.impacts.forEach(im => {
+      const p = P(wx(im.xid), 0, zWorld());
+      spine.push([p[0], p[1]]);
+    });
+    if (DATA.timeline && spine.length > 1) items.push({ d: 0.02, html: '<path d="' + dpath(spine) + '" fill="none" pointer-events="none" stroke="#3a3b38" stroke-width="1.1" stroke-opacity="' + (0.35 * layI).toFixed(3) + '"/>' });
+
+    DATA.impacts.forEach((im, ii) => {
+      const p = P(wx(im.xid), 0, zWorld());
+      const a0 = P(wx(im.xid), 0, 0);
+      const a = fade('i:' + im.xid, impactAlpha(im)) * layI;
+      const on = state.focus && state.focus.kind === 'x' && state.focus.id === im.xid;
+      const isProfile = state.preset === 'impact';
+      let g = '<g class="node" data-kind="x" data-id="' + im.xid + '" data-layer="z" opacity="' + a.toFixed(3) + '" style="cursor:pointer">';
+      if (isProfile){
+        g += '<line x1="' + p[0].toFixed(1) + '" y1="' + a0[1].toFixed(1) + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="#3a3b38" stroke-width="10" stroke-opacity="0.085" stroke-linecap="butt"/>';
+        g += '<line x1="' + (p[0] - 9).toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + (p[0] + 9).toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="#3a3b38" stroke-width="2.2"/>';
+      } else {
+        g += '<line x1="' + a0[0].toFixed(1) + '" y1="' + a0[1].toFixed(1) + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '" stroke="#8f9089" stroke-width="0.8" stroke-dasharray="2 4"/>';
+      }
+      const bs = 11 * nodeK;
+      if (topView){
+        g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (5.4 * nodeK).toFixed(1) + '" fill="#fdfdfa" stroke="#3a3b38" stroke-width="1.8"/>';
+      } else if (!isProfile){
+        g += '<rect x="' + (p[0] - bs / 2).toFixed(1) + '" y="' + (p[1] - bs / 2).toFixed(1) + '" width="' + bs.toFixed(1) + '" height="' + bs.toFixed(1) + '" rx="' + (1.6 * nodeK).toFixed(1) + '" fill="#fdfdfa" stroke="#3a3b38" stroke-width="' + (on ? 2.2 : 1.5) + '"' + (im.pending ? ' stroke-dasharray="3 2"' : '') + '/>';
+      }
+      const isLast = im.xid === XIDS[XIDS.length - 1];
+      const lx = isLast ? p[0] - bs : p[0] + bs;
+      const anchor = isLast ? 'end' : 'start';
+      g += '</g>';
+      items.push({ d: p[2], html: g });
+      if (isProfile){
+        labels.push({ x: p[0], y: p[1] - 13, anchor: 'middle', size: 10.5, text: im.xid, short: '', opacity: a, fill: '#40403b', weight: 0, priority: 70 + (on ? 40 : 0) });
+      } else {
+        labels.push({ x: lx, y: p[1] + (topView ? -12 - (ii % 2) * 24 : 3.8), anchor: anchor, size: 10 * labK, text: im.xid + ' ' + (compact ? (im.paths.length ? im.paths.length + ' 条' : '待查') : im.label), short: im.xid, opacity: a, fill: '#40403b', weight: 0, priority: 60 + (on ? 40 : 0) });
+      }
+      if (im.pending && !topView && !isProfile && !compact){
+        labels.push({ x: lx, y: p[1] + 17, anchor: anchor, size: 9 * labK, text: '含待验证路径', short: '', opacity: Math.min(1, a), fill: '#8a7f5f', weight: 0, priority: 20 });
+      }
+    });
+  }
+
+  items.sort((a, b) => b.d - a.d);
+
+  /* 标签按优先级放，放不下的缩成编号，再放不下就省掉 */
+  labels.sort((a, b) => b.priority - a.priority);
+  const labelParts = [];
+  labels.forEach(L => {
+    if (L.opacity < 0.12) return;
+    let text = L.text;
+    let pos = placeLabel(L, text);
+    if (!pos && L.short && L.short !== L.text){
+      text = L.short;
+      pos = placeLabel(L, text);
+    }
+    if (!pos) return;
+    labelParts.push('<text x="' + pos[0].toFixed(1) + '" y="' + pos[1].toFixed(1) + '" text-anchor="' + L.anchor + '" font-size="' + L.size + '" fill="' + L.fill + '"' + (L.weight ? ' font-weight="' + L.weight + '"' : '') + ' opacity="' + L.opacity.toFixed(3) + '" style="paint-order:stroke;stroke:#fdfdfa;stroke-width:3;pointer-events:none">' + esc(text) + '</text>');
+  });
+
+  const svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="XYZ 三维分析图，X 是转折或观察，Y 是推动与制约因素，Z 是对研究主体的影响">' +
+    '<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#8f9089"/></marker></defs>' +
+    curtainParts.join('') + base.join('') + items.map(i => i.html).join('') + labelParts.join('') + '</svg>';
+
+  plot.innerHTML = svg;
+  if (alphaBusy) schedule();
+}
+
+/* ==========================================================================
+   详情面板
+   ========================================================================== */
+function dirPill(dir){
+  if (dir === 1) return '<span class="pill push">推动</span>';
+  if (dir === -1) return '<span class="pill con">制约</span>';
+  return '<span class="pill pend">待查</span>';
+}
+function factorPattern(f){
+  const seq = [];
+  f.segs.forEach(s => {
+    const d = s.dir;
+    if (seq.length === 0 || seq[seq.length - 1].d !== d) seq.push({ d: d, n: 1 });
+    else seq[seq.length - 1].n++;
+  });
+  return seq.map(o => (o.d === 1 ? '推动' : o.d === -1 ? '制约' : '待查') + (o.n > 1 ? '×' + o.n : '')).join(DATA.timeline ? ' → ' : '、');
+}
+function refLinks(cites, claim){
+  return [...cites, ...(claim ? [claim] : [])].map(id =>
+    '<a href="output.html#' + (id.startsWith('S') ? 'src-' : 'claim-') + esc(id) + '">' + esc(id) + '</a>'
+  ).join(' · ') || '依据待查';
+}
+
+const factorNames = Object.fromEntries(stations.map(st => [st.seg.id, st.seg.name]));
+function impactDetails(paths){
+  if (paths.length === 0) return '<p>暂无可列入的影响路径。</p>';
+  return paths.map(path =>
+    '<section class="path-detail" data-impact-id="' + esc(path.id) + '">' +
+    '<h3>' + esc(path.result) + (path.pending ? ' <span class="pill pend">待验证</span>' : '') + '</h3>' +
+    '<p>' + path.factors.map(id => esc(factorNames[id])).join('、') + ' → ' + path.path.map(esc).join(' → ') + '</p>' +
+    '<p>成立条件　' + esc(path.condition) + '</p>' +
+    (path.evidence ? '<p>' + esc(path.evidence) + '</p>' : '') +
+    '<p>' + refLinks(path.cites, path.claim) + '</p></section>'
+  ).join('');
+}
+
+function factorObservation(seg){
+  return '<p>' + dirPill(seg.dir) + ' <strong>' + esc(seg.name) + '</strong></p>' +
+    '<p>' + esc(seg.note) + ' <span class="sm">' + refLinks(seg.cites) + '</span></p>';
+}
+
+function xDetailHTML(x){
+  const rows = stations.filter(st => st.xid === x.id);
+  return '<p class="eyebrow">' + esc(x.id) + (x.time ? ' · ' + esc(x.time) : '') + '</p><h2>' + esc(x.title) + '</h2>' +
+    '<p>' + esc(x.detail) + '</p><p>' + refLinks(x.cites) + '</p>' +
+    '<h3>Y · 作用因素</h3>' + (rows.length ? rows.map(st => factorObservation(st.seg)).join('') : '<p>因素待查。</p>') +
+    '<h3>Z · 对研究主体的影响</h3>' + impactDetails(IM[x.id].paths);
+}
+
+function factorDetailHTML(f){
+  return '<p class="eyebrow">Y · 因素</p><h2>' + esc(f.name) + '</h2>' +
+    f.segs.map(seg => '<h3>' + esc(XMAP[seg.x].title) + '</h3>' + factorObservation(seg) +
+      '<h3>Z · 对研究主体的影响</h3>' +
+      impactDetails(IM[seg.x].paths.filter(path => path.factors.includes(seg.id)))
+    ).join('');
+}
+
+function renderDetail(){
+  const f = state.focus;
+  if (!f){
+    detailEl.innerHTML = '';
+    detailEl.classList.remove('swap');
+    return;
+  }
+  if (f.kind === 'x') detailEl.innerHTML = xDetailHTML(XMAP[f.id]);
+  else detailEl.innerHTML = factorDetailHTML(F[f.id]);
+  detailEl.classList.remove('swap');
+  void detailEl.offsetWidth;
+  detailEl.classList.add('swap');
+}
+
+/* ==========================================================================
+   左侧列表、图例
+   ========================================================================== */
+function buildRail(){
+  const xl = document.getElementById('xlist');
+  xl.innerHTML = DATA.xs.map(x =>
+    '<button class="row" data-act="focus-x" data-id="' + x.id + '">' +
+      '<span class="code">' + esc(x.id) + '</span>' +
+      '<span class="name">' + esc(x.title) + (x.time ? '<span class="sub">' + esc(x.time) + '</span>' : '') + '</span>' +
+      '<span class="tail">' + stations.filter(s => s.xid === x.id).length + ' 因素</span>' +
+    '</button>').join('');
+
+  const fl = document.getElementById('flist');
+  fl.innerHTML = DATA.factors.length === 0 ? '<p class="sm">因素待查</p>' : DATA.factors.map(f =>
+    '<button class="row" data-act="focus-f" data-id="' + f.id + '">' +
+      '<span class="code" style="background:' + f.hex + '">' + esc(f.id) + '</span>' +
+      '<span class="name"><span class="swatch" style="background:' + f.hex + '"></span>' + esc(f.name) + '<span class="sub">' + esc(factorPattern(f)) + '</span></span>' +
+      '<span class="tail">' + f.segs.length + ' 站位' + '</span>' +
+    '</button>').join('');
+
+  const legend = document.getElementById('legend');
+  const glyph = (inner) => '<svg width="24" height="16" viewBox="0 0 24 16" aria-hidden="true">' + inner + '</svg>';
+  const leg = [
+    ['推动', glyph('<line x1="12" y1="14" x2="12" y2="5" stroke="#3a3b38" stroke-width="2"/><circle cx="12" cy="4" r="3" fill="#3a3b38"/>'), ''],
+    ['制约', glyph('<line x1="12" y1="2" x2="12" y2="11" stroke="#3a3b38" stroke-width="1.8" stroke-dasharray="4 3"/><circle cx="12" cy="13" r="3" fill="#fdfdfa" stroke="#3a3b38" stroke-width="1.4"/>'), ''],
+    ['待查', glyph('<path d="M12 3.5L16.8 8L12 12.5L7.2 8Z" fill="#fdfdfa" stroke="#8a7f5f" stroke-width="1.2" stroke-dasharray="2 2"/>'), ''],
+    ['影响节点', glyph('<rect x="8" y="4" width="8" height="8" rx="1" fill="none" stroke="#3a3b38" stroke-width="1.4"/>'), ''],
+    ['轴距仅用于布局', '', '']
+  ];
+  legend.innerHTML = leg.map(o => '<span class="lg">' + o[1] + '<b>' + o[0] + '</b>' + (o[2] ? '<span class="lg-n">' + o[2] + '</span>' : '') + '</span>').join('');
+}
+
+function syncControls(){
+  const f = state.focus;
+  document.querySelectorAll('[data-act="focus-x"], [data-act="focus-f"]').forEach(b => {
+    if (!f) { b.classList.remove('sel'); return; }
+    const on = (f.kind === 'x' && b.dataset.act === 'focus-x' && b.dataset.id === f.id) ||
+               (f.kind === 'f' && b.dataset.act === 'focus-f' && b.dataset.id === f.id);
+    b.classList.toggle('sel', on);
+  });
+  document.querySelectorAll('[data-act="filter"]').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === state.filter);
+  });
+  document.getElementById('spreadVal').textContent = Math.round(state.spread * 100) + '%';
+  document.getElementById('spread').value = String(Math.round(state.spread * 100));
+}
+
+function updateAll(){
+  renderScene();
+  renderDetail();
+  syncControls();
+}
+
+function setFocus(nf){
+  if (nf && state.focus && nf.kind === state.focus.kind && nf.id === state.focus.id) nf = null;
+  state.focus = nf;
+  if (nf && !drawerEl.classList.contains('open')) setDrawer(true);
+  updateAll();
+}
+
+function setPreset(name){
+  const to = { yaw: -0.55, pitch: 0.5, zoom: 1 };
+  const layers = {
+    iso:     { factors: true,  links: true,  impacts: true },
+    factors: { factors: true,  links: false, impacts: false },
+    impact:  { factors: false, links: false, impacts: true },
+    top:     { factors: false, links: false, impacts: false }
+  }[name] || { factors: true, links: true, impacts: true };
+  if (name === 'factors'){ to.yaw = 0.02; to.pitch = 1.02; }
+  if (name === 'impact'){ to.yaw = 0.0; to.pitch = 0.03; }
+  if (name === 'top'){ to.yaw = 0.0; to.pitch = 1.5; }
+  view.panX = 0;
+  view.panY = 0;
+  state.levels.factors = layers.factors;
+  state.levels.links = layers.links;
+  state.levels.impacts = layers.impacts;
+  state.preset = name;
+  document.querySelectorAll('[data-act="view"]').forEach(b => b.classList.toggle('active', b.dataset.preset === name));
+  startTween(to, 560);
+  schedule();
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if (!t) return;
+  const act = t.dataset.act;
+  if (act === 'focus-x') setFocus({ kind: 'x', id: t.dataset.id });
+  else if (act === 'focus-f') setFocus({ kind: 'f', id: t.dataset.id });
+  else if (act === 'clear') setFocus(null);
+  else if (act === 'filter') { state.filter = t.dataset.filter; updateAll(); }
+  else if (act === 'view') setPreset(t.dataset.preset);
+  else if (act === 'reset') resetView();
+});
+
+function resetView(){
+  state.focus = null;
+  state.filter = 'all';
+  setPreset('iso');
+  updateAll();
+}
+
+document.getElementById('spread').addEventListener('input', e => {
+  state.spread = Number(e.target.value) / 100;
+  document.getElementById('spreadVal').textContent = e.target.value + '%';
+  schedule();
+});
+
+/* 舞台拖拽、缩放、点击 */
+let drag = null, suppressClick = false;
+
+stage.addEventListener('pointerdown', e => {
+  if (e.target.closest('.panel-area')) return;
+  tween = null; fling = null;
+  drag = { x: e.clientX, y: e.clientY, yaw: view.yaw, pitch: view.pitch, moved: 0, lx: e.clientX, ly: e.clientY, lt: performance.now(), vx: 0, vy: 0 };
+  suppressClick = false;
+});
+stage.addEventListener('pointermove', e => {
+  if (drag){
+    const now = performance.now();
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    const dt = Math.max(8, now - drag.lt);
+    drag.vx = (e.clientX - drag.lx) / dt;
+    drag.vy = (e.clientY - drag.ly) / dt;
+    drag.lx = e.clientX;
+    drag.ly = e.clientY;
+    drag.lt = now;
+    const distance = Math.hypot(dx, dy);
+    if (drag.moved <= 5 && distance > 5) stage.setPointerCapture(e.pointerId);
+    drag.moved = Math.max(drag.moved, distance);
+    if (drag.moved <= 5) return;
+    view.yaw = drag.yaw - dx * 0.008;
+    view.pitch = clamp(drag.pitch + dy * 0.006, -0.25, 1.5);
+    if (drag.moved > 4) tipEl.hidden = true;
+    schedule();
+    return;
+  }
+  const t = e.target.closest('[data-kind]');
+  if (!t || t.dataset.quiet){ tipEl.hidden = true; return; }
+  tipEl.innerHTML = tipHTML(t.dataset.kind, t.dataset.id, t.dataset.xid);
+  tipEl.hidden = false;
+  const r = stage.getBoundingClientRect();
+  let x = e.clientX - r.left + 14, y = e.clientY - r.top + 14;
+  if (x > r.width - 250) x = e.clientX - r.left - 250;
+  if (y > r.height - 96) y = e.clientY - r.top - 96;
+  tipEl.style.left = x + 'px';
+  tipEl.style.top = y + 'px';
+});
+stage.addEventListener('pointerup', e => {
+  if (drag && drag.moved > 5){
+    suppressClick = true;
+    if (!reduceMotion && performance.now() - drag.lt < 90){
+      const vy = clamp(-drag.vx * 0.12, -0.09, 0.09);
+      const vp = clamp(drag.vy * 0.09, -0.06, 0.06);
+      if (Math.abs(vy) + Math.abs(vp) > 0.003){
+        fling = { vy: vy, vp: vp };
+        if (!ticking){ ticking = true; requestAnimationFrame(motionTick); }
+      }
+    }
+  }
+  drag = null;
+});
+stage.addEventListener('pointercancel', () => { drag = null; });
+stage.addEventListener('pointerleave', e => {
+  if (!stage.hasPointerCapture(e.pointerId)) drag = null;
+  tipEl.hidden = true;
+});
+stage.addEventListener('wheel', e => {
+  if (e.target.closest('.panel-area')) return;
+  e.preventDefault();
+  const nz = clamp(view.zoom * Math.exp(-e.deltaY * 0.0012), 0.55, 2.8);
+  startTween({ yaw: view.yaw, pitch: view.pitch, zoom: nz }, 200);
+}, { passive: false });
+stage.addEventListener('click', e => {
+  if (e.target.closest('.panel-area')) return;
+  if (suppressClick){ suppressClick = false; return; }
+  const t = e.target.closest('[data-kind]');
+  if (!t){ setFocus(null); return; }
+  if (t.dataset.kind === 'station' || t.dataset.kind === 'lane') setFocus({ kind: 'f', id: t.dataset.id });
+  else if (t.dataset.kind === 'x') setFocus({ kind: 'x', id: t.dataset.id });
+});
+stage.addEventListener('dblclick', e => {
+  if (!e.target.closest('.panel-area, .corner-label, [data-kind]:not([data-quiet])')) resetView();
+});
+
+/* 右侧读图抽屉 */
+const drawerEl = document.getElementById('drawer');
+const drawerTab = document.getElementById('drawerTab');
+function setDrawer(open){
+  drawerEl.classList.toggle('open', open);
+  document.getElementById('drawerBody').inert = !open;
+  document.body.classList.toggle('drawer-open', open);
+  drawerTab.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+drawerTab.addEventListener('click', e => {
+  e.stopPropagation();
+  setDrawer(!drawerEl.classList.contains('open'));
+});
+
+/* 抽屉里的 X / Y 切换 */
+const pickTabs = Array.from(document.querySelectorAll('[data-pick]'));
+function setPick(name){
+  pickTabs.forEach(b => b.classList.toggle('active', b.dataset.pick === name));
+  document.getElementById('xlist').hidden = (name !== 'x');
+  document.getElementById('flist').hidden = (name !== 'y');
+}
+pickTabs.forEach(b => b.addEventListener('click', e => {
+  e.stopPropagation();
+  setPick(b.dataset.pick);
+}));
+setPick('x');
+
+/* 图表上的三个面板，一次只开一个 */
+const PANEL_BODY = {
+  filter: document.getElementById('bodyFilter'),
+  view: document.getElementById('bodyView')
+};
+const panelBtns = Array.from(document.querySelectorAll('[data-panel]'));
+function setPanel(name){
+  Object.keys(PANEL_BODY).forEach(k => {
+    PANEL_BODY[k].classList.toggle('open', k === name);
+  });
+  panelBtns.forEach(b => b.setAttribute('aria-expanded', String(b.dataset.panel === name)));
+}
+panelBtns.forEach(b => {
+  b.addEventListener('click', e => {
+    e.stopPropagation();
+    setPanel(PANEL_BODY[b.dataset.panel].classList.contains('open') ? null : b.dataset.panel);
+  });
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.panel-area')) setPanel(null);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    setFocus(null);
+    setPanel(null);
+  }
+});
+
+function tipHTML(kind, id, xid){
+  if (kind === 'x'){
+    const x = XMAP[id];
+    return '<span class="t-name">' + esc(x.title) + '</span><span class="t-meta">' + esc(x.time || x.id) + '</span>';
+  }
+  const f = F[id], seg = f.segs.find(item => item.x === xid);
+  return '<span class="t-name">' + esc(seg ? seg.name : f.name) + '</span>' +
+    '<span class="t-meta">' + (seg ? dirPill(seg.dir) + ' ' + esc(seg.note) : esc(factorPattern(f))) + '</span>';
+}
+
+/* 尺寸变化 */
+if (window.ResizeObserver){
+  new ResizeObserver(() => schedule()).observe(stage);
+} else {
+  window.addEventListener('resize', schedule);
+}
+
+/* 启动 */
+try {
+  buildRail();
+  document.documentElement.classList.add('ready');
+  updateAll();
+  document.querySelector('[data-act="view"][data-preset="iso"]').classList.add('active');
+} catch (err) {
+  document.documentElement.classList.remove('ready');
+  if (window.console) console.error(err);
+}
+
+})();
+</script>
+</body>
+</html>

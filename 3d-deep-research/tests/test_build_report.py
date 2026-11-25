@@ -25,9 +25,9 @@ class BuildReportTests(unittest.TestCase):
         self.source.write_text(VALID_REPORT, encoding="utf-8")
         self.output = self.root / "output.html"
 
-    def test_cli_defaults_to_html(self):
+    def test_cli_can_build_only_the_report(self):
         process = subprocess.run(
-            [sys.executable, "-B", build_report.__file__, str(self.source), "--require-xyz"],
+            [sys.executable, "-B", build_report.__file__, str(self.source), "--require-xyz", "--report-only"],
             env=dict(os.environ, PYTHONIOENCODING="utf-8"), capture_output=True,
             text=True, encoding="utf-8", check=True,
         )
