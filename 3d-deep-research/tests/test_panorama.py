@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import copy
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 from test_validate_report import VALID_REPORT
-from build_panorama import build, load_panorama
+from build_panorama import build, drawing_data, load_panorama
 from build_report import build_report
 
 
@@ -93,6 +96,52 @@ class PanoramaTests(unittest.TestCase):
             build(self.xyz, self.source, self.panorama, check=True)
         build(self.xyz, self.source, self.panorama)
         build(self.xyz, self.source, self.panorama, check=True)
+
+    def test_default_cli_publishes_checked_pair_in_output_directory(self):
+        self.save()
+        delivery = self.root / "delivery"
+        command = [sys.executable, "-B", str(Path(__file__).resolve().parents[1] / "scripts" / "build_report.py"),
+                   str(self.source), "--output-dir", str(delivery)]
+        kwargs = dict(env=dict(os.environ, PYTHONIOENCODING="utf-8"), capture_output=True, text=True, encoding="utf-8")
+        process = subprocess.run(command, **kwargs)
+        self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+        panorama = delivery / self.panorama.name
+        build(self.xyz, self.source, panorama, check=True)
+        report = delivery / self.report.name
+        self.assertIn('href="panorama.html"', report.read_text(encoding="utf-8"))
+        before = {path.name: path.read_bytes() for path in delivery.iterdir()}
+        self.xyz.unlink()
+        process = subprocess.run(command, **kwargs)
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("XYZ data is required", process.stdout)
+        self.assertEqual({path.name: path.read_bytes() for path in delivery.iterdir()}, before)
+
+    def test_comparison_uses_observation_without_date_or_invented_path(self):
+        self.data["mode"] = "comparison"
+        del self.data["xs"][0]["time"]
+        self.data["factors"] = []
+        self.data["impacts"] = []
+        model = drawing_data(load_panorama(json.dumps(self.data).encode("utf-8"), VALID_REPORT))
+        self.assertFalse(model["timeline"])
+        self.assertEqual(model["xs"][0]["time"], "")
+        self.assertEqual(model["factors"], [])
+        self.assertEqual(model["impacts"][0]["paths"], [])
+        self.assertTrue(model["impacts"][0]["pending"])
+
+    def test_series_groups_explicit_observations_without_merging_paths(self):
+        first = self.data["factors"][0]
+        first["series"] = "测量"
+        self.data["xs"].append(dict(self.data["xs"][0], id="X2", time="2026-10"))
+        self.data["factors"].append(dict(first, id="Y3", x="X2", kind="制约"))
+        self.data["factors"][1]["name"] = first["name"]
+        model = drawing_data(load_panorama(json.dumps(self.data).encode("utf-8"), VALID_REPORT))
+        self.assertEqual([[seg["id"] for seg in series["segs"]] for series in model["factors"]],
+                         [["Y1", "Y3"], ["Y2"]])
+        self.assertEqual([path["factors"] for path in model["impacts"][0]["paths"]], [["Y1"], ["Y2"]])
+        self.assertEqual(model["impacts"][1]["paths"], [])
+        self.data["factors"][-1]["x"] = "X1"
+        with self.assertRaisesRegex(ValueError, "只能有一个站位"):
+            load_panorama(json.dumps(self.data).encode("utf-8"), VALID_REPORT)
 
     def test_static_report_can_build_without_panorama(self):
         build_report(self.source, self.report)

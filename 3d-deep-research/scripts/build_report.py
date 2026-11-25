@@ -11,12 +11,13 @@ import re
 from html.parser import HTMLParser
 from os.path import relpath
 from pathlib import Path
+from shutil import copy2
 from string import Template
 from tempfile import TemporaryDirectory
 from urllib.parse import quote, urlsplit, urlunsplit
 from xml.etree import ElementTree
 
-from build_panorama import TEMPLATE as PANORAMA_TEMPLATE, load_panorama
+from build_panorama import TEMPLATE as PANORAMA_TEMPLATE, load_panorama, render as render_panorama
 from report_artifacts import MediaReferences, local_path, manifest_path, sha256, write_manifest
 from validate_report import (
     _configure_utf8_console,
@@ -356,15 +357,25 @@ def with_panorama_link(document: str, xyz_hash: str) -> str:
         claims[2],
     )
     link = '<p><a href="panorama.html">查看 XYZ 全景图</a></p>'
-    document = document[:claims.start(2)] + rows + document[claims.start(3):claims.end(3)] + link + document[claims.end(3):]
+    document = document[:claims.start(2)] + rows + document[claims.start(3):]
+    document = document.replace('</header><div id="reading"', link + '</header><div id="reading"', 1)
     return document.replace("</head>", f'<meta name="xyz-sha256" content="{xyz_hash}">\n</head>', 1)
 
 
 def build_report(
-    source: Path, output: Path, *, require_xyz: bool = False, xyz: Path | None = None
+    source: Path, output: Path, *, require_xyz: bool = False, xyz: Path | None = None,
+    companion: bool = False,
 ) -> None:
-    if source == output:
-        raise ValueError("The input report and HTML destination must be different files.")
+    panorama = output.with_name("panorama.html")
+    destinations = (output, manifest_path(output), panorama) if companion else (output, manifest_path(output))
+    if companion and (xyz is None or output.name != "output.html"):
+        raise ValueError("A paired build requires XYZ data and an output.html destination.")
+    for target in destinations:
+        for original in (source, xyz):
+            if original is not None and (target.resolve() == original.resolve() or (
+                target.exists() and original.exists() and target.samefile(original)
+            )):
+                raise ValueError(f"The build destination cannot overwrite an input: {target}")
     source_bytes = source.read_bytes()
     source_hash = hashlib.sha256(source_bytes).hexdigest()
     md_text = source_bytes.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
@@ -386,7 +397,7 @@ def build_report(
         if xyz == output.resolve():
             raise ValueError("The XYZ input and HTML destination must be different files.")
         raw_xyz = xyz.read_bytes()
-        load_panorama(raw_xyz, md_text)
+        xyz_data = load_panorama(raw_xyz, md_text)
         dependencies.update((xyz, PANORAMA_TEMPLATE, SKILL_DIR / "scripts" / "build_panorama.py"))
         expected_inputs.update({
             xyz: hashlib.sha256(raw_xyz).hexdigest(),
@@ -409,16 +420,37 @@ def build_report(
     # Stage both files before publishing and exclude overlapping writes to the same pair.
     lock = output.with_name(f".{output.name}.lock")
     with TemporaryDirectory(prefix=".report-build-", dir=output.parent) as directory:
-        staged = Path(directory) / output.name
+        work = Path(directory)
+        staged = work / output.name
         staged.write_text(document, encoding="utf-8")
+        if companion:
+            (work / panorama.name).write_text(
+                render_panorama(xyz_data, expected_inputs[xyz]), encoding="utf-8", newline="\n"
+            )
         try:
             lock.touch(exist_ok=False)
         except FileExistsError as exc:
             raise RuntimeError(f"Build lock exists: {lock}. Remove it only if no build is running.") from exc
         try:
             write_manifest(source, staged, sorted(dependencies), remote, expected_inputs)
-            staged.replace(output)
-            manifest_path(staged).replace(manifest_path(output))
+            # Preserve the previous revision if an existing output cannot be replaced.
+            backups = {}
+            for target in destinations:
+                if target.exists():
+                    backups[target] = work / f"{target.name}.previous"
+                    copy2(target, backups[target])
+            published = []
+            try:
+                for target in destinations:
+                    (work / target.name).replace(target)
+                    published.append(target)
+            except OSError:
+                for target in reversed(published):
+                    if target in backups:
+                        backups[target].replace(target)
+                    else:
+                        target.unlink()
+                raise
         finally:
             lock.unlink()
 
@@ -430,18 +462,27 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, help="Default: Markdown directory")
     parser.add_argument("--require-xyz", action="store_true", help="Check the order of the analysis chapters")
     parser.add_argument("--formats", nargs="+", choices=("html",), help=argparse.SUPPRESS)
-    parser.add_argument("--xyz", type=Path, help="Bind a checked XYZ file for a companion panorama")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--xyz", type=Path, help="XYZ data file (default: xyz.json beside the report)")
+    mode.add_argument("--report-only", action="store_true", help="Build the report without a panorama")
     args = parser.parse_args()
     source = args.input.expanduser().resolve()
     output_dir = args.output_dir.expanduser().resolve() if args.output_dir else source.parent
     output = output_dir / "output.html"
     try:
-        build_report(source, output, require_xyz=args.require_xyz, xyz=args.xyz)
+        xyz = None
+        if not args.report_only:
+            xyz = args.xyz.expanduser().resolve() if args.xyz else source.with_name("xyz.json")
+            if not xyz.is_file():
+                raise ValueError(f"XYZ data is required for paired delivery: {xyz}")
+        build_report(source, output, require_xyz=args.require_xyz, xyz=xyz, companion=xyz is not None)
     except (OSError, ValueError, RuntimeError) as exc:
         print(f"[ERROR] {exc}")
         return 1
 
     print(f"[OK] HTML built and validated: {output}")
+    if xyz is not None:
+        print(f"[OK] Paired panorama built: {output_dir / 'panorama.html'}")
     return 0
 
 

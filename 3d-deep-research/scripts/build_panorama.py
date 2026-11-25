@@ -41,9 +41,9 @@ def ids(record: dict, key: str, allowed, where: str, *, empty: bool = False) -> 
     return values
 
 
-def records(data: dict, key: str) -> dict[str, dict]:
+def records(data: dict, key: str, *, allow_empty: bool = False) -> dict[str, dict]:
     rows = data.get(key)
-    require(isinstance(rows, list) and bool(rows), f"{key} 必须是非空数组")
+    require(isinstance(rows, list) and (bool(rows) or allow_empty), f"{key} 必须是有效数组")
     indexed = {}
     for index, row in enumerate(rows):
         where = f"{key}[{index}]"
@@ -64,14 +64,17 @@ def load_panorama(raw: bytes, report: str) -> dict:
     sources = {row[0] for row in source_rows}
     claims = {row[0]: row for row in claim_rows}
 
+    mode = data.get("mode", "timeline")
+    require(isinstance(mode, str) and mode in {"timeline", "comparison"}, "mode 必须是 timeline 或 comparison")
     xs = records(data, "xs")
-    factors = records(data, "factors")
-    impacts = records(data, "impacts")
+    factors = records(data, "factors", allow_empty=True)
+    impacts = records(data, "impacts", allow_empty=True)
     require(not (set(xs) & set(factors) or set(xs) & set(impacts) or set(factors) & set(impacts)),
             "X、Y 和 Z 的节点编号须在全图唯一")
     events = {}
     for xid, x in xs.items():
-        fields = {k: string(x, k, xid) for k in ("time", "title", "detail")}
+        fields = {k: string(x, k, xid) for k in ("title", "detail")}
+        fields["time"] = string(x, "time", xid) if mode == "timeline" else ""
         events[xid] = dict(fields, id=xid, cites=ids(x, "cites", sources, xid), factors=[], impacts=[])
 
     for fid, f in factors.items():
@@ -79,7 +82,11 @@ def load_panorama(raw: bytes, report: str) -> dict:
         require(xid in events, f"{fid}.x 未登记：{xid}")
         fields = {k: string(f, k, fid) for k in ("name", "kind", "detail")}
         require(fields["kind"] in KINDS, f"{fid}.kind 必须是推动、制约或待查")
-        events[xid]["factors"].append(dict(fields, id=fid, cites=ids(
+        series = string(f, "series", fid) if "series" in f else None
+        if series:
+            require(all(existing["series"] != series for existing in events[xid]["factors"]),
+                    f"{xid} 下因素线 {series!r} 只能有一个站位")
+        events[xid]["factors"].append(dict(fields, id=fid, series=series, cites=ids(
             f, "cites", sources, fid, empty=fields["kind"] == "待查")))
 
     for zid, z in impacts.items():
@@ -116,7 +123,7 @@ def load_panorama(raw: bytes, report: str) -> dict:
     lines = [line.strip() for line in report.splitlines() if line.strip()]
     meta = re.fullmatch(r">\s*研究问题\s*[：:]\s*(.+?)\s*\|\s*资料截止\s*[：:]\s*(\d{4}-\d{2}-\d{2})\s*\|.*", lines[1] if len(lines) > 1 else "")
     require(bool(meta), "报告缺少研究问题或资料截止日")
-    return dict(title=_plain_text(lines[0].lstrip("#")), question=meta[1], cutoff=meta[2],
+    return dict(title=_plain_text(lines[0].lstrip("#")), question=meta[1], cutoff=meta[2], mode=mode,
                 events=list(events.values()))
 
 
@@ -138,7 +145,8 @@ def fallback(data: dict) -> str:
 
     sections = []
     for event in data["events"]:
-        sections.append(f'<section><h3>{html.escape(event["time"]+" · "+event["title"])}</h3>')
+        heading = " · ".join(filter(None, (event["time"], event["title"])))
+        sections.append(f"<section><h3>{html.escape(heading)}</h3>")
         sections.append(p(event["detail"]) + f'<p>{citation_links(event["cites"])}</p>')
         for factor in event["factors"]:
             sections.append(entry(factor, "Y · "+factor["name"], factor["kind"]+"。"+factor["detail"]))
@@ -155,15 +163,47 @@ def fallback(data: dict) -> str:
     return "\n".join(sections)
 
 
+def drawing_data(data: dict) -> dict:
+    """Project the evidence-bound data onto the original PR #48 isometric camera."""
+    palette = ("#5a6b7a", "#6b7a5e", "#8a6a52", "#7a5f66", "#4f6b6b", "#8c877a")
+    directions = {"推动": 1, "制约": -1, "待查": 0}
+    xs, impacts, series = [], [], {}
+    timeline = data["mode"] == "timeline"
+    for event in data["events"]:
+        xid = event["id"]
+        xs.append({key: event[key] for key in ("id", "title", "time", "detail", "cites")})
+        for factor in event["factors"]:
+            name = factor["series"]
+            key = (bool(name), name or factor["id"])
+            if key not in series:
+                index = len(series)
+                series[key] = dict(id=f"F{index+1}", name=name or factor["name"],
+                                   hex=palette[index % len(palette)], segs=[])
+            series[key]["segs"].append(dict(
+                id=factor["id"], x=xid, dir=directions[factor["kind"]],
+                name=factor["name"], note=factor["detail"], cites=factor["cites"],
+            ))
+        paths = event["impacts"]
+        label = paths[0]["result"] if paths else "影响待查"
+        if len(paths) > 1:
+            label += f" 等 {len(paths)} 条"
+        impacts.append(dict(xid=xid, label=label, paths=paths,
+                            pending=not paths or any(path["pending"] for path in paths)))
+    return dict(xs=xs, impacts=impacts, factors=list(series.values()), timeline=timeline,
+                question=data["question"], cutoff=data["cutoff"])
+
+
 def render(data: dict, xyz_hash: str) -> str:
     template = TEMPLATE.read_text(encoding="utf-8")
     replacements = {
         "TITLE": html.escape(data["title"]),
         "QUESTION": html.escape(data["question"]),
         "CUTOFF": html.escape(data["cutoff"]),
-        "DATA": json.dumps(data, ensure_ascii=False, allow_nan=False).replace("<", "\\u003c"),
+        "DATA": json.dumps(drawing_data(data), ensure_ascii=False, allow_nan=False).replace("<", "\\u003c"),
         "FALLBACK": fallback(data),
         "REVISION": xyz_hash,
+        "TOP": "时间俯视" if data["mode"] == "timeline" else "观察俯视",
+        "XNAME": "转折节点" if data["mode"] == "timeline" else "观察节点",
     }
     return re.sub(r"@@([A-Z]+)@@", lambda match: replacements[match[1]], template)
 
@@ -187,7 +227,7 @@ def build(source: Path, report: Path, output: Path, *, check: bool = False) -> N
     manifest = json.loads(manifest_path(report_html).read_text(encoding="utf-8"))
     tracked = any((report.parent / dependency["path"]).resolve() == source and dependency["sha256"] == xyz_hash
                   for dependency in manifest["dependencies"])
-    require(tracked, "报告没有绑定此版本 XYZ 数据，请先用 build_report.py --xyz 重建报告")
+    require(tracked, "报告没有绑定此版本 XYZ 数据，请先用 build_report.py 重建报告")
     built_report = report_html.read_text(encoding="utf-8")
     require('href="panorama.html"' in built_report and f'<meta name="xyz-sha256" content="{xyz_hash}">' in built_report,
             "报告 HTML 未绑定此版本全景图，请重建报告")

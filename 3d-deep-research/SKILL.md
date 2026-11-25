@@ -1,14 +1,14 @@
 ---
 name: 3d-deep-research
 description: |
-  用于需要系统取证并形成深度研究报告的分析、研究与调研。用证据链和 XYZ 分析形成可追溯的判断，默认交付 HTML。
+  用于需要系统取证并形成深度研究报告的分析、研究与调研。用证据链和 XYZ 分析形成可追溯的判断，默认交付 HTML 报告与 XYZ 全景图。
 ---
 
 # 3D Deep Research
 
 用证据链核实关键事实。用 XYZ 确定关键转折、查明推动与制约因素，并追踪核心因素对研究主体的影响。综合三轴形成可核查、可修订的研究判断。
 
-默认交付独立可打开的 HTML 报告。以 Markdown 写作，保留源稿便于复查与更新。HTML 使用石墨杂志版式、折叠目录和三级编号，需要 PDF 时从浏览器打印。有可核实转折且全景能解释因素如何影响研究主体时，随报告交付 XYZ 全景图。作为其他研究流程的辅助方法时，按用户指定的主流程交付。
+默认成对交付 HTML 报告和交互式 XYZ 全景图。两份文件放在同一目录，可离线打开并互相跳转。报告使用石墨杂志版式、折叠目录和三级编号。保留 Markdown 源稿便于复查，需要 PDF 时从浏览器打印。用户指定只交付报告或使用其他主流程时，按其要求执行。
 
 开始研究时读[证据协议](references/evidence-protocol.md)，规划图表时读[视觉表达规范](references/visual-guidelines.md)。
 
@@ -28,7 +28,7 @@ description: |
 
 ### 2. XYZ 分析
 
-在研究笔记中建立 XYZ 分析表。每个需要解释的关键转折占一行。按[证据协议](references/evidence-protocol.md)边分析边检索。新证据改变转折或解释时，更新、拆分或补充相应行，并同步账本。
+在研究笔记中建立 XYZ 分析表。每个需要解释的关键转折或已核实观察占一行。按[证据协议](references/evidence-protocol.md)边分析边检索。新证据改变转折或解释时，更新、拆分或补充相应行，并同步账本。
 
 | X 关键转折（如适用） | Y 推动与制约因素 | Z 对研究主体的影响 | 证据与待查问题 |
 |---|---|---|---|
@@ -36,7 +36,7 @@ description: |
 
 逐行将 X、Y、Z 写到证据能支持的范围，在关键事实和判断旁标注对应的 S、C 编号。证据不足处写清缺口。
 
-适用全景图时，按[全景图规范](references/panorama.md)将转折、因素和影响路径写入 xyz.json，与报告账本核对。
+交付 HTML 报告与全景图时，按[全景图规范](references/panorama.md)将 XYZ 分析表整理为 xyz.json，与报告账本同步。
 
 #### X · 确定关键转折
 
@@ -70,14 +70,12 @@ description: |
 
 ### 4. 校验与交付
 
-使用[构建脚本](scripts/build_report.py)生成 HTML。缺少 Python-Markdown 时运行 pip install Markdown。
+将 report.md 和 xyz.json 放在同一目录，用[构建脚本](scripts/build_report.py)生成两份 HTML。缺少 Python-Markdown 时运行 pip install Markdown。
 
 ```bash
 python [skill目录]/scripts/build_report.py report.md
 ```
 
-命令在源稿目录生成 output.html 和核验用的 output.html.manifest.json。每份报告使用独立目录。多个源稿共用目录时，为每份报告指定独立的 --output-dir。沿 XYZ 分章的旧稿可加 --require-xyz 检查原章节结构。较早账本可用[结构校验脚本](scripts/validate_report.py)的 --legacy-schema 单独复核。
+命令生成 output.html、panorama.html 和核验用的 output.html.manifest.json。每份报告使用独立目录。也可通过 --xyz 指定数据文件，通过 --output-dir 指定输出目录。只交付报告时加 --report-only。沿 XYZ 分章的旧稿可加 --require-xyz 检查原章节结构。较早账本可用[结构校验脚本](scripts/validate_report.py)的 --legacy-schema 单独复核。
 
-适用全景图时，按[全景图规范](references/panorama.md)将 XYZ 数据绑定报告，生成全景图并联合验收。离线检查三次累计展开、作用路径和账本跳转。
-
-将交付 HTML 复制到空目录离线打开，检查正文、图表、目录跳转和窄屏布局。联网检查需要访问原文的来源链接。图表使用可嵌入的本地图片或自包含 SVG。按需提供 Markdown 源稿或浏览器打印的 PDF。报告机器校验、事实审计和实际版面检查的结果。
+按[全景图规范](references/panorama.md)联合校验。将两份 HTML 一起复制到空目录离线打开，检查报告正文、图表、目录和窄屏布局，并验证全景图视角、作用路径和账本跳转。联网检查需要访问原文的来源链接。图表使用可嵌入的本地图片或自包含 SVG。按需提供 Markdown 源稿或浏览器打印的 PDF。报告机器校验、事实审计和实际版面检查的结果。
