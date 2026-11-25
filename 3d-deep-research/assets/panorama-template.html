@@ -663,7 +663,7 @@ function renderScene(){
       const d = P(cp[0], cp[1], cp[2])[2];
       items.push({
         d: d,
-        html: '<path d="' + dpath(pts) + '" fill="none" stroke="' + F[st.fid].hex + '" stroke-width="' + (state.preset === 'impact' ? 1.3 : 0.9) + '" stroke-opacity="' + (0.28 * (state.preset === 'impact' ? 1.7 : 1) * a).toFixed(3) + '" stroke-dasharray="' + (paths.every(path => path.pending) ? '3 3' : '0') + '"/>'
+        html: '<path d="' + dpath(pts) + '" fill="none" pointer-events="none" stroke="' + F[st.fid].hex + '" stroke-width="' + (state.preset === 'impact' ? 1.3 : 0.9) + '" stroke-opacity="' + (0.28 * (state.preset === 'impact' ? 1.7 : 1) * a).toFixed(3) + '" stroke-dasharray="' + (paths.every(path => path.pending) ? '3 3' : '0') + '"/>'
       });
     });
   }
@@ -677,7 +677,7 @@ function renderScene(){
         const x = wx(s.x), y = (s.dir === 0 ? 0 : dyOf(f.id, s.x)), z = zX(s.x);
         return { s: s, x: x, y: y, z: z, p: P(x, y, z) };
       });
-      const lineTo = (p1, p2, dash, op) => '<line x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) + '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" stroke="' + f.hex + '" stroke-width="' + (hot ? 3 : 2.2) + '" stroke-opacity="' + op.toFixed(3) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>';
+      const lineTo = (p1, p2, dash, op) => '<line pointer-events="none" x1="' + p1[0].toFixed(1) + '" y1="' + p1[1].toFixed(1) + '" x2="' + p2[0].toFixed(1) + '" y2="' + p2[1].toFixed(1) + '" stroke="' + f.hex + '" stroke-width="' + (hot ? 3 : 2.2) + '" stroke-opacity="' + op.toFixed(3) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>';
 
       for (let i = 1; DATA.timeline && i < nodes.length; i++){
         const A = nodes[i - 1], B = nodes[i];
@@ -726,7 +726,7 @@ function renderScene(){
       const p = P(wx(im.xid), 0, zWorld());
       spine.push([p[0], p[1]]);
     });
-    if (DATA.timeline && spine.length > 1) items.push({ d: 0.02, html: '<path d="' + dpath(spine) + '" fill="none" stroke="#3a3b38" stroke-width="1.1" stroke-opacity="' + (0.35 * layI).toFixed(3) + '"/>' });
+    if (DATA.timeline && spine.length > 1) items.push({ d: 0.02, html: '<path d="' + dpath(spine) + '" fill="none" pointer-events="none" stroke="#3a3b38" stroke-width="1.1" stroke-opacity="' + (0.35 * layI).toFixed(3) + '"/>' });
 
     DATA.impacts.forEach((im, ii) => {
       const p = P(wx(im.xid), 0, zWorld());
@@ -950,13 +950,15 @@ document.addEventListener('click', e => {
   else if (act === 'clear') setFocus(null);
   else if (act === 'filter') { state.filter = t.dataset.filter; updateAll(); }
   else if (act === 'view') setPreset(t.dataset.preset);
-  else if (act === 'reset') {
-    state.focus = null;
-    state.filter = 'all';
-    setPreset('iso');
-    updateAll();
-  }
+  else if (act === 'reset') resetView();
 });
+
+function resetView(){
+  state.focus = null;
+  state.filter = 'all';
+  setPreset('iso');
+  updateAll();
+}
 
 document.getElementById('spread').addEventListener('input', e => {
   state.spread = Number(e.target.value) / 100;
@@ -971,7 +973,6 @@ stage.addEventListener('pointerdown', e => {
   if (e.target.closest('.panel-area')) return;
   tween = null; fling = null;
   drag = { x: e.clientX, y: e.clientY, yaw: view.yaw, pitch: view.pitch, moved: 0, lx: e.clientX, ly: e.clientY, lt: performance.now(), vx: 0, vy: 0 };
-  try { stage.setPointerCapture(e.pointerId); } catch (err) {}
   suppressClick = false;
 });
 stage.addEventListener('pointermove', e => {
@@ -984,7 +985,10 @@ stage.addEventListener('pointermove', e => {
     drag.lx = e.clientX;
     drag.ly = e.clientY;
     drag.lt = now;
-    drag.moved = Math.max(drag.moved, Math.hypot(dx, dy));
+    const distance = Math.hypot(dx, dy);
+    if (drag.moved <= 5 && distance > 5) stage.setPointerCapture(e.pointerId);
+    drag.moved = Math.max(drag.moved, distance);
+    if (drag.moved <= 5) return;
     view.yaw = drag.yaw - dx * 0.008;
     view.pitch = clamp(drag.pitch + dy * 0.006, -0.25, 1.5);
     if (drag.moved > 4) tipEl.hidden = true;
@@ -1016,7 +1020,11 @@ stage.addEventListener('pointerup', e => {
   }
   drag = null;
 });
-stage.addEventListener('pointerleave', () => { tipEl.hidden = true; });
+stage.addEventListener('pointercancel', () => { drag = null; });
+stage.addEventListener('pointerleave', e => {
+  if (!stage.hasPointerCapture(e.pointerId)) drag = null;
+  tipEl.hidden = true;
+});
 stage.addEventListener('wheel', e => {
   if (e.target.closest('.panel-area')) return;
   e.preventDefault();
@@ -1031,7 +1039,9 @@ stage.addEventListener('click', e => {
   if (t.dataset.kind === 'station' || t.dataset.kind === 'lane') setFocus({ kind: 'f', id: t.dataset.id });
   else if (t.dataset.kind === 'x') setFocus({ kind: 'x', id: t.dataset.id });
 });
-stage.addEventListener('dblclick', () => setFocus(null));
+stage.addEventListener('dblclick', e => {
+  if (!e.target.closest('.panel-area, .corner-label, [data-kind]:not([data-quiet])')) resetView();
+});
 
 /* 右侧读图抽屉 */
 const drawerEl = document.getElementById('drawer');
