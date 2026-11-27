@@ -1,0 +1,2 @@
+# Runtime dependencies for 3d-deep-research scripts (requires Python 3.10+)
+Markdown>=3.4

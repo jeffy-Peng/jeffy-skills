@@ -1,7 +1,18 @@
 ---
 name: 3d-deep-research
-description: |
-  用于需要系统取证并形成深度研究报告的分析、研究与调研。用证据链和 XYZ 分析形成可追溯的判断，默认交付内含交互式 XYZ 全景图与完整报告的单文件 HTML。
+slug: 3d-deep-research
+displayName: 3D Deep Research
+version: 1.0.0
+summary: 用证据链与 XYZ 三轴分析生成可追溯的深度研究报告，默认交付内含交互式 XYZ 全景图与完整正文的离线单文件 HTML。
+description: 用于需要系统取证并形成深度研究报告的分析、研究与调研（如 deep research、系统调研、竞品或市场研究、尽职调查、来龙去脉分析与证据链研究）。用证据链和 XYZ 分析形成可追溯的判断，默认交付内含交互式 XYZ 全景图与完整报告的单文件 HTML。简单名词解释、新闻摘要、短篇观点、仿写，以及 3D 建模、渲染、CAD 或图形设计不使用。
+tags:
+  - research
+  - deep-research
+  - evidence-chain
+  - report
+  - html
+license: MIT
+homepage: https://github.com/jeffy-Peng/jeffy-skills
 ---
 
 # 3D Deep Research
@@ -70,7 +81,7 @@ description: |
 
 ### 4. 校验与交付
 
-将 `report.md` 和 `xyz.json` 放在同一目录，用[构建脚本](scripts/build_report.py)生成单文件 HTML。缺少 Python-Markdown 时运行 `pip install Markdown`。
+将 `report.md` 和 `xyz.json` 放在同一目录，用[构建脚本](scripts/build_report.py)生成单文件 HTML。构建脚本需 Python 3.10+ 与 Python-Markdown，缺少依赖时运行 `pip install -r [skill目录]/requirements.txt`（或 `pip install Markdown`）。
 
 ```bash
 python [skill目录]/scripts/build_report.py report.md
