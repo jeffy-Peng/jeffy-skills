@@ -3,16 +3,17 @@ name: 3d-deep-research
 slug: 3d-deep-research
 displayName: 3D Deep Research
 version: 1.0.0
-summary: 用证据链与 XYZ 三轴分析生成可追溯的深度研究报告，默认交付内含交互式 XYZ 全景图与完整正文的离线单文件 HTML。
-description: 用于需要系统取证并形成深度研究报告的分析、研究与调研（如 deep research、系统调研、竞品或市场研究、尽职调查、来龙去脉分析与证据链研究）。用证据链和 XYZ 分析形成可追溯的判断，默认交付内含交互式 XYZ 全景图与完整报告的单文件 HTML。简单名词解释、新闻摘要、短篇观点、仿写，以及 3D 建模、渲染、CAD 或图形设计不使用。
+summary: 系统取证、逐条可回源的深度研究助手：沿“关键转折 × 背后动因 × 实际影响”拆解复杂问题，一键交付内含交互式 3D 全景图与完整报告的离线单文件 HTML。
+description: 用于需要系统取证并形成深度研究报告的分析、研究与调研（如 deep research、公司/行业/竞品研究、尽职调查、事件来龙去脉分析、证据链核查）。通过交叉取证与 XYZ（关键转折、推动与制约因素、对主体的影响）三轴分析形成可追溯判断，默认交付内含交互式 XYZ 全景图与完整正文的离线单文件 HTML。简单名词解释、新闻摘要、短篇观点、仿写，以及 3D 建模、渲染、CAD 或图形设计不使用。
 tags:
-  - research
   - deep-research
+  - research
   - evidence-chain
   - report
   - html
 license: MIT
 homepage: https://github.com/jeffy-Peng/jeffy-skills
+iconUrl: https://raw.githubusercontent.com/jeffy-Peng/jeffy-skills/main/3d-deep-research/assets/icon.png
 ---
 
 # 3D Deep Research
