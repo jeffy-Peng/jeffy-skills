@@ -1,27 +1,23 @@
 // 扫描主题与素材声明，生成登记表、能力表、主题清单。人只改数据，这里是唯一的生成入口。
 // 用法 node scripts/sync.mjs [--check]
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, existsSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { ARCHETYPES, listThemeFiles, PROJECT_ROOT } from '../lib/constants.mjs';
 import { parseFrontMatter } from './front-matter.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const root = PROJECT_ROOT;
 const checkOnly = process.argv.includes('--check');
 const outDir = join(root, 'build', 'generated');
-const ARCHETYPES = ['compare', 'trend', 'share', 'table', 'timeline', 'relation', 'flow'];
 
 function readThemes() {
   const dir = join(root, 'themes');
-  return readdirSync(dir)
-    .filter((name) => name.endsWith('.json'))
-    .sort((a, b) => (a === 'simple-line.json' ? -1 : b === 'simple-line.json' ? 1 : a.localeCompare(b)))
-    .map((name) => {
-      const theme = JSON.parse(readFileSync(join(dir, name), 'utf8'));
-      if (!theme.name) throw Error(`${name} 缺少 name`);
-      if (!theme.fonts?.ea || !theme.fonts?.latin) throw Error(`${name} 缺少字体声明`);
-      if (!Array.isArray(theme.scale) || !theme.scale.length) throw Error(`${name} 缺少字号阶梯`);
-      return { file: name, name: theme.name, label: theme.label || theme.name };
-    });
+  return listThemeFiles().map((name) => {
+    const theme = JSON.parse(readFileSync(join(dir, name), 'utf8'));
+    if (!theme.name) throw Error(`${name} 缺少 name`);
+    if (!theme.fonts?.ea || !theme.fonts?.latin) throw Error(`${name} 缺少字体声明`);
+    if (!Array.isArray(theme.scale) || !theme.scale.length) throw Error(`${name} 缺少字号阶梯`);
+    return { file: name, name: theme.name, label: theme.label || theme.name };
+  });
 }
 
 function readMaterialFiles() {
@@ -48,6 +44,10 @@ function mergeMaterials(catalog, files) {
       const d = file.data;
       if (!ARCHETYPES.includes(d.archetype) || !['engine', 'model'].includes(d.implementation))
         throw Error(d.id + ' 缺少有效 archetype/implementation');
+      const declaredOptions = Array.isArray(d.options) ? d.options : [];
+      for (const defaultKey of Object.keys(d.defaults || {})) {
+        if (!declaredOptions.includes(defaultKey)) throw Error(`${d.id} 的 defaults.${defaultKey} 未在 options 中声明`);
+      }
       const entry = {
         aliases: [],
         purpose: d.name || d.form,
@@ -87,6 +87,7 @@ function build() {
     shape: entry.shape || null,
     tier: entry.tier || 'backup',
     implementation: entry.implementation || 'engine',
+    options: Array.isArray(entry.options) ? entry.options : [],
     defaults: entry.defaults || {},
     encoding: entry.encoding || null,
     readingTime: entry.readingTime || null,
@@ -104,6 +105,7 @@ function build() {
         archetype: material.archetype,
         renderer: 'theme-v1',
         implementedIn: 'lib/theming/renderers.js',
+        allowedOptions: material.options,
         defaultOptions: material.defaults,
         sampleSource: material.sources[0] || null,
       },

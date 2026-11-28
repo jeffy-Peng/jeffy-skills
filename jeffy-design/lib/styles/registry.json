@@ -1,7 +1,7 @@
 {
   "note": "笔触登记。families 写这套笔触能画哪些几何族，params 是它可以接受的参数与默认值。主题只选择并赋参数，不实现笔触。",
   "line": {
-    "file": "lib/kit/../theming/drawing.js",
+    "file": "lib/theming/drawing.js",
     "families": [
       "*"
     ],

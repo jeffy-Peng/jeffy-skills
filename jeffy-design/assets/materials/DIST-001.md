@@ -10,7 +10,7 @@ cost: small
 alternates: [BAR-001]
 tier: backup
 implementation: engine
-options: [direction, sort]
+options: [direction, sort, widthRatio]
 defaults: { direction: vertical, sort: given }
 question: 查看原始样本的区间分布
 minimumInput: 有限原始样本；调用参考实现前按明确区间预分箱

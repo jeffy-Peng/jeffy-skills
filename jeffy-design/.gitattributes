@@ -4,5 +4,6 @@
 *.js text eol=lf
 *.json text eol=lf
 *.py text eol=lf
+*.sh text eol=lf
 *.html text eol=lf
 *.png binary

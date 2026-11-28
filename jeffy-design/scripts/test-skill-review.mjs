@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { PROJECT_ROOT } from '../lib/constants.mjs';
 import { parseFrontMatter } from './front-matter.mjs';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+import { withBrowser } from '../lib/browser.mjs';
+const root = PROJECT_ROOT,
   work = join(root, 'build/skill-review');
 mkdirSync(work, { recursive: true });
 const results = [];
@@ -94,8 +95,7 @@ test('build-review-pages', () => {
   const out = run('build-composition.mjs', file, html);
   assert.equal(out.status, 0, out.stderr);
 });
-const browser = await loadChromium().launch({ executablePath: findChrome() });
-try {
+await withBrowser(async (browser) => {
   const p = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
   await p.goto(pathToFileURL(html).href + '?static=1');
   await p.waitForFunction(() => window.renderComplete);
@@ -203,8 +203,6 @@ try {
   test('review-pages-runtime-clean', () => assert.deepEqual(actual.errors, []));
   await p.locator('.sheet[data-page="content"]').screenshot({ path: join(work, 'target-axis.png') });
   await p.locator('.sheet[data-page="toc"]').screenshot({ path: join(work, 'toc.png') });
-} finally {
-  await browser.close();
-}
+});
 writeFileSync(join(work, 'validation.json'), JSON.stringify(results, null, 2));
 console.log(results.length + ' skill review regressions passed');

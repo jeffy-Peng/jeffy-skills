@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+import { PROJECT_ROOT } from '../lib/constants.mjs';
+import { withBrowser } from '../lib/browser.mjs';
+const root = PROJECT_ROOT,
   out = join(root, 'build/material-selection');
 mkdirSync(out, { recursive: true });
 const data = {
@@ -90,8 +91,7 @@ for (const kind of ['solid', 'rhythm']) {
   );
   assert.equal(built.status, 0, built.stderr);
 }
-const browser = await loadChromium().launch({ executablePath: findChrome() });
-try {
+await withBrowser(async (browser) => {
   const page = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
   for (const kind of ['solid', 'rhythm']) {
     await page.goto(pathToFileURL(join(out, kind + '.html')).href + '?static=1');
@@ -139,8 +139,6 @@ try {
     catalog: 'both forms expanded',
     explicitSolidOverridesTheme: true,
   });
-} finally {
-  await browser.close();
-}
+});
 writeFileSync(join(out, 'validation.json'), JSON.stringify(results, null, 2));
 console.log(`${rows.length} selection scenarios + invalid context + rendering/catalog checks passed`);

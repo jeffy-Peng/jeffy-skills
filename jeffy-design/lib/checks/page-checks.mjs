@@ -48,22 +48,17 @@ export async function auditDeck(page, theme) {
           });
         }
         const strokes = [];
-        for (const frame of [sheet, ...sheet.querySelectorAll('iframe')]) {
-          try {
-            const doc = frame === sheet ? sheet : frame.contentDocument;
-            for (const node of doc.querySelectorAll('[stroke-width]')) {
-              // 没有描边的节点（stroke:none）不算线宽，否则实心色块会被误判成 1px 线。
-              const stroke = (node.getAttribute('stroke') || '').toLowerCase();
-              if (!stroke || stroke === 'none' || stroke === 'transparent') continue;
-              const w = parseFloat(node.getAttribute('stroke-width'));
-              // 按角色分组：网格线和轴线本来就不是一个粗细，不能互相比较。
-              if (Number.isFinite(w))
-                strokes.push({
-                  role: node.getAttribute('data-stroke-role') || node.getAttribute('data-shape-role') || null,
-                  w: +w.toFixed(3),
-                });
-            }
-          } catch {}
+        for (const node of sheet.querySelectorAll('[stroke-width]')) {
+          // 没有描边的节点（stroke:none）不算线宽，否则实心色块会被误判成 1px 线。
+          const stroke = (node.getAttribute('stroke') || '').toLowerCase();
+          if (!stroke || stroke === 'none' || stroke === 'transparent') continue;
+          const w = parseFloat(node.getAttribute('stroke-width'));
+          // 按角色分组：网格线和轴线本来就不是一个粗细，不能互相比较。
+          if (Number.isFinite(w))
+            strokes.push({
+              role: node.getAttribute('data-stroke-role') || node.getAttribute('data-shape-role') || null,
+              w: +w.toFixed(3),
+            });
         }
         const centering = [...sheet.querySelectorAll('[data-text-center]')].map((shape) => {
           const key = shape.dataset.focusKey;

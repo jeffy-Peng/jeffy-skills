@@ -1,16 +1,16 @@
 // 环境自检与自修。换机器、容器重建、隔了几个月回来，先跑这一条。
 // 用法 node scripts/doctor.mjs [--no-install]
 import { fontPython } from '../lib/font-environment.mjs';
+import { getDefaultThemeName, loadThemeConfig, PROJECT_ROOT } from '../lib/constants.mjs';
+import { withBrowser } from '../lib/browser.mjs';
 import { tmpdir } from 'node:os';
 import { readFileSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const root = PROJECT_ROOT;
 const noInstall = process.argv.includes('--no-install');
 const results = [];
-const browser = await import('../lib/browser.mjs');
 
 function run(command, args) {
   return spawnSync(command, args, { cwd: root, encoding: 'utf8', stdio: 'pipe' });
@@ -59,31 +59,19 @@ await check(
   { description: 'npm install', run: () => run('npm', ['install', '--no-audit', '--no-fund']) },
 );
 
-await check(
-  'Chromium 浏览器',
-  async () => {
-    const launched = await browser.loadChromium().launch({ executablePath: browser.findChrome() });
-    const version = launched.version();
-    await launched.close();
-    return 'Chromium ' + version;
-  },
-  {
-    description: 'npx playwright install chromium',
-    run: () => run('npx', ['playwright', 'install', 'chromium']),
-  },
-);
+await check('Chromium 浏览器', async () => withBrowser((b) => 'Chromium ' + b.version()), {
+  description: 'npx playwright install chromium',
+  run: () => run('npx', ['playwright', 'install', 'chromium']),
+});
 
-const theme = JSON.parse(readFileSync(resolve(root, 'themes/simple-line.json'), 'utf8'));
-await check('主题字体（真实浏览器）', async () => {
-  const b = await browser.loadChromium().launch({ executablePath: browser.findChrome() });
-  try {
+const theme = loadThemeConfig(getDefaultThemeName());
+await check('主题字体（真实浏览器）', async () =>
+  withBrowser(async (b) => {
     const p = await b.newPage();
     await p.addScriptTag({ content: readFileSync(resolve(root, 'lib/theming/drawing-fonts.js'), 'utf8') });
     return (await p.evaluate((t) => window.ThemeFontCheck.fonts(document, t), theme)).join('、');
-  } finally {
-    await b.close();
-  }
-});
+  }),
+);
 if (process.argv.includes('--embed')) await check('字体子集工具', () => fontPython());
 
 await check(

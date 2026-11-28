@@ -2,19 +2,17 @@
 // 用例从已有样本派生：基础、单条、十二条、超长标签。期望是「通过或明确报容量」，不允许崩溃或静默。
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { getDefaultThemeName, PROJECT_ROOT, readJson } from '../lib/constants.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const root = PROJECT_ROOT;
 const out = resolve(process.argv[2] || 'build/reports/material-contract.json');
 mkdirSync(dirname(out), { recursive: true });
 
 const fixtures = ['tests/composition/pressure.json', 'tests/composition/extended.json'].flatMap((f) =>
-  JSON.parse(readFileSync(resolve(root, f), 'utf8')).pages.flatMap((p) =>
-    p.components.map((c) => ({ page: p, component: c })),
-  ),
+  readJson(f).pages.flatMap((p) => p.components.map((c) => ({ page: p, component: c }))),
 );
-const capability = JSON.parse(readFileSync(resolve(root, 'assets/capability.json'), 'utf8'));
+const capability = readJson('assets/capability.json');
 // 关系与流程类素材的样本由节点和连线组成，机械复制会造出非法结构，这几类只跑基础用例。
 const MUTABLE = new Set(['compare', 'trend', 'share', 'table', 'timeline']);
 const samples = new Map();
@@ -99,7 +97,7 @@ for (const [material, sample] of samples) {
 const deckPath = join(root, 'build/reports/material-contract.deck.json');
 const htmlPath = join(root, 'build/reports/material-contract.html');
 const reportPath = join(root, 'build/reports/material-contract.pages.json');
-const THEME = JSON.parse(readFileSync(resolve(root, 'build/generated/themes.json'), 'utf8'))[0].name;
+const THEME = getDefaultThemeName();
 writeFileSync(deckPath, JSON.stringify({ theme: THEME, pages }, null, 2));
 const built = spawnSync(process.execPath, [resolve(root, 'scripts/build-composition.mjs'), deckPath, htmlPath], {
   encoding: 'utf8',
@@ -117,20 +115,13 @@ if (
   verified.signal ||
   !report.audit ||
   !Array.isArray(report.audit.issues) ||
+  !Array.isArray(report.errors) ||
   verified.status === null ||
-  report.errors?.length ||
-  report.audit?.error ||
+  report.errors.length ||
+  report.audit.error ||
   report.pages?.length !== pages.length
 )
   throw Error('验收未完成或报告覆盖不足');
-if (
-  !report.audit ||
-  !Array.isArray(report.audit.issues) ||
-  !Array.isArray(report.errors) ||
-  verified.error ||
-  verified.signal
-)
-  throw Error('验收基础设施或报告缺失');
 const reportedFailure = report.pages.some((p) => !p.ok) || report.audit.issues.length > 0;
 if (verified.status !== (reportedFailure ? 1 : 0)) throw Error('验收退出码与报告不一致，不能读取旧报告放行');
 const byPage = new Map(report.pages.map((p) => [p.id, p]));

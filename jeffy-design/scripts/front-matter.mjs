@@ -58,10 +58,6 @@ export function parseFrontMatter(text) {
     if (!kv) continue;
     const [, key, rawValue] = kv;
 
-    if (indent > 0 && currentItem && data[currentKey] === undefined) {
-      currentItem[key] = scalar(rawValue);
-      continue;
-    }
     if (indent > 0 && currentItem) {
       currentItem[key] = scalar(rawValue);
       continue;

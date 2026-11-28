@@ -2,15 +2,16 @@ import { readFileSync, writeFileSync, mkdirSync, mkdtempSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+import { pathToFileURL } from 'node:url';
+import { getDefaultThemeName, PROJECT_ROOT } from '../lib/constants.mjs';
+import { withBrowser } from '../lib/browser.mjs';
+const root = PROJECT_ROOT,
   out = resolve(process.argv[2] || 'adapters-validation.json');
 mkdirSync(dirname(out), { recursive: true });
 const deck = JSON.parse(readFileSync(join(root, 'tests/composition/extended.json'), 'utf8')),
   all = deck.pages.flatMap((p) => p.components),
   work = mkdtempSync(join(tmpdir(), 'ppt-adapters-')),
-  THEME = JSON.parse(readFileSync(join(root, 'build/generated/themes.json'), 'utf8'))[0]?.name || 'klein-blue',
+  THEME = getDefaultThemeName(),
   cases = [];
 function add(name, id, options = {}, change = null, expected = null) {
   const c = structuredClone(all.find((x) => x.material === id));
@@ -62,9 +63,8 @@ add('timeline-duplicate-id', 'TIME-001', {}, (c) => (c.data.events[1].id = c.dat
 add('hierarchy-empty-root', 'REL-001', {}, (c) => (c.data.root = {}), 'DATA');
 add('hierarchy-small-slot', 'REL-001', {}, (c) => (c.box = { x: 64, y: 170, width: 120, height: 70 }), 'CAPACITY');
 add('grouped-small-slot', 'BAR-002', {}, (c) => (c.box = { x: 64, y: 170, width: 100, height: 60 }), 'CAPACITY');
-const browser = await loadChromium().launch({ executablePath: findChrome() }),
-  results = [];
-try {
+const results = [];
+await withBrowser(async (browser) => {
   const page = await browser.newPage({ viewport: { width: 1340, height: 900 }, reducedMotion: 'reduce' });
   for (const { name, c, expected } of cases) {
     const input = join(work, name + '.json'),
@@ -132,6 +132,4 @@ try {
     console.log(results.filter((x) => !x.pass));
     process.exitCode = 1;
   }
-} finally {
-  await browser.close();
-}
+});

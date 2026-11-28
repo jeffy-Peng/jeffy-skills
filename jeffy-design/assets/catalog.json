@@ -151,6 +151,7 @@
       "options": [
         "direction",
         "mode",
+        "sort",
         "widthRatio"
       ],
       "shape": "parts-stacked",
@@ -193,7 +194,8 @@
       "archetype": "compare",
       "options": [
         "direction",
-        "sort"
+        "sort",
+        "widthRatio"
       ],
       "shape": "compare-sign",
       "tier": "backup",
@@ -274,7 +276,8 @@
       "archetype": "compare",
       "options": [
         "direction",
-        "sort"
+        "sort",
+        "widthRatio"
       ],
       "shape": "bar-target",
       "tier": "backup",
@@ -347,7 +350,8 @@
       "archetype": "compare",
       "options": [
         "direction",
-        "sort"
+        "sort",
+        "widthRatio"
       ],
       "shape": "distribution",
       "tier": "backup",
@@ -708,7 +712,8 @@
       "archetype": "share",
       "options": [
         "intensity",
-        "center"
+        "center",
+        "sort"
       ],
       "shape": "parts-of-whole-2d",
       "tier": "primary",

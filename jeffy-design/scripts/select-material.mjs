@@ -1,12 +1,11 @@
 // 素材选型：按数据形状与意图给出候选，并说明为什么排除别的。
 // 用法 node scripts/select-material.mjs <数据.json> [--intent 比较|构成|趋势|时间|关系|流程|表格]
 import { readFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
+import { readJson } from '../lib/constants.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const catalog = JSON.parse(readFileSync(resolve(root, 'assets/catalog.json'), 'utf8')).entries;
-const cap = JSON.parse(readFileSync(resolve(root, 'assets/capability.json'), 'utf8'));
+const catalog = readJson('assets/catalog.json').entries;
+const cap = readJson('assets/capability.json');
 const byId = Object.fromEntries(catalog.map((e) => [e.id, e]));
 
 const file = process.argv[2];

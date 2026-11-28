@@ -39,7 +39,7 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 - 笔触 `lib/styles/registry.json`：登记有哪些笔触、支持哪些原型、可接受哪些参数。当前落笔质感由主题量（圆角、线宽、填充、明度阶梯）决定，笔触层只做声明与校验。
 - 素材 `assets/materials/<ID>.md`：一条素材一个文件，写语义、画法、可调参数、规则和验收。
 
-几何集中在 `lib/theming/renderers.js`，共用轴、图例等在 `lib/kit/`。素材和主题不复制引擎；已有能力可配置复用，未实现的新形态需补代码。
+几何集中在 `lib/theming/renderers/`（按图形家族拆分为共享内核、直角坐标、极坐标、表格时间、关系流向），由 `lib/theming/renderers.js` 统一注册分发；共用轴、图例等在 `lib/kit/`，色彩计算在 `lib/theming/color.js`。素材和主题不复制引擎；已有能力可配置复用，未实现的新形态需补代码。
 
 ## 六种页面
 
@@ -75,14 +75,16 @@ node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation
 ## 验证
 
 ```sh
-npm test                           # 同步检查 + 主题契约
-npm run gen:rules                  # 从 contract 生成规则清单
+npm test                           # 同步检查 + 规则表检查 + 主题契约 + 架构守卫
+npm run gen:rules                  # 从 contract 生成规则清单（--check 只检查）
+npm run test:arch                  # 架构边界、SSOT 对齐、无循环依赖守卫
 npm run test:composition           # 组装回归
 npm run test:adapters              # 参数回归
 npm run test:themes                # 主题与区域检查
 npm run test:materials             # 素材契约用例
 npm run test:selection             # 类型与视觉形态选材
 npm run test:review                # 规则冲突和实际绘制反例
+npm run test:html:smoke            # 真实浏览器 HTML 交互事件冒烟
 npm run specimen BAR-001           # 生成素材示意图（只有图表，26 条引擎素材）
 npm run baseline                   # 从当前源码重绘引擎素材后比较已批准基线
 ```

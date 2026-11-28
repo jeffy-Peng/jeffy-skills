@@ -2,9 +2,10 @@ import { readFileSync, writeFileSync, mkdirSync, mkdtempSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+import { pathToFileURL } from 'node:url';
+import { PROJECT_ROOT } from '../lib/constants.mjs';
+import { withBrowser } from '../lib/browser.mjs';
+const root = PROJECT_ROOT;
 const out = resolve(process.argv[2] || 'composition-regression.json');
 mkdirSync(dirname(out), { recursive: true });
 const baseline = JSON.parse(readFileSync(join(root, 'tests/composition/pressure.json'), 'utf8'));
@@ -26,9 +27,8 @@ const cases = [
   ['invalid-table', (d) => d.pages[2].components[1].data.rows[0].pop(), 'DATA'],
   ['long-label', (d) => (d.pages[2].components[0].data.data[0].label = '非常长的方案名称'.repeat(12)), 'CAPACITY'],
 ];
-const browser = await loadChromium().launch({ executablePath: findChrome() }),
-  results = [];
-try {
+const results = [];
+await withBrowser(async (browser) => {
   const page = await browser.newPage({ viewport: { width: 1340, height: 900 }, reducedMotion: 'reduce' });
   for (const [name, mutate, expected] of cases) {
     const d = structuredClone(baseline);
@@ -160,6 +160,4 @@ try {
   );
   console.log(results.filter((r) => r.pass).length + '/' + results.length + ' 项通过');
   if (results.some((r) => !r.pass)) process.exitCode = 1;
-} finally {
-  await browser.close();
-}
+});

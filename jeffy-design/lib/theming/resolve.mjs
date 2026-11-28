@@ -1,11 +1,6 @@
-import { readFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { ARCHETYPES, loadThemeConfig, loadThemeDefaults, readJson } from '../constants.mjs';
 
-const REGISTRY = JSON.parse(
-  readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../styles/registry.json'), 'utf8'),
-);
-const ARCHETYPES = ['compare', 'trend', 'share', 'table', 'timeline', 'relation', 'flow'];
+const REGISTRY = readJson('lib/styles/registry.json');
 
 export function resolveTheme(theme, defaults, paletteName) {
   // 色板是外观内的一层：同一套设计语言可以换色板，不改字号与版面。
@@ -136,4 +131,8 @@ export function resolveTheme(theme, defaults, paletteName) {
       if (role.size % unit !== 0) fail(`笔触 ${name} 要求字号是 ${unit} 的倍数，角色 ${role.role} 是 ${role.size}`);
   }
   return { ...theme, materials, brush };
+}
+
+export function loadResolvedTheme(themeName, paletteName) {
+  return resolveTheme(loadThemeConfig(themeName), loadThemeDefaults(), paletteName);
 }
