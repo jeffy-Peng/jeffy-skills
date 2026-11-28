@@ -50,6 +50,11 @@ check('rules-table-in-sync', () => {
   assert.equal(res.status, 0, res.stderr || res.stdout);
 });
 
+check('catalog-in-sync', () => {
+  const res = spawnSync(process.execPath, [projectPath('scripts/build-catalog.mjs'), '--check'], { encoding: 'utf8' });
+  assert.equal(res.status, 0, res.stderr || res.stdout);
+});
+
 check('runtime-bundle-files-exist', () => {
   const themeName = getDefaultThemeName();
   for (const file of new Set([...DECK_RUNTIME_SCRIPT_FILES, ...visualBaselineSourceFiles(themeName)])) {

@@ -6,7 +6,8 @@
   "description": "Content-first presentation design with reusable materials, themes, composition and validation.",
   "scripts": {
     "test": "node scripts/sync.mjs --check && node scripts/gen-rules.mjs --check && node scripts/test-theme-contract.mjs && node scripts/test-architecture.mjs",
-    "catalog": "node scripts/run-python.mjs scripts/build-catalog.py",
+    "catalog": "node scripts/build-catalog.mjs",
+    "catalog:check": "node scripts/build-catalog.mjs --check",
     "example:pressure": "node scripts/build-composition.mjs tests/composition/pressure.json build/pressure/index.html",
     "example:extended": "node scripts/build-composition.mjs tests/composition/extended.json build/extended/index.html",
     "verify:pressure": "node scripts/verify-page.mjs build/pressure/index.html build/pressure/validation.json",
