@@ -18,17 +18,29 @@ window.ThemeRenderers = (() => {
       fail('UNSUPPORTED', '折线 mode 控制数据变换，shape 控制普通或阶梯');
   };
 
-  const BAR_OPTIONS = ['direction', 'mode', 'kind', 'widthRatio', 'sort'];
+  const BAR_SORT_OPTIONS = ['direction', 'sort', 'widthRatio'];
   const GRAPH_OPTIONS = ['direction', 'details', 'arrows', 'labels', 'focus'];
 
   const SPECS = {
-    'BAR-001': { render: cartesian.bars, allowedOptions: BAR_OPTIONS, validate: validateBars('BAR-001') },
-    'BAR-002': { render: cartesian.bars, allowedOptions: BAR_OPTIONS, validate: validateBars('BAR-002') },
-    'BAR-003': { render: cartesian.bars, allowedOptions: BAR_OPTIONS, validate: validateBars('BAR-003') },
-    'BAR-005': { render: cartesian.bars, allowedOptions: BAR_OPTIONS, validate: validateBars('BAR-005') },
-    'BAR-006': { render: cartesian.bars, allowedOptions: BAR_OPTIONS, validate: validateBars('BAR-006') },
-    'BAR-007': { render: cartesian.bars, allowedOptions: BAR_OPTIONS, validate: validateBars('BAR-007') },
-    'DIST-001': { render: cartesian.bars, allowedOptions: BAR_OPTIONS, validate: validateBars('DIST-001') },
+    'BAR-001': {
+      render: cartesian.bars,
+      allowedOptions: ['direction', 'sort', 'widthRatio', 'kind'],
+      validate: validateBars('BAR-001'),
+    },
+    'BAR-002': { render: cartesian.bars, allowedOptions: BAR_SORT_OPTIONS, validate: validateBars('BAR-002') },
+    'BAR-003': {
+      render: cartesian.bars,
+      allowedOptions: ['direction', 'mode', 'sort', 'widthRatio'],
+      validate: validateBars('BAR-003'),
+    },
+    'BAR-005': { render: cartesian.bars, allowedOptions: BAR_SORT_OPTIONS, validate: validateBars('BAR-005') },
+    'BAR-006': {
+      render: cartesian.bars,
+      allowedOptions: ['direction', 'widthRatio'],
+      validate: validateBars('BAR-006'),
+    },
+    'BAR-007': { render: cartesian.bars, allowedOptions: BAR_SORT_OPTIONS, validate: validateBars('BAR-007') },
+    'DIST-001': { render: cartesian.bars, allowedOptions: BAR_SORT_OPTIONS, validate: validateBars('DIST-001') },
     'LINE-001': {
       render: cartesian.lines,
       allowedOptions: ['single', 'mode', 'shape', 'zero', 'points', 'labels', 'focus', 'area'],
@@ -45,7 +57,7 @@ window.ThemeRenderers = (() => {
     'TIME-001': { render: tabular.timeline, allowedOptions: ['direction', 'spacing', 'details', 'focus'] },
     'HEAT-001': { render: tabular.heatmap, allowedOptions: ['labels'] },
     'TIME-002': { render: tabular.gantt, allowedOptions: [] },
-    'REL-001': { render: relational.hierarchy, allowedOptions: GRAPH_OPTIONS },
+    'REL-001': { render: relational.hierarchy, allowedOptions: ['direction', 'details', 'focus'] },
     'REL-003': { render: relational.containment, allowedOptions: [] },
     'REL-004': { render: relational.layers, allowedOptions: [] },
     'REL-006': { render: relational.graph, allowedOptions: GRAPH_OPTIONS },

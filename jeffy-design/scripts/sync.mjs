@@ -44,6 +44,10 @@ function mergeMaterials(catalog, files) {
       const d = file.data;
       if (!ARCHETYPES.includes(d.archetype) || !['engine', 'model'].includes(d.implementation))
         throw Error(d.id + ' 缺少有效 archetype/implementation');
+      const declaredOptions = Array.isArray(d.options) ? d.options : [];
+      for (const defaultKey of Object.keys(d.defaults || {})) {
+        if (!declaredOptions.includes(defaultKey)) throw Error(`${d.id} 的 defaults.${defaultKey} 未在 options 中声明`);
+      }
       const entry = {
         aliases: [],
         purpose: d.name || d.form,
@@ -83,6 +87,7 @@ function build() {
     shape: entry.shape || null,
     tier: entry.tier || 'backup',
     implementation: entry.implementation || 'engine',
+    options: Array.isArray(entry.options) ? entry.options : [],
     defaults: entry.defaults || {},
     encoding: entry.encoding || null,
     readingTime: entry.readingTime || null,
@@ -100,6 +105,7 @@ function build() {
         archetype: material.archetype,
         renderer: 'theme-v1',
         implementedIn: 'lib/theming/renderers.js',
+        allowedOptions: material.options,
         defaultOptions: material.defaults,
         sampleSource: material.sources[0] || null,
       },

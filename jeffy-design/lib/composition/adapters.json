@@ -3,6 +3,12 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "sort",
+      "widthRatio",
+      "kind"
+    ],
     "defaultOptions": {
       "direction": "vertical",
       "sort": "given"
@@ -13,6 +19,11 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "sort",
+      "widthRatio"
+    ],
     "defaultOptions": {
       "direction": "vertical",
       "widthRatio": 0.5
@@ -23,6 +34,12 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "mode",
+      "sort",
+      "widthRatio"
+    ],
     "defaultOptions": {
       "direction": "vertical",
       "mode": "absolute"
@@ -33,6 +50,11 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "sort",
+      "widthRatio"
+    ],
     "defaultOptions": {
       "direction": "vertical",
       "sort": "given"
@@ -43,6 +65,10 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "widthRatio"
+    ],
     "defaultOptions": {
       "direction": "vertical"
     },
@@ -52,6 +78,11 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "sort",
+      "widthRatio"
+    ],
     "defaultOptions": {
       "direction": "vertical",
       "sort": "given"
@@ -62,6 +93,7 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [],
     "defaultOptions": {},
     "sampleSource": null
   },
@@ -69,6 +101,11 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "sort",
+      "widthRatio"
+    ],
     "defaultOptions": {
       "direction": "vertical",
       "sort": "given"
@@ -79,6 +116,13 @@
     "archetype": "flow",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "details",
+      "arrows",
+      "labels",
+      "focus"
+    ],
     "defaultOptions": {
       "direction": "horizontal",
       "details": true,
@@ -91,6 +135,9 @@
     "archetype": "flow",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "conversion"
+    ],
     "defaultOptions": {
       "conversion": true
     },
@@ -100,6 +147,9 @@
     "archetype": "table",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "labels"
+    ],
     "defaultOptions": {
       "labels": true
     },
@@ -109,6 +159,16 @@
     "archetype": "trend",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "mode",
+      "shape",
+      "zero",
+      "points",
+      "labels",
+      "focus",
+      "area",
+      "single"
+    ],
     "defaultOptions": {
       "mode": "line",
       "shape": "line",
@@ -121,6 +181,9 @@
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "labels"
+    ],
     "defaultOptions": {
       "labels": true
     },
@@ -130,6 +193,11 @@
     "archetype": "share",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "donut",
+      "percent",
+      "sort"
+    ],
     "defaultOptions": {
       "donut": false,
       "percent": true,
@@ -141,6 +209,11 @@
     "archetype": "share",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "intensity",
+      "center",
+      "sort"
+    ],
     "defaultOptions": {
       "intensity": true,
       "center": false,
@@ -152,6 +225,7 @@
     "archetype": "compare",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [],
     "defaultOptions": {},
     "sampleSource": null
   },
@@ -159,6 +233,11 @@
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "details",
+      "focus"
+    ],
     "defaultOptions": {
       "direction": "vertical",
       "details": true
@@ -169,6 +248,7 @@
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [],
     "defaultOptions": {},
     "sampleSource": null
   },
@@ -176,6 +256,7 @@
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [],
     "defaultOptions": {},
     "sampleSource": null
   },
@@ -183,6 +264,13 @@
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "details",
+      "arrows",
+      "labels",
+      "focus"
+    ],
     "defaultOptions": {
       "direction": "horizontal",
       "details": true,
@@ -195,6 +283,7 @@
     "archetype": "flow",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [],
     "defaultOptions": {},
     "sampleSource": null
   },
@@ -202,6 +291,9 @@
     "archetype": "relation",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "labels"
+    ],
     "defaultOptions": {
       "labels": true
     },
@@ -211,6 +303,9 @@
     "archetype": "table",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "focus"
+    ],
     "defaultOptions": {},
     "sampleSource": null
   },
@@ -218,6 +313,9 @@
     "archetype": "table",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "focus"
+    ],
     "defaultOptions": {},
     "sampleSource": null
   },
@@ -225,6 +323,12 @@
     "archetype": "timeline",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [
+      "direction",
+      "spacing",
+      "details",
+      "focus"
+    ],
     "defaultOptions": {
       "direction": "vertical",
       "spacing": "equal",
@@ -236,6 +340,7 @@
     "archetype": "timeline",
     "renderer": "theme-v1",
     "implementedIn": "lib/theming/renderers.js",
+    "allowedOptions": [],
     "defaultOptions": {},
     "sampleSource": null
   }
