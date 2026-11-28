@@ -1,9 +1,7 @@
 // 讲稿与画面数字比对。用真实渲染出来的文字，不用输入数据，避免坐标和原始数组干扰。
 // 用法 node scripts/check-notes.mjs deck.json out.html [notes.md]
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
+import { withBrowser, openDeckPage } from '../lib/browser.mjs';
 
 const [deckPath, htmlArg, notesArg] = process.argv.slice(2);
 if (!deckPath || !htmlArg) throw Error('用法 node scripts/check-notes.mjs deck.json out.html [notes.md]');
@@ -51,33 +49,16 @@ function normalizeChineseNumbers(text) {
     .replace(/[零〇一二两三四五六七八九十百千万]{2,}/g, (m) => String(cnNumber(m)));
 }
 
-const browser = await loadChromium().launch({ executablePath: findChrome() });
-let pageTexts = [];
-try {
-  const page = await browser.newPage({ viewport: { width: 1400, height: 1000 }, reducedMotion: 'reduce' });
-  await page.goto(pathToFileURL(resolve(htmlArg)).href);
-  await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 });
-  pageTexts = await page.evaluate(() =>
+const pageTexts = await withBrowser(async (browser) => {
+  const { page } = await openDeckPage(browser, htmlArg);
+  return page.evaluate(() =>
     [...document.querySelectorAll('.sheet')].map((sheet) => {
       const own = sheet.innerText || '';
       // SVG 里的 <text> 不进 innerText，必须单独取，否则图表上的数字全部漏掉。
-      const inner = [...sheet.querySelectorAll('iframe')]
-        .map((frame) => {
-          try {
-            const doc = frame.contentDocument;
-            const svg = [...doc.querySelectorAll('svg text')].map((t) => t.textContent).join(' ');
-            return (doc.body.innerText || '') + '\n' + svg;
-          } catch {
-            return '';
-          }
-        })
-        .join('\n');
-      return own + '\n' + [...sheet.querySelectorAll('svg text')].map((t) => t.textContent).join(' ') + '\n' + inner;
+      return own + '\n' + [...sheet.querySelectorAll('svg text')].map((t) => t.textContent).join(' ');
     }),
   );
-} finally {
-  await browser.close();
-}
+});
 if (!pageTexts.length) throw Error('页面里没有 .sheet，先确认渲染是否失败');
 
 // 自动检查只声称数量/单位一致，不推定对象、分母和因果正确。

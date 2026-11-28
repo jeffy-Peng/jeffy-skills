@@ -1,10 +1,10 @@
 // 提纲前置校验：每页必须有可回答的问题与结论，素材须有实现或可按规范绘制。
 // 用法 node scripts/validate-outline.mjs outline.json [capability.json]
-import { readFileSync, existsSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { getDeliverables, PROJECT_ROOT, STRUCTURAL_OUTLINE_TYPES } from '../lib/constants.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const root = PROJECT_ROOT;
 const [input, capPath] = process.argv.slice(2);
 if (!input) throw Error('用法 node scripts/validate-outline.mjs outline.json [capability.json]');
 
@@ -21,7 +21,7 @@ const required =
   deck.deliverable === 'chart'
     ? ['id']
     : ['id', 'title', 'question', 'claim', 'readingOrder', 'speakerNotes', 'source'];
-const DELIVERABLES = ['chart', 'deck', 'report'];
+const DELIVERABLES = getDeliverables();
 const deliverable = deck.deliverable || 'deck';
 if (!DELIVERABLES.includes(deliverable))
   problems.push({ code: 'CONTENT', message: '交付形式只能是 ' + DELIVERABLES.join(' / ') });
@@ -29,7 +29,7 @@ if (!DELIVERABLES.includes(deliverable))
 if (!Array.isArray(deck.pages) || !deck.pages.length) problems.push({ code: 'CONTENT', message: '没有页面' });
 for (const [index, page] of (deck.pages || []).entries()) {
   const label = page.id || `第${index + 1}页`;
-  const structural = ['cover', 'section', 'toc', 'closing'].includes(page.type);
+  const structural = STRUCTURAL_OUTLINE_TYPES.includes(page.type);
   for (const key of structural ? ['id', 'title'] : required) {
     const value = page[key];
     const empty =

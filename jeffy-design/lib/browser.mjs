@@ -2,11 +2,11 @@
 // 顺序：环境变量 → 本仓库 node_modules → DSH profile。都找不到就给出安装命令。
 import { createRequire } from 'node:module';
 import { existsSync, readdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { PROJECT_ROOT } from './constants.mjs';
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-export const PROJECT_ROOT = resolve(HERE, '..');
+export { PROJECT_ROOT };
 
 function tryPkg(pkgJson) {
   if (!pkgJson || !existsSync(pkgJson)) return null;
@@ -83,4 +83,33 @@ export function findChrome() {
   ].filter(Boolean);
   for (const p of system) if (existsSync(p)) return p;
   return undefined;
+}
+
+export async function withBrowser(fn, launchOptions = {}) {
+  const browser = await loadChromium().launch({ executablePath: findChrome(), ...launchOptions });
+  try {
+    return await fn(browser);
+  } finally {
+    await browser.close();
+  }
+}
+
+export async function openDeckPage(browser, htmlPath, options = {}) {
+  const {
+    viewport = { width: 1400, height: 1000 },
+    deviceScaleFactor,
+    reducedMotion = 'reduce',
+    staticMode = false,
+    timeout = 20000,
+  } = options;
+  const pageOptions = { viewport, reducedMotion };
+  if (deviceScaleFactor !== undefined) pageOptions.deviceScaleFactor = deviceScaleFactor;
+  const page = await browser.newPage(pageOptions);
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const url = pathToFileURL(resolve(htmlPath));
+  if (staticMode) url.searchParams.set('static', '1');
+  await page.goto(url.href);
+  await page.waitForFunction(() => window.renderComplete === true, {}, { timeout });
+  return { page, errors };
 }

@@ -1,28 +1,16 @@
 // 渲染验收：页面报告 + 整页检查（含手画页）。
-import { writeFileSync, readFileSync, existsSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { pathToFileURL, fileURLToPath } from 'node:url';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
+import { writeFileSync } from 'node:fs';
+import { getDefaultThemeName, loadThemeConfig } from '../lib/constants.mjs';
+import { withBrowser, openDeckPage } from '../lib/browser.mjs';
 import { auditDeck } from '../lib/checks/page-checks.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const generatedThemes = resolve(root, 'build', 'generated', 'themes.json');
-const defaultTheme = existsSync(generatedThemes)
-  ? JSON.parse(readFileSync(generatedThemes, 'utf8'))[0].name
-  : 'simple-line';
+const defaultTheme = getDefaultThemeName();
 const [file, out = 'validation.json', themeName = defaultTheme] = process.argv.slice(2);
 if (!file) throw Error('用法 node scripts/verify-page.mjs out.html [report.json] [主题名]');
 
-const theme = JSON.parse(readFileSync(resolve(root, 'themes', themeName + '.json'), 'utf8'));
-const browser = await loadChromium().launch({ executablePath: findChrome() });
-try {
-  const page = await browser.newPage({ viewport: { width: 1400, height: 1000 }, reducedMotion: 'reduce' });
-  const errors = [];
-  page.on('pageerror', (e) => errors.push(e.message));
-  const staticUrl = pathToFileURL(resolve(file));
-  staticUrl.searchParams.set('static', '1');
-  await page.goto(staticUrl.href);
-  await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 });
+const theme = loadThemeConfig(themeName);
+await withBrowser(async (browser) => {
+  const { page, errors } = await openDeckPage(browser, file, { staticMode: true });
   const failed = await page.evaluate(() => Boolean(window.renderFailed));
   const report = await page.evaluate(() => window.validationReport || []);
   const audit = await auditDeck(page, theme).catch((e) => ({ pages: 0, nodes: 0, issues: [], error: e.message }));
@@ -55,6 +43,4 @@ try {
     for (const issue of auditIssues.slice(0, 8))
       console.log(`  [${issue.code}] ${issue.page ? issue.page + ' ' : ''}${issue.message}`);
   }
-} finally {
-  await browser.close();
-}
+});

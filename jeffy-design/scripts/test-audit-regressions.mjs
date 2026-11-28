@@ -1,12 +1,13 @@
 // 对抗审查反例：正确输入通过，缺覆盖、丢关系、单位误读不能通过。
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, mkdirSync, unlinkSync, cpSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
+import { PROJECT_ROOT } from '../lib/constants.mjs';
+import { withBrowser } from '../lib/browser.mjs';
 import { auditDeck } from '../lib/checks/page-checks.mjs';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+const root = PROJECT_ROOT,
   work = join(root, 'build/audit-regressions');
 mkdirSync(work, { recursive: true });
 const results = [];
@@ -66,6 +67,7 @@ test('sourced-background-is-reviewable', () => assert.equal(run('check-notes.mjs
 test('unknown-baseline-fails', () => assert.notEqual(run('visual-baseline.mjs', 'DOES-NOT-EXIST').status, 0));
 const isolated = join(work, 'sync-fixture');
 for (const path of [
+  'lib/constants.mjs',
   'scripts/sync.mjs',
   'scripts/front-matter.mjs',
   'themes',
@@ -141,8 +143,7 @@ test('image-build-and-verify', () => {
   assert.equal(run('verify-page.mjs', out, join(work, 'image-report.json')).status, 0);
 });
 // 真实浏览器运行引擎，检查非法连线、守恒与两边共享比例。
-const browser = await loadChromium().launch({ executablePath: findChrome() });
-try {
+await withBrowser(async (browser) => {
   const p = await browser.newPage();
   await p.goto(pathToFileURL(html).href);
   await p.waitForFunction(() => window.renderComplete);
@@ -258,8 +259,6 @@ try {
   await p.goto(pathToFileURL(join(work, 'custom.html')).href);
   await p.waitForFunction(() => window.renderComplete);
   await p.locator('.sheet').screenshot({ path: join(work, 'custom.png') });
-} finally {
-  await browser.close();
-}
+});
 writeFileSync(join(work, 'results.json'), JSON.stringify(results, null, 2));
 console.log(results.length + ' 项对抗回归通过');

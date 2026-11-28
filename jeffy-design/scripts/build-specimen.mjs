@@ -1,15 +1,15 @@
 // 生成素材示意图：只用素材本身，不带页面骨架。占位数据用 A、B、C、D。
 // 用法 node scripts/build-specimen.mjs [素材ID...]
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { resolve, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
+import { getDefaultThemeName, PROJECT_ROOT, readJson } from '../lib/constants.mjs';
+import { withBrowser } from '../lib/browser.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const capability = JSON.parse(readFileSync(resolve(root, 'assets/capability.json'), 'utf8'));
-const themes = JSON.parse(readFileSync(resolve(root, 'build/generated/themes.json'), 'utf8'));
-const themeName = process.env.SPECIMEN_THEME || themes[0].name;
+const root = PROJECT_ROOT;
+const capability = readJson('assets/capability.json');
+const themeName = process.env.SPECIMEN_THEME || getDefaultThemeName();
 const outDir = resolve(root, process.env.SPECIMEN_DIR || 'assets/materials/specimens');
 const workDir = resolve(root, 'build/specimens');
 mkdirSync(outDir, { recursive: true });
@@ -307,68 +307,68 @@ function sample(material, archetype) {
   return null;
 }
 
-const browser = await loadChromium().launch({ executablePath: findChrome() });
 const results = [];
-for (const id of wanted) {
-  const entry = capability[id];
-  const data = sample(id, entry.archetype);
-  if (!data) {
-    results.push({ id, ok: false, note: '这个原型还没有示意图数据' });
-    continue;
-  }
-  const deck = {
-    theme: themeName,
-    palette: process.env.SPECIMEN_PALETTE || 'mono',
-    pages: [
-      {
-        id: id,
-        preview: true,
-        title: '',
-        question: '',
-        claim: '',
-        readingOrder: ['c'],
-        source: '',
-        speakerNotes: '',
-        components: [
-          { id: 'c', material: id, purpose: entry.archetype, data, box: { x: 64, y: 136, width: 1152, height: 518 } },
-        ],
-      },
-    ],
-  };
-  const deckPath = join(workDir, id + '.deck.json');
-  const htmlPath = join(workDir, id + '.html');
-  const reportPath = join(workDir, id + '.report.json');
-  writeFileSync(deckPath, JSON.stringify(deck, null, 2));
-  const built = spawnSync(process.execPath, [resolve(root, 'scripts/build-composition.mjs'), deckPath, htmlPath], {
-    encoding: 'utf8',
-  });
-  if (built.status !== 0) {
-    results.push({ id, ok: false, note: '构建失败' });
-    continue;
-  }
-  const verified = spawnSync(
-    process.execPath,
-    [resolve(root, 'scripts/verify-page.mjs'), htmlPath, reportPath, themeName],
-    {
+await withBrowser(async (browser) => {
+  for (const id of wanted) {
+    const entry = capability[id];
+    const data = sample(id, entry.archetype);
+    if (!data) {
+      results.push({ id, ok: false, note: '这个原型还没有示意图数据' });
+      continue;
+    }
+    const deck = {
+      theme: themeName,
+      palette: process.env.SPECIMEN_PALETTE || 'mono',
+      pages: [
+        {
+          id: id,
+          preview: true,
+          title: '',
+          question: '',
+          claim: '',
+          readingOrder: ['c'],
+          source: '',
+          speakerNotes: '',
+          components: [
+            { id: 'c', material: id, purpose: entry.archetype, data, box: { x: 64, y: 136, width: 1152, height: 518 } },
+          ],
+        },
+      ],
+    };
+    const deckPath = join(workDir, id + '.deck.json');
+    const htmlPath = join(workDir, id + '.html');
+    const reportPath = join(workDir, id + '.report.json');
+    writeFileSync(deckPath, JSON.stringify(deck, null, 2));
+    const built = spawnSync(process.execPath, [resolve(root, 'scripts/build-composition.mjs'), deckPath, htmlPath], {
       encoding: 'utf8',
-    },
-  );
-  const report = JSON.parse(readFileSync(reportPath, 'utf8'));
-  const page = await browser.newPage({ viewport: { width: 1340, height: 800 }, deviceScaleFactor: 2 });
-  const staticUrl = pathToFileURL(htmlPath);
-  staticUrl.searchParams.set('static', '1');
-  await page.goto(staticUrl.href);
-  await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 }).catch(() => {});
-  await page.waitForTimeout(300);
-  await page
-    .locator('.sheet')
-    .first()
-    .screenshot({ path: join(outDir, id + '.png') });
-  await page.close();
-  results.push({ id, ok: verified.status === 0 && report.pages?.[0]?.ok === true });
-  console.log(id, results.at(-1).ok ? 'PASS' : 'FAIL', '→ assets/materials/specimens/' + id + '.png');
-}
-await browser.close();
+    });
+    if (built.status !== 0) {
+      results.push({ id, ok: false, note: '构建失败' });
+      continue;
+    }
+    const verified = spawnSync(
+      process.execPath,
+      [resolve(root, 'scripts/verify-page.mjs'), htmlPath, reportPath, themeName],
+      {
+        encoding: 'utf8',
+      },
+    );
+    const report = JSON.parse(readFileSync(reportPath, 'utf8'));
+    const page = await browser.newPage({ viewport: { width: 1340, height: 800 }, deviceScaleFactor: 2 });
+    const staticUrl = pathToFileURL(htmlPath);
+    staticUrl.searchParams.set('static', '1');
+    await page.goto(staticUrl.href);
+    await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 }).catch(() => {});
+    await page.waitForTimeout(300);
+    await page
+      .locator('.sheet')
+      .first()
+      .screenshot({ path: join(outDir, id + '.png') });
+    await page.close();
+    results.push({ id, ok: verified.status === 0 && report.pages?.[0]?.ok === true });
+    console.log(id, results.at(-1).ok ? 'PASS' : 'FAIL', '→ assets/materials/specimens/' + id + '.png');
+  }
+});
 writeFileSync(join(workDir, 'index.json'), JSON.stringify({ theme: themeName, results }, null, 2));
 console.log(results.filter((r) => r.ok).length + '/' + results.length + ' 张示意图已生成');
 

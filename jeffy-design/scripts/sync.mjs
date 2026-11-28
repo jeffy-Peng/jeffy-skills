@@ -1,27 +1,23 @@
 // 扫描主题与素材声明，生成登记表、能力表、主题清单。人只改数据，这里是唯一的生成入口。
 // 用法 node scripts/sync.mjs [--check]
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, existsSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { ARCHETYPES, listThemeFiles, PROJECT_ROOT } from '../lib/constants.mjs';
 import { parseFrontMatter } from './front-matter.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const root = PROJECT_ROOT;
 const checkOnly = process.argv.includes('--check');
 const outDir = join(root, 'build', 'generated');
-const ARCHETYPES = ['compare', 'trend', 'share', 'table', 'timeline', 'relation', 'flow'];
 
 function readThemes() {
   const dir = join(root, 'themes');
-  return readdirSync(dir)
-    .filter((name) => name.endsWith('.json'))
-    .sort((a, b) => (a === 'simple-line.json' ? -1 : b === 'simple-line.json' ? 1 : a.localeCompare(b)))
-    .map((name) => {
-      const theme = JSON.parse(readFileSync(join(dir, name), 'utf8'));
-      if (!theme.name) throw Error(`${name} 缺少 name`);
-      if (!theme.fonts?.ea || !theme.fonts?.latin) throw Error(`${name} 缺少字体声明`);
-      if (!Array.isArray(theme.scale) || !theme.scale.length) throw Error(`${name} 缺少字号阶梯`);
-      return { file: name, name: theme.name, label: theme.label || theme.name };
-    });
+  return listThemeFiles().map((name) => {
+    const theme = JSON.parse(readFileSync(join(dir, name), 'utf8'));
+    if (!theme.name) throw Error(`${name} 缺少 name`);
+    if (!theme.fonts?.ea || !theme.fonts?.latin) throw Error(`${name} 缺少字体声明`);
+    if (!Array.isArray(theme.scale) || !theme.scale.length) throw Error(`${name} 缺少字号阶梯`);
+    return { file: name, name: theme.name, label: theme.label || theme.name };
+  });
 }
 
 function readMaterialFiles() {

@@ -1,11 +1,8 @@
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { listThemeNames, loadThemeConfig, loadThemeDefaults } from '../lib/constants.mjs';
 import { resolveTheme } from '../lib/theming/resolve.mjs';
-const defaults = JSON.parse(readFileSync(new URL('../lib/theming/defaults.json', import.meta.url)));
-const dir = new URL('../themes/', import.meta.url),
-  themes = readdirSync(dir)
-    .filter((x) => x.endsWith('.json'))
-    .map((x) => JSON.parse(readFileSync(new URL(x, dir))));
+const defaults = loadThemeDefaults();
+const themes = listThemeNames().map((name) => loadThemeConfig(name));
 assert.ok(themes.length > 0, 'theme 目录下至少要有一个主题');
 assert.equal(new Set(themes.map((t) => t.name)).size, themes.length, '主题 name 不能重复');
 for (const t of themes) assert.ok(resolveTheme(t, defaults).page.content.width > 0);

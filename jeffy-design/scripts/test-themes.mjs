@@ -1,28 +1,26 @@
-import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { resolve, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
+import { listThemeNames, loadThemeConfig, loadThemeDefaults, PROJECT_ROOT, readJson } from '../lib/constants.mjs';
+import { withBrowser } from '../lib/browser.mjs';
 import { resolveTheme } from '../lib/theming/resolve.mjs';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..'),
+const root = PROJECT_ROOT,
   out = resolve(process.argv[2] || 'build/theming');
 mkdirSync(out, { recursive: true });
-const registry = JSON.parse(readFileSync(join(root, 'lib/composition/adapters.json'))),
-  defaults = JSON.parse(readFileSync(join(root, 'lib/theming/defaults.json'))),
+const registry = readJson('lib/composition/adapters.json'),
+  defaults = loadThemeDefaults(),
   components = new Map();
 for (const fixture of ['pressure', 'extended'])
-  for (const p of JSON.parse(readFileSync(join(root, 'tests/composition', fixture + '.json'))).pages)
+  for (const p of readJson(join('tests/composition', fixture + '.json')).pages)
     for (const c of p.components) components.set(c.material, c);
-const themes = readdirSync(join(root, 'themes'))
-    .filter((x) => x.endsWith('.json'))
-    .map((x) => x.replace(/\.json$/, '')),
+const themes = listThemeNames(),
   results = [],
   geometry = {};
-const browser = await loadChromium().launch({ executablePath: findChrome() });
-try {
+await withBrowser(async (browser) => {
   const page = await browser.newPage({ viewport: { width: 1340, height: 900 }, reducedMotion: 'reduce' });
   for (const name of themes) {
-    const theme = JSON.parse(readFileSync(join(root, 'themes', name + '.json'))),
+    const theme = loadThemeConfig(name),
       resolved = resolveTheme(theme, defaults),
       pages = [];
     for (const [id, a] of Object.entries(registry).filter(([, a]) => a.renderer === 'theme-v1')) {
@@ -236,6 +234,4 @@ try {
     console.log(results.filter((x) => !x.pass));
     process.exitCode = 1;
   }
-} finally {
-  await browser.close();
-}
+});
