@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Content-first presentation design with reusable materials, themes, composition and validation.",
   "scripts": {
-    "test": "node scripts/sync.mjs --check && node scripts/test-theme-contract.mjs",
+    "test": "node scripts/sync.mjs --check && node scripts/gen-rules.mjs --check && node scripts/test-theme-contract.mjs && node scripts/test-architecture.mjs",
     "catalog": "node scripts/run-python.mjs scripts/build-catalog.py",
     "example:pressure": "node scripts/build-composition.mjs tests/composition/pressure.json build/pressure/index.html",
     "example:extended": "node scripts/build-composition.mjs tests/composition/extended.json build/extended/index.html",
@@ -26,7 +26,7 @@
     "sync:check": "node scripts/sync.mjs --check",
     "doctor": "node scripts/doctor.mjs",
     "test:materials": "node scripts/test-material-contract.mjs",
-    "test:all": "npm run test && npm run test:composition && npm run test:adapters && npm run test:themes && npm run test:materials && npm run test:audit && npm run test:rhythm && npm run test:selection && npm run test:review",
+    "test:all": "npm run format:check && npm run test && npm run test:composition && npm run test:adapters && npm run test:themes && npm run test:materials && npm run test:audit && npm run test:rhythm && npm run test:selection && npm run test:review && npm run test:html:smoke",
     "specimen": "node scripts/build-specimen.mjs",
     "baseline": "node scripts/visual-baseline.mjs",
     "baseline:update": "node scripts/visual-baseline.mjs --update",
@@ -35,8 +35,10 @@
     "export": "node scripts/export-pages.mjs",
     "select": "node scripts/select-material.mjs",
     "materials-doc": "node scripts/run-python.mjs scripts/build-materials-doc.py build/materials.docx",
+    "test:arch": "node scripts/test-architecture.mjs",
     "test:audit": "node scripts/test-audit-regressions.mjs",
     "test:html": "node scripts/test-html-interaction.mjs",
+    "test:html:smoke": "npm run example:pressure && node scripts/test-html-interaction.mjs build/pressure/index.html build/reports/pressure-interaction.json",
     "test:rhythm": "node scripts/test-rhythm.mjs",
     "test:selection": "node scripts/test-material-selection.mjs",
     "test:review": "node scripts/test-skill-review.mjs"
