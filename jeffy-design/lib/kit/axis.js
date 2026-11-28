@@ -107,7 +107,7 @@ window.KitAxis = {
         window.KitUnit.label(p, { metric, unit, horizontal, right, bottom, top, pad, labelSize });
         return;
       }
-      // 轴线形状取自素材原画法 bar.js：横轴右端小箭头，纵轴顶端小箭头。
+      // 标准轴线形态：横轴右端外侧半箭头，纵轴顶端外侧半箭头。
       p.add('path', {
         d: `M${left} ${top}V${bottom}H${right}h8l-4 3 M${left} ${top}v-8l-3 4`,
         fill: 'none',

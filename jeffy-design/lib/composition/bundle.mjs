@@ -11,6 +11,11 @@ export const RENDERER_SCRIPT_FILES = Object.freeze([
   'lib/kit/layout.js',
   'lib/kit/line-labels.js',
   'lib/theming/drawing.js',
+  'lib/theming/renderers/shared.js',
+  'lib/theming/renderers/cartesian.js',
+  'lib/theming/renderers/polar.js',
+  'lib/theming/renderers/tabular.js',
+  'lib/theming/renderers/relational.js',
   'lib/theming/renderers.js',
 ]);
 
