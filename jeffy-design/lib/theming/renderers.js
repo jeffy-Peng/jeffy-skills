@@ -47,44 +47,7 @@ window.ThemeRenderers = (() => {
       axisStyle,
     });
   }
-  // 相对亮度：格子上的字取深还是取浅，按背景实际亮度定。
-  function luminance(hex) {
-    const c = [0, 2, 4]
-      .map((i) => parseInt(String(hex).replace('#', '').substr(i, 2), 16) / 255)
-      .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-  }
-  // 取对比度更高的字色：底色深浅不定时，不能按固定阈值拍。
-  function isLight(hex, inkHex, paperHex) {
-    const l = luminance(hex);
-    const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-    return ratio(l, luminance(inkHex)) >= ratio(l, luminance(paperHex));
-  }
-  // 明度阶梯：主题声明两端，中间按比例插值。占比/大小越大越深。
-  function rampColor(theme, t, f) {
-    const roles = t.shadeRamp && t.shadeRamp.length ? t.shadeRamp : ['ink', 'soft'],
-      hex = (h) =>
-        [0, 2, 4].map((i) =>
-          parseInt(
-            String(h)
-              .replace('#', '')
-              .slice(i, i + 2),
-            16,
-          ),
-        ),
-      a = hex(theme.colors[roles[0]]),
-      b = hex(theme.colors[roles[roles.length - 1]]);
-    return (
-      '#' +
-      a
-        .map((c, i) =>
-          Math.round(c + (b[i] - c) * f)
-            .toString(16)
-            .padStart(2, '0'),
-        )
-        .join('')
-    );
-  }
+  const rampColor = (theme, f) => window.ThemeColor.rampColor(theme, f);
   function bars(svg, input, opt, theme, box, material) {
     const p = setup(svg, theme, box),
       horizontal = opt.direction === 'horizontal',
@@ -238,7 +201,7 @@ window.ThemeRenderers = (() => {
             ? 0
             : (maxAbs - Math.abs(value)) / Math.max(maxAbs - minAbs, 0.0001)
           : 0;
-        const fillHex = ramp ? rampColor(theme, theme.materials, rank) : null;
+        const fillHex = ramp ? rampColor(theme, rank) : null;
         const radius = style === 'capsule' ? Math.min(w, h) / 2 : theme.materials.radius;
         const barNode = p.box('bar' + i + '-' + j, x, y, w, h, outline ? 'paper' : paint, {
           stroke: outline ? p.color(paint) : 'none',
@@ -921,24 +884,12 @@ window.ThemeRenderers = (() => {
       maxI = Math.max(...data.map((d) => d.intensity)),
       gap = (t.petalGapDeg * Math.PI) / 180,
       pt = (a, r) => [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
-    // 明度跟占比走：最大的一块最深，按排序在墨色与浅灰之间线性插值。
-    const hex = (h) => [0, 2, 4].map((i) => parseInt(h.replace('#', '').slice(i, i + 2), 16)),
-      rampRoles = t.shadeRamp?.length ? t.shadeRamp : ['ink', 'soft'],
-      dark = hex(theme.colors[rampRoles[0]]),
-      light = hex(theme.colors[rampRoles[rampRoles.length - 1]]),
-      order = data.map((d, i) => ({ i, v: d.value })).sort((a, b) => b.v - a.v),
+    // 明度跟占比走：最大的一块最深，按排序在主题明度阶梯两端之间线性插值。
+    const order = data.map((d, i) => ({ i, v: d.value })).sort((a, b) => b.v - a.v),
       shade = {};
     order.forEach((r, k) => {
       const f = order.length > 1 ? k / (order.length - 1) : 0;
-      shade[r.i] =
-        '#' +
-        dark
-          .map((c, j) =>
-            Math.round(c + (light[j] - c) * f)
-              .toString(16)
-              .padStart(2, '0'),
-          )
-          .join('');
+      shade[r.i] = rampColor(theme, f);
     });
     // 参考圈：外圈是半径标尺的上限，内圈给出最小半径的位置。
     for (const r of [R, R * t.petalRingRatio])
@@ -1136,7 +1087,7 @@ window.ThemeRenderers = (() => {
         f = i / Math.max(st.length - 1, 1);
       p.box('stage' + i, x, y, w, rowH, p.series(0), {
         rx: Math.min(6, rowH / 4),
-        fill: rampColor(theme, theme.materials, f * 0.75),
+        fill: rampColor(theme, f * 0.75),
         'data-shape-role': 'stage' + i,
         'data-focus-key': 'stage' + i,
         'data-focus-label': d.label + ' ' + num(d.value),
@@ -1193,8 +1144,8 @@ window.ThemeRenderers = (() => {
           return;
         }
         const f = max > min ? (max - v) / (max - min) : 0,
-          fill = rampColor(theme, theme.materials, f),
-          light = isLight(fill, '#' + theme.colors.ink, '#' + theme.colors.paper);
+          fill = rampColor(theme, f),
+          light = window.ThemeColor.preferDarkText(fill, theme.colors.ink, theme.colors.paper);
         p.add('rect', {
           x,
           y,
@@ -1412,7 +1363,7 @@ window.ThemeRenderers = (() => {
       p.text(left - p.tokens.gap, y, d.label, 'category', 'end');
       p.box(key, x, y - barH / 2, w, barH, p.series(0), {
         rx: Math.min(6, barH / 3),
-        fill: rampColor(theme, theme.materials, (i / Math.max(rows.length - 1, 1)) * 0.6),
+        fill: rampColor(theme, (i / Math.max(rows.length - 1, 1)) * 0.6),
         'data-shape-role': key,
         'data-focus-key': key,
         'data-focus-label': d.label + ' ' + num(d.start) + '–' + num(d.end),
@@ -1572,7 +1523,7 @@ window.ThemeRenderers = (() => {
         'data-link-from': 'nodel' + k.from,
         'data-link-to': 'noder' + k.to,
         'data-focus-label': k.from + ' → ' + k.to + ' ' + num(k.value),
-        fill: rampColor(theme, theme.materials, 0.25 + (l.findIndex((n) => n.name === k.from) % 3) * 0.18),
+        fill: rampColor(theme, 0.25 + (l.findIndex((n) => n.name === k.from) % 3) * 0.18),
         'fill-opacity': theme.materials.flowAlpha === undefined ? 0.55 : theme.materials.flowAlpha,
       });
     });

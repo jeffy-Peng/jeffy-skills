@@ -92,12 +92,9 @@ window.ThemeDrawing = {
       });
     }
     function contrast(role) {
-      const c = theme.colors[role]
-          .match(/../g)
-          .map((v) => parseInt(v, 16) / 255)
-          .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)),
-        l = c[0] * 0.2126 + c[1] * 0.7152 + c[2] * 0.0722;
-      return l > 0.35 ? 'ink' : 'paper';
+      return window.ThemeColor.preferDarkText(theme.colors[role], theme.colors.ink, theme.colors.paper)
+        ? 'ink'
+        : 'paper';
     }
     function series(i) {
       return ['accent', 'accent2', 'body', 'muted'][i % 4];
@@ -117,6 +114,6 @@ window.ThemeDrawing = {
       });
     }
 
-    return { add, text, measure, wrap, block, line, box, color, contrast, series, legend, tokens, roles, theme };
+    return { svg, add, text, measure, wrap, block, line, box, color, contrast, series, legend, tokens, roles, theme };
   },
 };

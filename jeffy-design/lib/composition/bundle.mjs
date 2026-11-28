@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { projectPath } from '../constants.mjs';
 
 export const RENDERER_SCRIPT_FILES = Object.freeze([
+  'lib/theming/color.js',
   'lib/theming/drawing-fonts.js',
   'lib/kit/legend.js',
   'lib/kit/unit.js',
