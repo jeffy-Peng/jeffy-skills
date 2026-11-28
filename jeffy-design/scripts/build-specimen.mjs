@@ -1,15 +1,16 @@
 // 生成素材示意图：只用素材本身，不带页面骨架。占位数据用 A、B、C、D。
 // 用法 node scripts/build-specimen.mjs [素材ID...]
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { spawnSync } from 'node:child_process';
-import { getDefaultThemeName, PROJECT_ROOT, readJson } from '../lib/constants.mjs';
-import { withBrowser } from '../lib/browser.mjs';
+import { getDefaultThemeName, loadThemeConfig, PROJECT_ROOT, readJson } from '../lib/constants.mjs';
+import { withBrowser, openDeckPage } from '../lib/browser.mjs';
+import { buildComposition, ensureSynced } from '../lib/composition/build.mjs';
+import { verifyDeckInPage } from '../lib/checks/verify.mjs';
 
 const root = PROJECT_ROOT;
 const capability = readJson('assets/capability.json');
 const themeName = process.env.SPECIMEN_THEME || getDefaultThemeName();
+const themeConfig = loadThemeConfig(themeName);
 const outDir = resolve(root, process.env.SPECIMEN_DIR || 'assets/materials/specimens');
 const workDir = resolve(root, 'build/specimens');
 mkdirSync(outDir, { recursive: true });
@@ -307,6 +308,7 @@ function sample(material, archetype) {
   return null;
 }
 
+ensureSynced();
 const results = [];
 await withBrowser(async (browser) => {
   for (const id of wanted) {
@@ -339,33 +341,29 @@ await withBrowser(async (browser) => {
     const htmlPath = join(workDir, id + '.html');
     const reportPath = join(workDir, id + '.report.json');
     writeFileSync(deckPath, JSON.stringify(deck, null, 2));
-    const built = spawnSync(process.execPath, [resolve(root, 'scripts/build-composition.mjs'), deckPath, htmlPath], {
-      encoding: 'utf8',
-    });
-    if (built.status !== 0) {
+    try {
+      buildComposition(deck, htmlPath, { baseDir: workDir, skipSyncCheck: true });
+    } catch {
       results.push({ id, ok: false, note: '构建失败' });
       continue;
     }
-    const verified = spawnSync(
-      process.execPath,
-      [resolve(root, 'scripts/verify-page.mjs'), htmlPath, reportPath, themeName],
-      {
-        encoding: 'utf8',
-      },
+    const { page, errors: pageErrors } = await openDeckPage(browser, htmlPath, {
+      viewport: { width: 1340, height: 800 },
+      deviceScaleFactor: 2,
+      staticMode: true,
+    });
+    const verified = await verifyDeckInPage(page, themeConfig, pageErrors);
+    writeFileSync(
+      reportPath,
+      JSON.stringify({ errors: verified.errors, pages: verified.pages, audit: verified.audit }, null, 2),
     );
-    const report = JSON.parse(readFileSync(reportPath, 'utf8'));
-    const page = await browser.newPage({ viewport: { width: 1340, height: 800 }, deviceScaleFactor: 2 });
-    const staticUrl = pathToFileURL(htmlPath);
-    staticUrl.searchParams.set('static', '1');
-    await page.goto(staticUrl.href);
-    await page.waitForFunction(() => window.renderComplete === true, {}, { timeout: 20000 }).catch(() => {});
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(100);
     await page
       .locator('.sheet')
       .first()
       .screenshot({ path: join(outDir, id + '.png') });
     await page.close();
-    results.push({ id, ok: verified.status === 0 && report.pages?.[0]?.ok === true });
+    results.push({ id, ok: verified.ok });
     console.log(id, results.at(-1).ok ? 'PASS' : 'FAIL', '→ assets/materials/specimens/' + id + '.png');
   }
 });

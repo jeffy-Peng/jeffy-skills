@@ -1,5 +1,5 @@
-# 把 31 条素材的 md 与目录描述排成一份 docx，方便在飞书里读。
-# 用法: /opt/data/venvs/fonts/bin/python scripts/build-materials-doc.py 输出.docx
+# 把全部素材的 md 与目录描述排成一份 docx 与 HTML，方便离线阅读。
+# 用法: npm run materials-doc  或  python scripts/build-materials-doc.py 输出.docx
 import json, re, sys
 from pathlib import Path
 from docx import Document
@@ -59,10 +59,9 @@ def md_blocks(text):
     if cur: blocks.append(cur)
     return blocks
 
-doc.add_heading('jeffy-design 素材规范', level=1)
-para('31 条素材，一条一页。每页含头部字段、目录描述、语义、绘制、可调整、不适用规则、验收与示意图。', 9.5, color=(0x66,0x66,0x66))
-
 ids = sorted(p.stem for p in (root / 'assets/materials').glob('*.md'))
+doc.add_heading('jeffy-design 素材规范', level=1)
+para(f'{len(ids)} 条素材，一条一页。每页含头部字段、目录描述、语义、绘制、可调整、不适用规则、验收与示意图。', 9.5, color=(0x66,0x66,0x66))
 for mid in ids:
     md = (root / f'assets/materials/{mid}.md').read_text(encoding='utf-8')
     head = dict(re.findall(r'^(\w+): (.+)$', md.split('---')[2] if False else md.split('---')[1], re.M))
@@ -102,7 +101,7 @@ parts = ['<!doctype html><meta charset="utf-8"><style>',
          'h2{font-size:16px;margin:16px 0 6px;color:#002FA7}',
          '.meta{font-size:12.5px;color:#666;margin:2px 0}.meta b{color:#333;font-weight:600}',
          'p{margin:6px 0}img{width:100%;border:1px solid #eee;margin:10px 0}',
-         '</style><h1>jeffy-design 素材规范</h1><p class=meta>31 条素材，一条一页。</p>']
+         f'</style><h1>jeffy-design 素材规范</h1><p class=meta>{len(ids)} 条素材，一条一页。</p>']
 for mid in ids:
     md = (root / f'assets/materials/{mid}.md').read_text(encoding='utf-8')
     head = dict(re.findall(r'^(\w+): (.+)$', md.split('---')[1], re.M))

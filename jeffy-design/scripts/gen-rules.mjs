@@ -1,12 +1,12 @@
 // 从 contract.json 生成规则清单，写进 docs/素材规则.md 的「规则清单」段。
-// 手写正文保留，只有这张表由脚本维护，避免条数和状态漂移。
+// 用法 node scripts/gen-rules.mjs [--check]
 import { readFileSync, writeFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
+import { loadContract, PROJECT_ROOT } from '../lib/constants.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const contract = JSON.parse(readFileSync(resolve(root, 'lib/composition/contract.json'), 'utf8'));
-const docPath = resolve(root, 'docs/素材规则.md');
+const checkOnly = process.argv.includes('--check');
+const contract = loadContract();
+const docPath = resolve(PROJECT_ROOT, 'docs/素材规则.md');
 const doc = readFileSync(docPath, 'utf8');
 
 const checked = contract.rules.filter((r) => r.checked).length;
@@ -33,5 +33,15 @@ if (doc.includes(start)) {
   const anchor = doc.indexOf('\n## ');
   next = anchor === -1 ? doc + '\n\n' + table + '\n' : doc.slice(0, anchor) + '\n\n' + table + '\n' + doc.slice(anchor);
 }
-writeFileSync(docPath, next);
-console.log(`规则清单已写入：${contract.rules.length} 条，其中 ${checked} 条有自动检查`);
+
+if (checkOnly) {
+  if (next !== doc) {
+    console.error('docs/素材规则.md 与 lib/composition/contract.json 不一致，运行 npm run gen:rules 重新生成。');
+    process.exitCode = 1;
+  } else {
+    console.log(`规则清单一致：${contract.rules.length} 条，其中 ${checked} 条有自动检查`);
+  }
+} else {
+  writeFileSync(docPath, next);
+  console.log(`规则清单已写入：${contract.rules.length} 条，其中 ${checked} 条有自动检查`);
+}

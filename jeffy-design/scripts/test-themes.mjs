@@ -222,8 +222,7 @@ await withBrowser(async (browser) => {
     JSON.stringify(
       {
         results,
-        scope:
-          '12个静态区域适配器 × 克莱因蓝主题；字体角色、线宽、轮廓、圆角、居中、容量及缺失配置；不验证动效或任意布局。',
+        scope: `${Object.keys(registry).length} 个静态区域适配器 × ${themes.join(' / ')} 主题；字体角色、线宽、轮廓、圆角、居中、容量及缺失配置；不验证动效或任意布局。`,
       },
       null,
       2,
