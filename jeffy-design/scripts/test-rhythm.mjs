@@ -1,28 +1,21 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import assert from 'node:assert/strict';
-import { loadChromium, findChrome } from '../lib/browser.mjs';
-import { resolveTheme } from '../lib/theming/resolve.mjs';
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+import { getDefaultThemeName, PROJECT_ROOT } from '../lib/constants.mjs';
+import { withBrowser } from '../lib/browser.mjs';
+import { loadResolvedTheme } from '../lib/theming/resolve.mjs';
+import { readConcatenatedScripts } from '../lib/composition/bundle.mjs';
+const root = PROJECT_ROOT;
 const out = join(root, 'build/rhythm');
+const updateSpecimens = process.argv.includes('--update');
 mkdirSync(out, { recursive: true });
-const theme = resolveTheme(
-  JSON.parse(readFileSync(join(root, 'themes/simple-line.json'))),
-  JSON.parse(readFileSync(join(root, 'lib/theming/defaults.json'))),
-  'mono',
-);
-const paths = [
-  'lib/theming/drawing-fonts.js',
-  'lib/kit/legend.js',
-  'lib/kit/unit.js',
-  'lib/kit/axis.js',
-  'lib/theming/drawing.js',
-  'lib/theming/renderers.js',
-];
-const source = paths.map((p) => readFileSync(join(root, p), 'utf8')).join('\n');
-const sample = join(root, 'assets/materials/specimens/BAR-001-rhythm.html');
+const theme = loadResolvedTheme(getDefaultThemeName(), 'mono');
+const source = readConcatenatedScripts();
+const sample = updateSpecimens
+  ? join(root, 'assets/materials/specimens/BAR-001-rhythm.html')
+  : join(out, 'BAR-001-rhythm.html');
 const html = `<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>随机分节 · BAR-001</title><style>body{margin:24px;background:#eee}main{width:960px;background:#${theme.colors.paper};margin:auto}svg{display:block}</style><main class="jd-component"><svg id="chart"></svg></main><script>window.compositionInput=${JSON.stringify({ theme })};</script><script>${source}</script><script>window.sampleData={metric:'指标',unit:'单位',data:[86,74,60,48].map((v,i)=>({label:'ABCD'[i],values:[v]}))};ThemeDrawing.fonts(document,compositionInput.theme).then(()=>{ThemeRenderers.render(document.querySelector('svg'),sampleData,{kind:'rhythm',direction:'horizontal',widthRatio:.68},compositionInput.theme,{width:960,height:540},'BAR-001');window.renderComplete=true})</script><script>${readFileSync(join(root, 'lib/composition/interaction.js'), 'utf8')}</script></html>`;
 const raw = join(out, 'reference.raw.html');
 writeFileSync(raw, html);
@@ -30,9 +23,8 @@ const embedded = spawnSync(process.execPath, [join(root, 'scripts/embed-fonts.mj
   encoding: 'utf8',
 });
 if (embedded.status) throw Error(embedded.stderr);
-const browser = await loadChromium().launch({ executablePath: findChrome() });
 const results = [];
-try {
+await withBrowser(async (browser) => {
   const page = await browser.newPage({ viewport: { width: 1040, height: 700 } });
   await page.goto(pathToFileURL(sample).href + '?static=1');
   await page.waitForFunction(() => window.renderComplete);
@@ -161,12 +153,16 @@ try {
   });
   assert.deepEqual(errors, { invalid: 'DATA', negative: 'DATA', capacity: 'CAPACITY', grouped: 'UNSUPPORTED' });
   results.push({ errors });
-  await page.locator('main').screenshot({ path: join(root, 'assets/materials/specimens/BAR-001-rhythm.png') });
+  const pngOut = updateSpecimens
+    ? join(root, 'assets/materials/specimens/BAR-001-rhythm.png')
+    : join(out, 'BAR-001-rhythm.png');
+  const jsonOut = updateSpecimens
+    ? join(root, 'assets/materials/specimens/BAR-001-rhythm.validation.json')
+    : join(out, 'BAR-001-rhythm.validation.json');
+  await page.locator('main').screenshot({ path: pngOut });
   writeFileSync(
-    join(root, 'assets/materials/specimens/BAR-001-rhythm.validation.json'),
+    jsonOut,
     JSON.stringify({ scope: '单系列随机分节；横纵、零值、小数、六类、主题及数据/容量反例', results }, null, 2),
   );
   console.log(`${results.length} rhythm scenarios passed`);
-} finally {
-  await browser.close();
-}
+});

@@ -5,6 +5,7 @@ import { resolve, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { getDefaultThemeName, loadThemeConfig, PROJECT_ROOT, readJson } from '../lib/constants.mjs';
+import { visualBaselineSourceFiles } from '../lib/composition/bundle.mjs';
 import { withBrowser } from '../lib/browser.mjs';
 
 const root = PROJECT_ROOT;
@@ -101,15 +102,7 @@ const browserVersion = await withBrowser(async (browser) => {
   return browser.version();
 });
 const fingerprint = createHash('sha256');
-for (const file of [
-  'lib/theming/renderers.js',
-  'lib/theming/drawing.js',
-  'lib/composition/runtime.js',
-  'scripts/build-specimen.mjs',
-  'scripts/fonts.lock.json',
-  'themes/' + themeName + '.json',
-  ...['axis', 'legend', 'layout', 'unit', 'line-labels'].map((n) => 'lib/kit/' + n + '.js'),
-])
+for (const file of visualBaselineSourceFiles(themeName))
   fingerprint.update(file).update(readFileSync(join(root, file)));
 const report = {
   theme: themeName,

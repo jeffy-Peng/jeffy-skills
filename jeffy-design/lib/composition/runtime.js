@@ -1,10 +1,24 @@
 (async () => {
-  const { deck, theme, adapters, kit, lineLabels, themeDrawing, themeRenderers, fontCheck } = window.compositionInput,
+  const { deck, theme, adapters } = window.compositionInput,
     roles = Object.fromEntries(theme.scale.map((x) => [x.role, x])),
     reports = [];
   const issue = (code, message, extra = {}) => ({ code, message, ...extra });
   const overlap = (a, b, g = 0) =>
     a.x < b.x + b.width - g && a.x + a.width > b.x + g && a.y < b.y + b.height - g && a.y + a.height > b.y + g;
+  const isInsideBox = (box, container) =>
+    box.x >= container.x &&
+    box.y >= container.y &&
+    box.x + box.width <= container.x + container.width &&
+    box.y + box.height <= container.y + container.height;
+  const resolvePageRegions = (typeSpec) =>
+    typeSpec?.regions || {
+      title: theme.page.title,
+      rule: theme.page.headerRule,
+      footerRule: theme.page.footerRule,
+      content: theme.page.content,
+      source: theme.page.source,
+      pageNo: theme.page.pageNo,
+    };
   function textBlock(parent, id, text, box, role = 'body') {
     const r = roles[role];
     if (!r) throw Error('未知主题角色 ' + role);
@@ -45,42 +59,33 @@
       r = roles[spec.labelRole || 'pill'];
     if (!r) return { ok: false, issues: [issue('THEME', '标签角色不存在')] };
     // 在当前文档挂载，沿用主题字体与统一交互。
-    const frame = document.createElement('div');
-    frame.className = 'component jd-component';
-    frame.style.cssText = `position:relative;width:${spec.box.width}px;height:${spec.box.height}px;font-size:${roles.body.size}px`;
-    frame.innerHTML = '<svg></svg><div id="table"></div>';
-    host.append(frame);
-    const doc = frame;
+    const container = document.createElement('div');
+    container.className = 'component jd-component';
+    container.style.cssText = `position:relative;width:${spec.box.width}px;height:${spec.box.height}px;font-size:${roles.body.size}px`;
+    container.innerHTML = '<svg></svg><div id="table"></div>';
+    host.append(container);
     await document.fonts.ready;
-    window.__fontMetrics = (window.compositionInput && window.compositionInput.fontMetrics) || {};
     if (a.renderer === 'theme-v1')
-      return await mountNative(
-        { contentWindow: window, contentDocument: document, container: frame },
-        { ...spec, options: { ...a.defaultOptions, ...spec.options }, archetype: a.archetype },
-      );
-    // 历史静态路径已移除：只保留 theme-v1 一套装配，旧图例实现不再参与生产流程。
+      return await mountNative(container, {
+        ...spec,
+        options: { ...a.defaultOptions, ...spec.options },
+        archetype: a.archetype,
+      });
     return { ok: false, material: spec.material, issues: [issue('UNSUPPORTED', '仅 theme-v1 适配器可装配')] };
   }
 
-  async function mountNative(frame, spec) {
+  async function mountNative(container, spec) {
     const EDGE = 2;
-    const win = frame.contentWindow;
-    // iframe 里没有 compositionInput，度量参考单独传进去。
-    win.__fontMetrics = (window.compositionInput && window.compositionInput.fontMetrics) || {};
-    const doc = frame.contentDocument,
-      issues = [];
+    const issues = [];
     let result;
     try {
       if (spec.labelRole && spec.labelRole !== 'pill')
         throw Object.assign(Error('theme-v1按元素语义选择角色，不支持labelRole覆盖'), { code: 'UNSUPPORTED' });
       if (spec.data.title?.trim())
         throw Object.assign(Error('组件标题需分配独立主题文字区域，不得静默丢弃'), { code: 'UNSUPPORTED' });
-      await win.ThemeDrawing.fonts(doc, theme);
-      win.__archetype = spec.archetype;
-      result = win.ThemeRenderers.render(
-        spec.material.startsWith('TABLE')
-          ? (frame.container || doc).querySelector('#table')
-          : (frame.container || doc).querySelector('svg'),
+      await window.ThemeDrawing.fonts(document, theme);
+      result = window.ThemeRenderers.render(
+        spec.material.startsWith('TABLE') ? container.querySelector('#table') : container.querySelector('svg'),
         spec.data,
         spec.options || {},
         theme,
@@ -96,10 +101,8 @@
       };
     }
     if (spec.material.startsWith('TABLE')) {
-      (frame.container || doc).querySelector('svg').remove();
-      // 去掉 iframe 后 doc.body 是整页，表格高度必须量组件容器本身。
-      const host = frame.container || doc.body;
-      const height = Math.max(host.scrollHeight, host.getBoundingClientRect().height);
+      container.querySelector('svg').remove();
+      const height = Math.max(container.scrollHeight, container.getBoundingClientRect().height);
       if (height > spec.box.height || result.minWidth > spec.box.width)
         issues.push(issue('CAPACITY', '表格主题字号下区域不足', { required: { width: result.minWidth, height } }));
       return {
@@ -113,17 +116,17 @@
         capability: 'theme-v1',
       };
     }
-    (frame.container || doc).querySelector('#table').remove();
-    const svg = (frame.container || doc).querySelector('svg');
+    container.querySelector('#table').remove();
+    const svg = container.querySelector('svg');
     svg.setAttribute('aria-label', spec.purpose);
     svg.setAttribute('role', 'img');
-    win.updateLineLabelMasks(svg, theme.materials.labelGap);
+    window.updateLineLabelMasks(svg, theme.materials.labelGap);
     const bounds = svg.getBoundingClientRect(),
       regions = [...svg.querySelectorAll('text')]
         .filter((t) => t.textContent.trim())
         .map((t) => {
           let b = t.getBoundingClientRect(),
-            css = win.getComputedStyle(t),
+            css = window.getComputedStyle(t),
             role = t.dataset.themeRole;
           return {
             text: t.textContent,
@@ -194,7 +197,7 @@
           issues.push(issue('THEME', '存在绕过主题的颜色', { value }));
       }
     // 交互靠属性契约：没有可聚焦的图形，页面就是死图，算缺陷。
-    if (!(frame.container || doc).querySelectorAll('[data-focus-key]').length)
+    if (!container.querySelectorAll('[data-focus-key]').length)
       issues.push(issue('INTERACTION', '没有可聚焦的图形，悬停不会生效'));
     return {
       ok: !issues.length,
@@ -213,15 +216,7 @@
     const formatName = deck.format || 'slide';
     const pageType = page.type || 'content';
     const typeSpec = theme.formats?.[formatName]?.types?.[pageType];
-    // 老主题没有 formats.types，字段名也不同，退回到旧 page 并统一命名。
-    const regions = typeSpec?.regions || {
-      title: theme.page.title,
-      rule: theme.page.headerRule,
-      footerRule: theme.page.footerRule,
-      content: theme.page.content,
-      source: theme.page.source,
-      pageNo: theme.page.pageNo,
-    };
+    const regions = resolvePageRegions(typeSpec);
     const report = {
       id: page.id,
       ok: false,
@@ -258,7 +253,6 @@
       const clean = label.replace(/[：:]$/, '');
       return clean + separator + value;
     };
-    const titleText = page.titleLabel ? withLabel(page.titleLabel, page.title) : page.title;
     if (!preview) {
       // 标签与标题分两段渲染：标签用弱色，标题用主色，中间给固定间距，避免全角冒号的空档。
       if (page.titleLabel) {
@@ -307,12 +301,7 @@
         report.issues.push(issue('CONTRACT', '组件缺少 ID、任务、目标区域或适配器'));
         continue;
       }
-      if (
-        c.box.x < regions.content.x ||
-        c.box.y < regions.content.y ||
-        c.box.x + c.box.width > regions.content.x + regions.content.width ||
-        c.box.y + c.box.height > regions.content.y + regions.content.height
-      )
+      if (!isInsideBox(c.box, regions.content))
         report.issues.push(issue('CAPACITY', '组件侵入页眉页脚或越界', { component: c.id }));
       occupied.push({ id: c.id, ...c.box });
       const host = document.createElement('div');
@@ -325,12 +314,7 @@
       report.issues.push(...response.issues.map((v) => ({ ...v, component: c.id })));
     }
     for (const t of page.text || []) {
-      if (
-        t.box.x < regions.content.x ||
-        t.box.y < regions.content.y ||
-        t.box.x + t.box.width > regions.content.x + regions.content.width ||
-        t.box.y + t.box.height > regions.content.y + regions.content.height
-      )
+      if (!isInsideBox(t.box, regions.content))
         report.issues.push(issue('CAPACITY', '文字侵入页眉页脚或越界', { block: t.id }));
       occupied.push({ id: t.id, ...t.box });
       textBlock(sheet, t.id, t.text, t.box, t.role || 'body');
